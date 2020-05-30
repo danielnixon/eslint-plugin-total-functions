@@ -6,3 +6,13 @@
 
 [![dependencies Status](https://david-dm.org/danielnixon/eslint-plugin-total-functions/status.svg)](https://david-dm.org/danielnixon/eslint-plugin-total-functions)
 [![devDependencies Status](https://david-dm.org/danielnixon/eslint-plugin-total-functions/dev-status.svg)](https://david-dm.org/danielnixon/eslint-plugin-total-functions?type=dev)
+
+## Installation
+
+```sh
+# yarn
+yarn add eslint-plugin-total-functions
+
+# npm
+npm install eslint-plugin-total-functions
+```
