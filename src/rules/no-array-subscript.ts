@@ -12,7 +12,7 @@ const noArraySubscript: RuleModule<"errorStringGeneric", readonly []> = {
       category: "Possible Errors" as const,
       description: "Array subscript access is not type-safe in TypeScript.",
       recommended: "error",
-      url: "https://github.com/danielnixon/total-functions",
+      url: "https://github.com/danielnixon/eslint-plugin-total-functions",
     },
     messages: {
       errorStringGeneric:
