@@ -42,6 +42,8 @@ module.exports = {
 
 ```
 
+Alternatively you can configure individual rules separately (see below).
+
 ## Rules
 
 ### total-functions/no-array-subscript
