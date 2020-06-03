@@ -46,7 +46,7 @@ module.exports = {
 
 ### total-functions/no-array-subscript
 
-Bans array subscript access. See [TypeScript issue #13778](https://github.com/Microsoft/TypeScript/issues/13778) for the corresponding issue and [total-functions](https://github.com/danielnixon/total-functions) for a safe (total) alternative.
+Bans array subscript access. See [TypeScript issue #13778](https://github.com/Microsoft/TypeScript/issues/13778) for the corresponding issue and [total-functions](https://github.com/danielnixon/total-functions#get-type-safe-array-index-operator) for a safe (total) alternative.
 
 # See Also
 * https://github.com/danielnixon/readonly-types
