@@ -52,6 +52,10 @@ Bans array subscript access. See [TypeScript issue #13778](https://github.com/Mi
 
 There are other ways to avoid this issue, such as [fp-ts's lookup](https://gcanti.github.io/fp-ts/modules/Array.ts.html#lookup), but the `get` function from total-functions is smart enough to exclude `undefined` when dealing with tuples and objects.
 
+### total-functions/no-array-destructuring
+
+Bans array destructuring. It is unsafe for the same reason as discussed above.
+
 # See Also
 * https://github.com/danielnixon/readonly-types
 * https://github.com/danielnixon/total-functions
