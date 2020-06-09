@@ -35,6 +35,12 @@ ruleTester.run("no-array-destructuring", rule, {
       code:
         "const array = [0, 1, 2] as [number, ...number[]]; const [foo] = array;",
     },
+    // Array destructuring when array type contains undefined.
+    {
+      filename: "file.ts",
+      code:
+        "const arr = [0, 1, 2] as Array<number | undefined>; const [foo] = arr;",
+    },
   ],
   invalid: [
     // Destructuring a regular array, even if within range at runtime.
@@ -77,19 +83,6 @@ ruleTester.run("no-array-destructuring", rule, {
       filename: "file.ts",
       code:
         "const array = [0, 1, 2] as [number, ...number[]]; const [foo, bar, baz, qux] = array;",
-      errors: [
-        {
-          messageId: "errorStringGeneric",
-          type: AST_NODE_TYPES.ArrayPattern,
-        },
-      ],
-    },
-    // Array destructuring when array type contains undefined.
-    // TODO: this should be valid.
-    {
-      filename: "file.ts",
-      code:
-        "const arr = [0, 1, 2] as Array<number | undefined>; const [foo] = arr;",
       errors: [
         {
           messageId: "errorStringGeneric",
