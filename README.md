@@ -48,13 +48,15 @@ Alternatively you can configure individual rules separately (see below).
 
 ### total-functions/no-array-subscript
 
-Bans array subscript access. See [TypeScript issue #13778](https://github.com/Microsoft/TypeScript/issues/13778) for the corresponding issue and [total-functions](https://github.com/danielnixon/total-functions#get-type-safe-array-index-operator) for a safe (total) alternative.
+Bans unsafe array subscript access. See [TypeScript issue #13778](https://github.com/Microsoft/TypeScript/issues/13778) for the corresponding issue and [total-functions](https://github.com/danielnixon/total-functions#get-type-safe-array-index-operator) for a safe (total) alternative.
+
+Tuples and (non-record) object are allowed.
 
 There are other ways to avoid this issue, such as [fp-ts's lookup](https://gcanti.github.io/fp-ts/modules/Array.ts.html#lookup), but the `get` function from total-functions is smart enough to exclude `undefined` when dealing with tuples and objects.
 
 ### total-functions/no-array-destructuring
 
-Bans array destructuring. It is unsafe for the same reason as discussed above.
+Bans unsafe array destructuring. It is unsafe for the same reason as discussed above. Destructuring tuples is allowed, as long as you're within the length of the tuple.
 
 # See Also
 * https://github.com/danielnixon/readonly-types

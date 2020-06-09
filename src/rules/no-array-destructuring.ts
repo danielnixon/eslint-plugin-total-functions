@@ -1,4 +1,6 @@
 import { RuleModule } from "@typescript-eslint/experimental-utils/dist/ts-eslint";
+import { ESLintUtils } from "@typescript-eslint/experimental-utils";
+import { isTupleTypeReference } from "tsutils";
 
 /**
  * An ESLint rule to ban array destructuring, which is not well-typed in TypeScript.
@@ -17,19 +19,34 @@ const noArrayDestructuring: RuleModule<"errorStringGeneric", readonly []> = {
     },
     schema: [],
   },
-  create: (context) => ({
-    // eslint-disable-next-line functional/no-return-void
-    ArrayPattern: (node): void => {
-      // TODO leverage type information here.
-      // https://github.com/typescript-eslint/typescript-eslint#can-we-write-rules-which-leverage-type-information
+  create: (context) => {
+    const parserServices = ESLintUtils.getParserServices(context);
+    const checker = parserServices.program.getTypeChecker();
 
-      // eslint-disable-next-line functional/no-expression-statement
-      context.report({
-        node: node,
-        messageId: "errorStringGeneric",
-      });
-    },
-  }),
+    return {
+      // eslint-disable-next-line functional/no-return-void
+      ArrayPattern: (node): void => {
+        const tsNode = parserServices.esTreeNodeToTSNodeMap.get(node);
+        const type = checker.getTypeAtLocation(tsNode);
+
+        // eslint-disable-next-line functional/no-conditional-statement
+        if (
+          isTupleTypeReference(type) &&
+          node.elements.length <= type.target.minLength
+        ) {
+          // Allow tuples (whether partial or not) if the indexes
+          // we're destructuring are all know to be safe at compile time.
+          return;
+        }
+
+        // eslint-disable-next-line functional/no-expression-statement
+        context.report({
+          node: node,
+          messageId: "errorStringGeneric",
+        });
+      },
+    };
+  },
 };
 
 export default noArrayDestructuring;

@@ -1,4 +1,6 @@
-import { RuleModule } from "@typescript-eslint/experimental-utils/dist/ts-eslint";
+import type { RuleModule } from "@typescript-eslint/experimental-utils/dist/ts-eslint";
+import { ESLintUtils } from "@typescript-eslint/experimental-utils";
+import { isTupleTypeReference, isObjectType } from "tsutils";
 
 /**
  * An ESLint rule to ban usage of the array index operator, which is not well-typed in TypeScript.
@@ -20,21 +22,53 @@ const noArraySubscript: RuleModule<"errorStringGeneric", readonly []> = {
     },
     schema: [],
   },
-  create: (context) => ({
-    // eslint-disable-next-line functional/no-return-void
-    MemberExpression: (node): void => {
-      // TODO leverage type information here.
-      // https://github.com/typescript-eslint/typescript-eslint#can-we-write-rules-which-leverage-type-information
-      // eslint-disable-next-line functional/no-conditional-statement
-      if (node.computed) {
+  create: (context) => {
+    const parserServices = ESLintUtils.getParserServices(context);
+    const checker = parserServices.program.getTypeChecker();
+
+    return {
+      // eslint-disable-next-line functional/no-return-void
+      MemberExpression: (node): void => {
+        // eslint-disable-next-line functional/no-conditional-statement
+        if (!node.computed) {
+          // Allow non-computer (regular) property access.
+          return;
+        }
+
+        const tsNode = parserServices.esTreeNodeToTSNodeMap.get(node.object);
+        const type = checker.getTypeAtLocation(tsNode);
+
+        // eslint-disable-next-line functional/no-conditional-statement
+        if (
+          isTupleTypeReference(type) &&
+          node.property.type === "Literal" &&
+          typeof node.property.value === "number" &&
+          node.property.value <= type.target.minLength
+        ) {
+          // Allow tuples (with or without a ...rest element) if
+          // the index we're accessing is know to be safe at compile time.
+          return;
+        }
+
+        // eslint-disable-next-line functional/no-conditional-statement
+        if (
+          isObjectType(type) &&
+          node.property.type === "Literal" &&
+          typeof node.property.value === "string" &&
+          type.getProperty(node.property.value) !== undefined
+        ) {
+          // Allow object subscript access when it is known to be safe (this excludes records).
+          return;
+        }
+
         // eslint-disable-next-line functional/no-expression-statement
         context.report({
           node: node,
           messageId: "errorStringGeneric",
         });
-      }
-    },
-  }),
+      },
+    };
+  },
 };
 
 export default noArraySubscript;
