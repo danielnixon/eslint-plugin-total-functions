@@ -56,7 +56,7 @@ There are other ways to avoid this issue, such as [fp-ts's lookup](https://gcant
 
 ### total-functions/no-array-destructuring
 
-Bans unsafe array destructuring. It is unsafe for the same reason as discussed above. Destructuring tuples is allowed, as long as you're within the length of the tuple.
+Bans unsafe array and object destructuring. Destructuring tuples is allowed, as long as you're within the length of the tuple.
 
 # See Also
 * https://github.com/danielnixon/readonly-types
