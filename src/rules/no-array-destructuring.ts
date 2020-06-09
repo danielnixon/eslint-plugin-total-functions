@@ -13,8 +13,9 @@ const noArrayDestructuring: RuleModule<"errorStringGeneric", readonly []> = {
   meta: {
     type: "problem",
     docs: {
-      category: "Possible Errors" as const,
-      description: "Array destructuring is not type-safe in TypeScript.",
+      category: "Possible Errors",
+      description:
+        "Array and object destructuring are not type-safe in TypeScript.",
       recommended: "error",
       url: "https://github.com/danielnixon/eslint-plugin-total-functions",
     },
