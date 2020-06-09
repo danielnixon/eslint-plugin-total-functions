@@ -1,5 +1,8 @@
 import { RuleModule } from "@typescript-eslint/experimental-utils/dist/ts-eslint";
-import { ESLintUtils } from "@typescript-eslint/experimental-utils";
+import {
+  ESLintUtils,
+  AST_NODE_TYPES,
+} from "@typescript-eslint/experimental-utils";
 import { isTupleTypeReference } from "tsutils";
 import ts from "typescript";
 
@@ -16,8 +19,7 @@ const noArrayDestructuring: RuleModule<"errorStringGeneric", readonly []> = {
       url: "https://github.com/danielnixon/eslint-plugin-total-functions",
     },
     messages: {
-      errorStringGeneric:
-        "This array destructuring is not type-safe in TypeScript.",
+      errorStringGeneric: "This destructuring is not type-safe in TypeScript.",
     },
     schema: [],
   },
@@ -52,6 +54,30 @@ const noArrayDestructuring: RuleModule<"errorStringGeneric", readonly []> = {
           typeParts.find((t) => t.flags & ts.TypeFlags.Undefined) !== undefined
         ) {
           // Allow destructuring if undefined is already in the array type.
+          return;
+        }
+
+        // eslint-disable-next-line functional/no-expression-statement
+        context.report({
+          node: node,
+          messageId: "errorStringGeneric",
+        });
+      },
+      // eslint-disable-next-line functional/no-return-void
+      ObjectPattern: (node): void => {
+        const tsNode = parserServices.esTreeNodeToTSNodeMap.get(node);
+        const type = checker.getTypeAtLocation(tsNode);
+
+        // True if every element we're destructuring is known to exist at compile time (or is the rest element).
+        const isSafe = node.properties.every(
+          (prop) =>
+            prop.type === AST_NODE_TYPES.RestElement ||
+            (prop.key.type === AST_NODE_TYPES.Identifier &&
+              type.getProperty(prop.key.name) !== undefined)
+        );
+
+        // eslint-disable-next-line functional/no-conditional-statement
+        if (isSafe) {
           return;
         }
 

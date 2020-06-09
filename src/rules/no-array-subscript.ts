@@ -1,5 +1,8 @@
 import type { RuleModule } from "@typescript-eslint/experimental-utils/dist/ts-eslint";
-import { ESLintUtils } from "@typescript-eslint/experimental-utils";
+import {
+  ESLintUtils,
+  AST_NODE_TYPES,
+} from "@typescript-eslint/experimental-utils";
 import { isTupleTypeReference, isObjectType } from "tsutils";
 import ts from "typescript";
 
@@ -46,10 +49,7 @@ const noArraySubscript: RuleModule<"errorStringGeneric", readonly []> = {
             ? numberIndexType.types
             : [numberIndexType];
           // eslint-disable-next-line functional/no-conditional-statement
-          if (
-            typeParts.find((t) => t.flags & ts.TypeFlags.Undefined) !==
-            undefined
-          ) {
+          if (typeParts.some((t) => t.flags & ts.TypeFlags.Undefined)) {
             // Allow subscript access if undefined is already in the array type.
             return;
           }
@@ -58,7 +58,7 @@ const noArraySubscript: RuleModule<"errorStringGeneric", readonly []> = {
         // eslint-disable-next-line functional/no-conditional-statement
         if (
           isTupleTypeReference(type) &&
-          node.property.type === "Literal" &&
+          node.property.type === AST_NODE_TYPES.Literal &&
           typeof node.property.value === "number" &&
           node.property.value <= type.target.minLength
         ) {
@@ -70,7 +70,7 @@ const noArraySubscript: RuleModule<"errorStringGeneric", readonly []> = {
         // eslint-disable-next-line functional/no-conditional-statement
         if (
           isObjectType(type) &&
-          node.property.type === "Literal" &&
+          node.property.type === AST_NODE_TYPES.Literal &&
           typeof node.property.value === "string" &&
           type.getProperty(node.property.value) !== undefined
         ) {

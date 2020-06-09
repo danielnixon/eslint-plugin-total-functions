@@ -13,11 +13,6 @@ const ruleTester = new RuleTester({
 // eslint-disable-next-line functional/no-expression-statement
 ruleTester.run("no-array-destructuring", rule, {
   valid: [
-    // Destructuring a regular array as an object.
-    {
-      filename: "file.ts",
-      code: "const arr = [0, 1, 2] as number[]; const { length } = arr;",
-    },
     // Const array destructuring.
     {
       filename: "file.ts",
@@ -40,6 +35,16 @@ ruleTester.run("no-array-destructuring", rule, {
       filename: "file.ts",
       code:
         "const arr = [0, 1, 2] as Array<number | undefined>; const [foo] = arr;",
+    },
+    // Object destructuring (all fields exist).
+    {
+      filename: "file.ts",
+      code: "const obj = { 'a': 'a' }; const { a } = obj;",
+    },
+    // Object destructuring (with rest element).
+    {
+      filename: "file.ts",
+      code: "const obj = { 'a': 'a' }; const { a, ...rest } = obj;",
     },
   ],
   invalid: [
@@ -87,6 +92,29 @@ ruleTester.run("no-array-destructuring", rule, {
         {
           messageId: "errorStringGeneric",
           type: AST_NODE_TYPES.ArrayPattern,
+        },
+      ],
+    },
+    // Object destructuring (field doesn't exist).
+    {
+      filename: "file.ts",
+      code: "const obj = { 'a': 'a' }; const { b } = obj;",
+      errors: [
+        {
+          messageId: "errorStringGeneric",
+          type: AST_NODE_TYPES.ObjectPattern,
+        },
+      ],
+    },
+    // Object destructuring (record).
+    {
+      filename: "file.ts",
+      code:
+        "const obj = { a: 'a' } as Record<string, string>; const { a } = obj;",
+      errors: [
+        {
+          messageId: "errorStringGeneric",
+          type: AST_NODE_TYPES.ObjectPattern,
         },
       ],
     },
