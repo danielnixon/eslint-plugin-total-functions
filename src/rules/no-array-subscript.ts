@@ -31,7 +31,7 @@ const noArraySubscript: RuleModule<"errorStringGeneric", readonly []> = {
       MemberExpression: (node): void => {
         // eslint-disable-next-line functional/no-conditional-statement
         if (!node.computed) {
-          // Allow non-computer (regular) property access.
+          // Allow non-computed (regular) property access.
           return;
         }
 
