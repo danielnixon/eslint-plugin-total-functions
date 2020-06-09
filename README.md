@@ -10,14 +10,16 @@
 
 An ESLint plugin to enforce the use of total functions (and prevent the use of [partial functions](https://wiki.haskell.org/Partial_functions)) in TypeScript.
 
+Intended to be used with [strictNullChecks](https://www.typescriptlang.org/docs/handbook/compiler-options.html) enabled.
+
 ## Installation
 
 ```sh
 # yarn
-yarn add eslint-plugin-total-functions
+yarn add --dev eslint-plugin-total-functions
 
 # npm
-npm install eslint-plugin-total-functions
+npm install eslint-plugin-total-functions --save-dev
 ```
 
 ## Setup
