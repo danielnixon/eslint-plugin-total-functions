@@ -1,6 +1,7 @@
 import type { RuleModule } from "@typescript-eslint/experimental-utils/dist/ts-eslint";
 import { ESLintUtils } from "@typescript-eslint/experimental-utils";
 import { isTupleTypeReference, isObjectType } from "tsutils";
+import ts from "typescript";
 
 /**
  * An ESLint rule to ban usage of the array index operator, which is not well-typed in TypeScript.
@@ -18,7 +19,7 @@ const noArraySubscript: RuleModule<"errorStringGeneric", readonly []> = {
     },
     messages: {
       errorStringGeneric:
-        "Array and object subscript access is not type-safe in TypeScript.",
+        "This subscript access is not type-safe in TypeScript.",
     },
     schema: [],
   },
@@ -37,6 +38,22 @@ const noArraySubscript: RuleModule<"errorStringGeneric", readonly []> = {
 
         const tsNode = parserServices.esTreeNodeToTSNodeMap.get(node.object);
         const type = checker.getTypeAtLocation(tsNode);
+
+        const numberIndexType = type.getNumberIndexType();
+        // eslint-disable-next-line functional/no-conditional-statement
+        if (numberIndexType !== undefined) {
+          const typeParts = numberIndexType.isUnion()
+            ? numberIndexType.types
+            : [numberIndexType];
+          // eslint-disable-next-line functional/no-conditional-statement
+          if (
+            typeParts.find((t) => t.flags & ts.TypeFlags.Undefined) !==
+            undefined
+          ) {
+            // Allow subscript access if undefined is already in the array type.
+            return;
+          }
+        }
 
         // eslint-disable-next-line functional/no-conditional-statement
         if (

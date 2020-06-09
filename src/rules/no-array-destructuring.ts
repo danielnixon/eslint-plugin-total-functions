@@ -15,7 +15,8 @@ const noArrayDestructuring: RuleModule<"errorStringGeneric", readonly []> = {
       url: "https://github.com/danielnixon/eslint-plugin-total-functions",
     },
     messages: {
-      errorStringGeneric: "Array destructuring is not type-safe in TypeScript.",
+      errorStringGeneric:
+        "This array destructuring is not type-safe in TypeScript.",
     },
     schema: [],
   },
