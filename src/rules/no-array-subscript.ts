@@ -3,13 +3,12 @@ import {
   ESLintUtils,
   AST_NODE_TYPES,
 } from "@typescript-eslint/experimental-utils";
-import { isTupleTypeReference, isObjectType } from "tsutils";
+import { isTupleTypeReference } from "tsutils";
 import ts from "typescript";
 
 /**
- * An ESLint rule to ban usage of the array index operator, which is not well-typed in TypeScript.
+ * An ESLint rule to ban unsafe usage of the array/object index operator, which is not well-typed in TypeScript.
  * @see https://github.com/Microsoft/TypeScript/issues/13778
- * @see https://github.com/estree/estree/blob/master/es5.md#memberexpression
  */
 const noArraySubscript: RuleModule<"errorStringGeneric", readonly []> = {
   meta: {
@@ -64,13 +63,12 @@ const noArraySubscript: RuleModule<"errorStringGeneric", readonly []> = {
           node.property.value <= type.target.minLength
         ) {
           // Allow tuples (with or without a ...rest element) if
-          // the index we're accessing is know to be safe at compile time.
+          // the index we're accessing is known to be safe at compile time.
           return;
         }
 
         // eslint-disable-next-line functional/no-conditional-statement
         if (
-          isObjectType(type) &&
           node.property.type === AST_NODE_TYPES.Literal &&
           typeof node.property.value === "string" &&
           type.getProperty(node.property.value) !== undefined

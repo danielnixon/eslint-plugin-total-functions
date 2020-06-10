@@ -7,7 +7,7 @@ import { isTupleTypeReference } from "tsutils";
 import ts from "typescript";
 
 /**
- * An ESLint rule to ban array destructuring, which is not well-typed in TypeScript.
+ * An ESLint rule to ban unsafe array/object destructuring, which is not well-typed in TypeScript.
  */
 const noArrayDestructuring: RuleModule<"errorStringGeneric", readonly []> = {
   meta: {
