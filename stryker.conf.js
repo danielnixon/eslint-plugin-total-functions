@@ -7,6 +7,6 @@ module.exports = function(config) {
     transpilers: [],
     coverageAnalysis: "off",
     tsconfigFile: "tsconfig.json",
-    mutate: ["src/**/*.ts", "!src/**/*.test.ts"]
+    mutate: ["src/**/*.ts", "!src/**/*.test.ts", "!src/**/index.ts", "!src/configs/*.ts"]
   });
 };
