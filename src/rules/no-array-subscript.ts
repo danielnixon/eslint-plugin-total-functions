@@ -39,6 +39,16 @@ const noArraySubscript: RuleModule<"errorStringGeneric", readonly []> = {
           return;
         }
 
+        // eslint-disable-next-line functional/no-conditional-statement
+        if (
+          node.parent?.type === AST_NODE_TYPES.AssignmentExpression &&
+          node.parent.left === node
+        ) {
+          // This is the left hand side of an array assignment, so there's no partiality issue here.
+          // eslint-plugin-functional will catch the mutation.
+          return;
+        }
+
         const tsNode = parserServices.esTreeNodeToTSNodeMap.get(node.object);
         const type = checker.getTypeAtLocation(tsNode);
 

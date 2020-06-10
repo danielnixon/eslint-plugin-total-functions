@@ -51,6 +51,11 @@ ruleTester.run("no-array-subscript", rule, {
       filename: "file.ts",
       code: "const obj = { 'a': 'a' }; const foo = obj['a'];",
     },
+    // Array assignment (unwise, but not a partiality issue).
+    {
+      filename: "file.ts",
+      code: "const arr = [0, 1, 2]; arr[0] = 42;",
+    },
   ],
   invalid: [
     // Array subscript access.
@@ -129,19 +134,6 @@ ruleTester.run("no-array-subscript", rule, {
     {
       filename: "file.ts",
       code: "const arr = [0, 1, 2]; const foo: number | undefined = arr[0];",
-      errors: [
-        {
-          messageId: "errorStringGeneric",
-          type: AST_NODE_TYPES.MemberExpression,
-        },
-      ],
-    },
-    // Assignment to array index.
-    // TODO: this should be allowed because there is no partiality in this scenario
-    // (and eslint-plugin-functional will call you out on the mutation).
-    {
-      filename: "file.ts",
-      code: "const arr = [0, 1, 2]; arr[0] = 42;",
       errors: [
         {
           messageId: "errorStringGeneric",
