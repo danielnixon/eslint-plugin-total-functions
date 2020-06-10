@@ -41,7 +41,8 @@ const noArraySubscript: RuleModule<"errorStringGeneric", readonly []> = {
 
         // eslint-disable-next-line functional/no-conditional-statement
         if (
-          node.parent?.type === AST_NODE_TYPES.AssignmentExpression &&
+          node.parent !== undefined &&
+          node.parent.type === AST_NODE_TYPES.AssignmentExpression &&
           node.parent.left === node
         ) {
           // This is the left hand side of an array assignment, so there's no partiality issue here.
