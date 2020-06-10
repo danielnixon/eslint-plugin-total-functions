@@ -136,5 +136,18 @@ ruleTester.run("no-array-subscript", rule, {
         },
       ],
     },
+    // Assignment to array index.
+    // TODO: this should be allowed because there is no partiality in this scenario
+    // (and eslint-plugin-functional will call you out on the mutation).
+    {
+      filename: "file.ts",
+      code: "const arr = [0, 1, 2]; arr[0] = 42;",
+      errors: [
+        {
+          messageId: "errorStringGeneric",
+          type: AST_NODE_TYPES.MemberExpression,
+        },
+      ],
+    },
   ],
 });
