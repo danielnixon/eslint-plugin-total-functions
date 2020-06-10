@@ -50,15 +50,19 @@ Alternatively you can configure individual rules separately (see below).
 
 ### total-functions/no-array-subscript
 
-Bans unsafe array subscript access. See [TypeScript issue #13778](https://github.com/Microsoft/TypeScript/issues/13778) for the corresponding issue and [total-functions](https://github.com/danielnixon/total-functions#get-type-safe-array-index-operator) for a safe (total) alternative.
+Bans unsafe array and object subscript access. See [TypeScript issue #13778](https://github.com/Microsoft/TypeScript/issues/13778) for the corresponding issue and [total-functions](https://github.com/danielnixon/total-functions#get-type-safe-array-index-operator) for a safe (total) alternative.
 
 Tuples and (non-record) objects are allowed.
 
 There are other ways to avoid this issue, such as [fp-ts's lookup](https://gcanti.github.io/fp-ts/modules/Array.ts.html#lookup), but the `get` function from total-functions is smart enough to exclude `undefined` when dealing with tuples and objects.
 
+For examples of subscript access that this rule considers valid and invalid, see [no-array-subscript.test.ts](https://github.com/danielnixon/eslint-plugin-total-functions/blob/master/src/rules/no-array-subscript.test.ts).
+
 ### total-functions/no-array-destructuring
 
 Bans unsafe array and object destructuring. Destructuring tuples is allowed, as long as you're within the length of the tuple.
+
+For examples of destructuring that this rule considers valid and invalid, see [no-array-destructuring.test.ts](https://github.com/danielnixon/eslint-plugin-total-functions/blob/master/src/rules/no-array-destructuring.test.ts).
 
 # See Also
 * https://github.com/danielnixon/readonly-types
