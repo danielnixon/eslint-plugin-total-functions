@@ -1,9 +1,6 @@
 import rule from "./no-array-subscript";
 import { RuleTester } from "@typescript-eslint/experimental-utils/dist/ts-eslint";
 import { AST_NODE_TYPES } from "@typescript-eslint/experimental-utils/dist/ts-estree";
-// import * as path from "path";
-
-// import * as path from "path";
 
 const ruleTester = new RuleTester({
   parserOptions: {
@@ -107,6 +104,31 @@ ruleTester.run("no-array-subscript", rule, {
       filename: "file.ts",
       code:
         "const record = { foo: 'foo' } as Record<string, string>; const bar = record['foo'];",
+      errors: [
+        {
+          messageId: "errorStringGeneric",
+          type: AST_NODE_TYPES.MemberExpression,
+        },
+      ],
+    },
+    // Result immediately returned as type that includes undefined.
+    // TODO: ideally this could be allowed because the partiality isn't observable.
+    {
+      filename: "file.ts",
+      code:
+        "const last: <A>(array: ReadonlyArray<A>) => A | undefined = (a) => a[a.length - 1];",
+      errors: [
+        {
+          messageId: "errorStringGeneric",
+          type: AST_NODE_TYPES.MemberExpression,
+        },
+      ],
+    },
+    // Result immediately assigned to type that includes undefined.
+    // TODO: ideally this could be allowed because the partiality isn't observable.
+    {
+      filename: "file.ts",
+      code: "const arr = [0, 1, 2]; const foo: number | undefined = arr[0];",
       errors: [
         {
           messageId: "errorStringGeneric",
