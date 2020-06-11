@@ -200,12 +200,75 @@ ruleTester.run("no-array-subscript", rule, {
         },
       ],
     },
-    // Result immediately returned as type that includes undefined.
+    // Result returned from arrow function expression (the compact form) whose return type includes undefined.
     // TODO: ideally this could be allowed because the partiality isn't observable.
     {
       filename: "file.ts",
       code:
         "const last: <A>(array: ReadonlyArray<A>) => A | undefined = (a) => a[a.length - 1];",
+      errors: [
+        {
+          messageId: "errorStringGeneric",
+          type: AST_NODE_TYPES.MemberExpression,
+        },
+      ],
+    },
+    // Result returned from arrow function whose return type includes undefined.
+    // TODO: ideally this could be allowed because the partiality isn't observable.
+    {
+      filename: "file.ts",
+      code:
+        "const last: <A>(array: ReadonlyArray<A>) => A | undefined = (a) => { console.log('a'); return a[a.length - 1]; }",
+      errors: [
+        {
+          messageId: "errorStringGeneric",
+          type: AST_NODE_TYPES.MemberExpression,
+        },
+      ],
+    },
+    // Result returned from function whose return type includes undefined.
+    // TODO: ideally this could be allowed because the partiality isn't observable.
+    {
+      filename: "file.ts",
+      code:
+        "function last<A>(array: ReadonlyArray<A>): A | undefined { console.log('a'); return array[array.length - 1]; }",
+      errors: [
+        {
+          messageId: "errorStringGeneric",
+          type: AST_NODE_TYPES.MemberExpression,
+        },
+      ],
+    },
+    // Result returned from function (alternate syntax) whose return type includes undefined.
+    // TODO: ideally this could be allowed because the partiality isn't observable.
+    {
+      filename: "file.ts",
+      code:
+        "const last = function <A>(array: ReadonlyArray<A>): A | undefined { console.log('a'); return array[array.length - 1]; }",
+      errors: [
+        {
+          messageId: "errorStringGeneric",
+          type: AST_NODE_TYPES.MemberExpression,
+        },
+      ],
+    },
+    // Array access within an arrow function but not the return value;
+    {
+      filename: "file.ts",
+      code:
+        "const last: <A>(array: ReadonlyArray<A>) => A | undefined = (a) => { a[a.length - 1]; return undefined; }",
+      errors: [
+        {
+          messageId: "errorStringGeneric",
+          type: AST_NODE_TYPES.MemberExpression,
+        },
+      ],
+    },
+    // Array access within a function but not the return value;
+    {
+      filename: "file.ts",
+      code:
+        "function last<A>(array: ReadonlyArray<A>): A | undefined { array[array.length - 1]; return undefined; }",
       errors: [
         {
           messageId: "errorStringGeneric",
