@@ -29,6 +29,12 @@ ruleTester.run("no-array-subscript", rule, {
       code:
         "const arr = [0, 1, 2] as [number, number, number]; const foo = arr[0];",
     },
+    // Tuple (last element within range).
+    {
+      filename: "file.ts",
+      code:
+        "const arr = [0, 1, 2] as [number, number, number]; const foo = arr[2];",
+    },
     // Partial tuple (within range).
     {
       filename: "file.ts",
@@ -46,10 +52,20 @@ ruleTester.run("no-array-subscript", rule, {
       filename: "file.ts",
       code: "const arr = [] as Array<undefined>; const foo = arr[0];",
     },
-    // Object subscript property access.
+    // Object subscript property access (string).
     {
       filename: "file.ts",
       code: "const obj = { 'a': 'a' }; const foo = obj['a'];",
+    },
+    // Object subscript property access (number).
+    {
+      filename: "file.ts",
+      code: "const obj = { 100: 'a' }; const foo = obj[100];",
+    },
+    // Object subscript property access (symbol).
+    {
+      filename: "file.ts",
+      code: "const s = Symbol(); const obj = { [s]: 'a' }; const foo = obj[s];",
     },
     // Array assignment (unwise, but not a partiality issue).
     {
@@ -69,7 +85,19 @@ ruleTester.run("no-array-subscript", rule, {
         },
       ],
     },
-    // Partial tuple (outside range)
+    // Partial tuple (first element outside range)
+    {
+      filename: "file.ts",
+      code:
+        "const arr = [0, 1, 2] as [number, number, ...number[]]; const foo = arr[3];",
+      errors: [
+        {
+          messageId: "errorStringGeneric",
+          type: AST_NODE_TYPES.MemberExpression,
+        },
+      ],
+    },
+    // Partial tuple (well outside range)
     {
       filename: "file.ts",
       code:
@@ -93,10 +121,21 @@ ruleTester.run("no-array-subscript", rule, {
         },
       ],
     },
-    // Object subscript property access (invalid property name).
+    // Object subscript property access (invalid string property name).
     {
       filename: "file.ts",
       code: "const obj = { 'a': 'a' }; const foo = obj['b'];",
+      errors: [
+        {
+          messageId: "errorStringGeneric",
+          type: AST_NODE_TYPES.MemberExpression,
+        },
+      ],
+    },
+    // Object subscript property access (invalid number property name).
+    {
+      filename: "file.ts",
+      code: "const obj = { 100: 'a' }; const foo = obj[200];",
       errors: [
         {
           messageId: "errorStringGeneric",
@@ -134,6 +173,19 @@ ruleTester.run("no-array-subscript", rule, {
     {
       filename: "file.ts",
       code: "const arr = [0, 1, 2]; const foo: number | undefined = arr[0];",
+      errors: [
+        {
+          messageId: "errorStringGeneric",
+          type: AST_NODE_TYPES.MemberExpression,
+        },
+      ],
+    },
+    // Const array property access with non-literal key;
+    // TODO this should be valid.
+    {
+      filename: "file.ts",
+      code:
+        "const arr = [0, 1, 2] as const; const key = 0 as const; const foo = arr[key];",
       errors: [
         {
           messageId: "errorStringGeneric",

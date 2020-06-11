@@ -31,7 +31,7 @@ const noArraySubscript: RuleModule<"errorStringGeneric", readonly []> = {
     const checker = parserServices.program.getTypeChecker();
 
     return {
-      // eslint-disable-next-line functional/no-return-void
+      // eslint-disable-next-line functional/no-return-void, sonarjs/cognitive-complexity
       MemberExpression: (node): void => {
         // eslint-disable-next-line functional/no-conditional-statement
         if (!node.computed) {
@@ -52,6 +52,11 @@ const noArraySubscript: RuleModule<"errorStringGeneric", readonly []> = {
 
         const tsNode = parserServices.esTreeNodeToTSNodeMap.get(node.object);
         const type = checker.getTypeAtLocation(tsNode);
+
+        const propertyNode = parserServices.esTreeNodeToTSNodeMap.get(
+          node.property
+        );
+        const propertyType = checker.getTypeAtLocation(propertyNode);
 
         const numberIndexType = type.getNumberIndexType();
         // eslint-disable-next-line functional/no-conditional-statement
@@ -81,10 +86,18 @@ const noArraySubscript: RuleModule<"errorStringGeneric", readonly []> = {
         // eslint-disable-next-line functional/no-conditional-statement
         if (
           node.property.type === AST_NODE_TYPES.Literal &&
-          typeof node.property.value === "string" &&
-          type.getProperty(node.property.value) !== undefined
+          (typeof node.property.value === "string" ||
+            typeof node.property.value === "number") &&
+          type.getProperty(node.property.value.toString()) !== undefined
         ) {
           // Allow object subscript access when it is known to be safe (this excludes records).
+          return;
+        }
+
+        // eslint-disable-next-line functional/no-conditional-statement, @typescript-eslint/no-unsafe-member-access
+        if (propertyType.flags & ts.TypeFlags.ESSymbolLike) {
+          // Using array subscript with a symbol that isn't actually a property on this object
+          // will return `any`, so type-coverage and typescript-eslint's no-unsafe-assignment rule will catch it.
           return;
         }
 

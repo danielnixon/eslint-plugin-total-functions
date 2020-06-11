@@ -2,3 +2,4 @@ coverage
 dist
 yarn-error.log
 node_modules
+reports
