@@ -61,6 +61,34 @@ const noArraySubscript: RuleModule<"errorStringGeneric", readonly []> = {
         // eslint-disable-next-line functional/no-conditional-statement
         if (
           node.parent !== undefined &&
+          node.parent.type === AST_NODE_TYPES.VariableDeclarator &&
+          node.parent.id.typeAnnotation !== undefined &&
+          node.parent.id.typeAnnotation.typeAnnotation.type ===
+            AST_NODE_TYPES.TSUnionType
+        ) {
+          const typeAnnotationNode = parserServices.esTreeNodeToTSNodeMap.get(
+            node.parent.id.typeAnnotation.typeAnnotation
+          );
+          const typeAnnotationType = checker.getTypeAtLocation(
+            typeAnnotationNode
+          );
+
+          // eslint-disable-next-line functional/no-conditional-statement
+          if (
+            typeAnnotationType.isUnion() &&
+            typeAnnotationType.types.some(
+              (t) => t.flags & ts.TypeFlags.Undefined
+            )
+          ) {
+            // We're using the result of the array access to initialise something
+            // that happens to include undefined, so we can ignore the partiality.
+            return;
+          }
+        }
+
+        // eslint-disable-next-line functional/no-conditional-statement
+        if (
+          node.parent !== undefined &&
           node.parent.type === AST_NODE_TYPES.AssignmentExpression &&
           node.parent.right === node
         ) {

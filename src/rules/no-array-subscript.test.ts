@@ -78,12 +78,40 @@ ruleTester.run("no-array-subscript", rule, {
       code:
         "const arr = [0, 1, 2]; let foo: number | undefined = undefined; foo = arr[0];",
     },
+    // Result used to initialise a value that includes undefined.
+    {
+      filename: "file.ts",
+      code: "const arr = [0, 1, 2]; const foo: number | undefined = arr[0];",
+    },
   ],
   invalid: [
     // Array subscript access.
     {
       filename: "file.ts",
       code: "const arr = [0, 1, 2] as number[]; const foo = arr[0];",
+      errors: [
+        {
+          messageId: "errorStringGeneric",
+          type: AST_NODE_TYPES.MemberExpression,
+        },
+      ],
+    },
+    // Array subscript access with type annotation (single type).
+    {
+      filename: "file.ts",
+      code: "const arr = [0, 1, 2] as number[]; const foo: number = arr[0];",
+      errors: [
+        {
+          messageId: "errorStringGeneric",
+          type: AST_NODE_TYPES.MemberExpression,
+        },
+      ],
+    },
+    // Array subscript access with type annotation (union).
+    {
+      filename: "file.ts",
+      code:
+        "const arr = [0, 1, 2] as number[]; const foo: number | string = arr[0];",
       errors: [
         {
           messageId: "errorStringGeneric",
@@ -165,18 +193,6 @@ ruleTester.run("no-array-subscript", rule, {
     {
       filename: "file.ts",
       code: "const arr = [0, 1, 2]; let foo: number = 1; foo = arr[0];",
-      errors: [
-        {
-          messageId: "errorStringGeneric",
-          type: AST_NODE_TYPES.MemberExpression,
-        },
-      ],
-    },
-    // Result used to initialise a value that includes undefined.
-    // TODO: ideally this could be allowed because the partiality isn't observable.
-    {
-      filename: "file.ts",
-      code: "const arr = [0, 1, 2]; const foo: number | undefined = arr[0];",
       errors: [
         {
           messageId: "errorStringGeneric",
