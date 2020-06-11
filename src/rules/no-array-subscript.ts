@@ -98,8 +98,12 @@ const noArraySubscript: RuleModule<"errorStringGeneric", readonly []> = {
         if (propertyType.flags & ts.TypeFlags.ESSymbolLike) {
           // Using array subscript with a symbol that isn't actually a property on this object
           // will return `any`, so type-coverage and typescript-eslint's no-unsafe-assignment rule will catch it.
+          // TODO: Figure out how to determine if this symbol is a valid key into this object and report error if not.
           return;
         }
+
+        // TODO: https://github.com/danielnixon/eslint-plugin-total-functions/issues/16
+        // TODO: https://github.com/danielnixon/eslint-plugin-total-functions/issues/11
 
         // eslint-disable-next-line functional/no-expression-statement
         context.report({
