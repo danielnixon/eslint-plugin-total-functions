@@ -72,6 +72,12 @@ ruleTester.run("no-array-subscript", rule, {
       filename: "file.ts",
       code: "const arr = [0, 1, 2]; arr[0] = 42;",
     },
+    // Result immediately assigned to type that includes undefined, so we can ignore the partiality.
+    {
+      filename: "file.ts",
+      code:
+        "const arr = [0, 1, 2]; let foo: number | undefined = undefined; foo = arr[0];",
+    },
   ],
   invalid: [
     // Array subscript access.
@@ -155,12 +161,10 @@ ruleTester.run("no-array-subscript", rule, {
         },
       ],
     },
-    // Result immediately returned as type that includes undefined.
-    // TODO: ideally this could be allowed because the partiality isn't observable.
+    // Result immediately assigned to type that does not include undefined.
     {
       filename: "file.ts",
-      code:
-        "const last: <A>(array: ReadonlyArray<A>) => A | undefined = (a) => a[a.length - 1];",
+      code: "const arr = [0, 1, 2]; let foo: number = 1; foo = arr[0];",
       errors: [
         {
           messageId: "errorStringGeneric",
@@ -168,11 +172,24 @@ ruleTester.run("no-array-subscript", rule, {
         },
       ],
     },
-    // Result immediately assigned to type that includes undefined.
+    // Result used to initialise a value that includes undefined.
     // TODO: ideally this could be allowed because the partiality isn't observable.
     {
       filename: "file.ts",
       code: "const arr = [0, 1, 2]; const foo: number | undefined = arr[0];",
+      errors: [
+        {
+          messageId: "errorStringGeneric",
+          type: AST_NODE_TYPES.MemberExpression,
+        },
+      ],
+    },
+    // Result immediately returned as type that includes undefined.
+    // TODO: ideally this could be allowed because the partiality isn't observable.
+    {
+      filename: "file.ts",
+      code:
+        "const last: <A>(array: ReadonlyArray<A>) => A | undefined = (a) => a[a.length - 1];",
       errors: [
         {
           messageId: "errorStringGeneric",

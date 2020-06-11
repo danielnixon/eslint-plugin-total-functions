@@ -58,6 +58,28 @@ const noArraySubscript: RuleModule<"errorStringGeneric", readonly []> = {
         );
         const propertyType = checker.getTypeAtLocation(propertyNode);
 
+        // eslint-disable-next-line functional/no-conditional-statement
+        if (
+          node.parent !== undefined &&
+          node.parent.type === AST_NODE_TYPES.AssignmentExpression &&
+          node.parent.right === node
+        ) {
+          const leftNode = parserServices.esTreeNodeToTSNodeMap.get(
+            node.parent.left
+          );
+          const leftType = checker.getTypeAtLocation(leftNode);
+
+          // eslint-disable-next-line functional/no-conditional-statement
+          if (
+            leftType.isUnion() &&
+            leftType.types.some((t) => t.flags & ts.TypeFlags.Undefined)
+          ) {
+            // We're assigning the result of the array access to something that happens
+            // to include undefined, so we can ignore the partiality.
+            return;
+          }
+        }
+
         const numberIndexType = type.getNumberIndexType();
         // eslint-disable-next-line functional/no-conditional-statement
         if (numberIndexType !== undefined) {
