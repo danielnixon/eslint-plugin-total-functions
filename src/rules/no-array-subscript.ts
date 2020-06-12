@@ -42,6 +42,31 @@ const noArraySubscript: RuleModule<"errorStringGeneric", readonly []> = {
         // eslint-disable-next-line functional/no-conditional-statement
         if (
           node.parent !== undefined &&
+          node.parent.type === AST_NODE_TYPES.TSAsExpression
+        ) {
+          const typeAnnotationNode = parserServices.esTreeNodeToTSNodeMap.get(
+            node.parent.typeAnnotation
+          );
+          const typeAnnotationType = checker.getTypeAtLocation(
+            typeAnnotationNode
+          );
+
+          // eslint-disable-next-line functional/no-conditional-statement
+          if (
+            typeAnnotationType.isUnion() &&
+            typeAnnotationType.types.some(
+              (t) => t.flags & ts.TypeFlags.Undefined
+            )
+          ) {
+            // We've annotated the array access with a type annotation that forces
+            // the result to include undefined.
+            return;
+          }
+        }
+
+        // eslint-disable-next-line functional/no-conditional-statement
+        if (
+          node.parent !== undefined &&
           node.parent.type === AST_NODE_TYPES.AssignmentExpression &&
           node.parent.left === node
         ) {
@@ -62,9 +87,7 @@ const noArraySubscript: RuleModule<"errorStringGeneric", readonly []> = {
         if (
           node.parent !== undefined &&
           node.parent.type === AST_NODE_TYPES.VariableDeclarator &&
-          node.parent.id.typeAnnotation !== undefined &&
-          node.parent.id.typeAnnotation.typeAnnotation.type ===
-            AST_NODE_TYPES.TSUnionType
+          node.parent.id.typeAnnotation !== undefined
         ) {
           const typeAnnotationNode = parserServices.esTreeNodeToTSNodeMap.get(
             node.parent.id.typeAnnotation.typeAnnotation

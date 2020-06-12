@@ -83,6 +83,11 @@ ruleTester.run("no-array-subscript", rule, {
       filename: "file.ts",
       code: "const arr = [0, 1, 2]; const foo: number | undefined = arr[0];",
     },
+    // Type cast to add undefined.
+    {
+      filename: "file.ts",
+      code: "const arr = [0]; const foo = arr[0] as number | undefined;",
+    },
   ],
   invalid: [
     // Array subscript access.
@@ -347,6 +352,17 @@ ruleTester.run("no-array-subscript", rule, {
       filename: "file.ts",
       code:
         "const arr = [0]; const foo = { foo: arr[0] } as { readonly foo: number | undefined };",
+      errors: [
+        {
+          messageId: "errorStringGeneric",
+          type: AST_NODE_TYPES.MemberExpression,
+        },
+      ],
+    },
+    // Type cast but doesn't add undefined.
+    {
+      filename: "file.ts",
+      code: "const arr = [0]; const foo = arr[0] as number;",
       errors: [
         {
           messageId: "errorStringGeneric",
