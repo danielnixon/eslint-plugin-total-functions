@@ -289,5 +289,70 @@ ruleTester.run("no-array-subscript", rule, {
         },
       ],
     },
+    // Object expression where result of array access is assigned to optional property (type name).
+    // TODO this should be valid.
+    {
+      filename: "file.ts",
+      code:
+        "type Foo = { readonly foo?: number }; const arr = [0]; const foo: Foo = { foo: arr[0] };",
+      errors: [
+        {
+          messageId: "errorStringGeneric",
+          type: AST_NODE_TYPES.MemberExpression,
+        },
+      ],
+    },
+    // Object expression where result of array access is assigned to optional property (type literal).
+    // TODO this should be valid.
+    {
+      filename: "file.ts",
+      code:
+        "const arr = [0]; const foo: { readonly foo?: number } = { foo: arr[0] };",
+      errors: [
+        {
+          messageId: "errorStringGeneric",
+          type: AST_NODE_TYPES.MemberExpression,
+        },
+      ],
+    },
+    // Object expression where result of array access is assigned to property that includes undefined (type name).
+    // TODO this should be valid.
+    {
+      filename: "file.ts",
+      code:
+        "type Foo = { readonly foo: number | undefined }; const arr = [0]; const foo: Foo = { foo: arr[0] };",
+      errors: [
+        {
+          messageId: "errorStringGeneric",
+          type: AST_NODE_TYPES.MemberExpression,
+        },
+      ],
+    },
+    // Object expression where result of array access is assigned to property that includes undefined (type literal).
+    // TODO this should be valid.
+    {
+      filename: "file.ts",
+      code:
+        "const arr = [0]; const foo: { readonly foo: number | undefined } = { foo: arr[0] };",
+      errors: [
+        {
+          messageId: "errorStringGeneric",
+          type: AST_NODE_TYPES.MemberExpression,
+        },
+      ],
+    },
+    // Object expression with cast to type that includes undefined for the property being assigned to by the array access.
+    // TODO this should be valid.
+    {
+      filename: "file.ts",
+      code:
+        "const arr = [0]; const foo = { foo: arr[0] } as { readonly foo: number | undefined };",
+      errors: [
+        {
+          messageId: "errorStringGeneric",
+          type: AST_NODE_TYPES.MemberExpression,
+        },
+      ],
+    },
   ],
 });
