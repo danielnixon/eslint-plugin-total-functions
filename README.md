@@ -74,7 +74,7 @@ const foo = {} as Foo; // This compiles
 foo.bar.toString(); // This explodes at runtime
 ```
 
-This is similar to the `consistent-type-assertions` rule from `typescript-eslint` (assuming you have set the `objectLiteralTypeAssertions` options set appropriately) but it goes even further than that rule. For example, the following will _not_ be flagged by `consistent-type-assertions` (even with `objectLiteralTypeAssertions: "never"`) but will be flagged by `no-unsafe-type-assertion`:
+This is similar to the `consistent-type-assertions` rule from `typescript-eslint` (assuming you have the `objectLiteralTypeAssertions` option set appropriately) but it goes even further than that rule. For example, the following will _not_ be flagged by `consistent-type-assertions` (even with `objectLiteralTypeAssertions: "never"`) but will be flagged by `no-unsafe-type-assertion`:
 
 ```typescript
 type Foo = { readonly bar: number };
