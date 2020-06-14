@@ -50,7 +50,19 @@ Alternatively you can configure individual rules separately (see below).
 
 ### total-functions/no-array-subscript
 
-Bans unsafe array and object subscript access. See [TypeScript issue #13778](https://github.com/Microsoft/TypeScript/issues/13778) for the corresponding issue and [total-functions](https://github.com/danielnixon/total-functions#get-type-safe-array-index-operator) for a safe (total) alternative.
+Bans unsafe array and object subscript access, for example:
+
+```typescript
+const a: object[] = [];
+const b = a[0]; // b has type object, not object | undefined as you might expect
+b.toString(); // This explodes at runtime
+
+const record = { foo: "foo" } as Record<string, string>;
+const bar = record["bar"]; // bar has type string, not string | undefined
+bar.toUpperCase(); // This explodes at runtime
+```
+
+See [TypeScript issue #13778](https://github.com/Microsoft/TypeScript/issues/13778) for the corresponding issue and [total-functions](https://github.com/danielnixon/total-functions#get-type-safe-array-index-operator) for a safe (total) alternative.
 
 Tuples and (non-record) objects are allowed.
 
