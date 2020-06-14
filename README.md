@@ -76,6 +76,10 @@ foo.bar.toString(); // This explodes at runtime
 
 This is similar to the `consistent-type-assertions` rule from `typescript-eslint` (assuming you have set the `objectLiteralTypeAssertions` options set appropriately) but it goes even further than that rule. For example, the following will _not_ be flagged by `consistent-type-assertions` (even with `objectLiteralTypeAssertions: "never"`) but will be flagged by `no-unsafe-type-assertion`:
 
+For examples of type assertions that this rule considers valid and invalid, see no-unsafe-type-assertion.test.ts.
+
+Note that this rule is not (yet?) included in the `recommended` config, so you'll have to enable it individually in your ESLint config. So this project's own ESLint config for an example.
+
 ```typescript
 type Foo = { readonly bar: number };
 const foo = {}; // This compiles
