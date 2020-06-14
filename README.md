@@ -78,8 +78,8 @@ This is similar to the `consistent-type-assertions` rule from `typescript-eslint
 
 ```typescript
 type Foo = { readonly bar: number };
-const foo = {}; // This compiles
-const foo2 = foo as Foo; // This compiles
+const foo = {};
+const foo2 = foo as Foo; // Flagged by this rule, but not by consistent-type-assertions
 foo2.bar.toString(); // This explodes at runtime
 ```
 
