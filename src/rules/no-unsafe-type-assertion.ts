@@ -81,9 +81,14 @@ const noUnsafeTypeAssertion: RuleModule<
         }
 
         // eslint-disable-next-line functional/no-conditional-statement
+        if (!isObjectType(destinationType) || !isObjectType(sourceType)) {
+          // Don't flag when either side of the type assertion is not an object.
+          // TODO: confirm there are no non-object type assertions that are unsafe.
+          return;
+        }
+
+        // eslint-disable-next-line functional/no-conditional-statement
         if (
-          isObjectType(destinationType) &&
-          isObjectType(sourceType) &&
           destinationType.getProperties().every((p) => {
             const propertyType = checker.getTypeOfSymbolAtLocation(
               p,

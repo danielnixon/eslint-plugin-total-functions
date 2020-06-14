@@ -73,10 +73,30 @@ ruleTester.run("no-unsafe-type-assertion", rule, {
       filename: "file.ts",
       code: "type Foo = { readonly foo: undefined }; const foo = {} as Foo;",
     },
-    // as exact same type
+    // as exact same type (object)
     {
       filename: "file.ts",
-      code: "const foo = 'foo' as 'foo';",
+      code: "const foo = {foo: 'a'} as {foo: 'a'};",
+    },
+    // as exact same type (string)
+    {
+      filename: "file.ts",
+      code: "const foo = 'a' as 'a';",
+    },
+    // widening string to union
+    {
+      filename: "file.ts",
+      code: "const foo = 'foo' as 'foo' | 'bar';",
+    },
+    // widening string to string
+    {
+      filename: "file.ts",
+      code: "const foo = 'foo' as string;",
+    },
+    // widening number to number
+    {
+      filename: "file.ts",
+      code: "const foo = 42 as number;",
     },
   ],
   invalid: [

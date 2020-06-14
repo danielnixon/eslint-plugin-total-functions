@@ -127,7 +127,7 @@ ruleTester.run("no-array-destructuring", rule, {
     {
       filename: "file.ts",
       code:
-        "const obj = { a: 'a' } as Record<string, string>; const { a } = obj;",
+        "const obj: Record<string, string> = { a: 'a' }; const { a } = obj;",
       errors: [
         {
           messageId: "errorStringGeneric",
