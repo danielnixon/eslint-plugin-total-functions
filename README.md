@@ -64,6 +64,26 @@ Bans unsafe array and object destructuring. Destructuring tuples is allowed, as 
 
 For examples of destructuring that this rule considers valid and invalid, see [no-array-destructuring.test.ts](https://github.com/danielnixon/eslint-plugin-total-functions/blob/master/src/rules/no-array-destructuring.test.ts).
 
+### total-functions/no-unsafe-type-assertion
+
+Bans unsafe type assertions, for example:
+
+```typescript
+type Foo = { readonly bar: number };
+const foo = {} as Foo; // This compiles
+foo.bar.toString(); // This explodes at runtime
+```
+
+This is similar to the `consistent-type-assertions` rule from `typescript-eslint` (assuming you have set the `objectLiteralTypeAssertions` options set appropriately) but it goes even further than that rule. For example, the following will _not_ be flagged by `consistent-type-assertions` (even with `objectLiteralTypeAssertions: "never"`) but will be flagged by `no-unsafe-type-assertion`:
+
+```typescript
+type Foo = { readonly bar: number };
+const foo = {}; // This compiles
+const foo2 = foo as Foo; // This compiles
+foo2.bar.toString(); // This explodes at runtime
+```
+
+
 # See Also
 * https://github.com/danielnixon/readonly-types
 * https://github.com/danielnixon/total-functions
