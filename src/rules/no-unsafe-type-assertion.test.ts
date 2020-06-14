@@ -62,11 +62,16 @@ ruleTester.run("no-unsafe-type-assertion", rule, {
       filename: "file.ts",
       code: "type Foo = { readonly foo?: string }; const foo = {} as Foo;",
     },
-    // as compatible type (prop that includes undefined not provided)
+    // as compatible type (prop that is union including undefined not provided)
     {
       filename: "file.ts",
       code:
         "type Foo = { readonly foo: string | undefined }; const foo = {} as Foo;",
+    },
+    // as compatible type (prop that is undefined not provided)
+    {
+      filename: "file.ts",
+      code: "type Foo = { readonly foo: undefined }; const foo = {} as Foo;",
     },
   ],
   invalid: [
@@ -119,6 +124,18 @@ ruleTester.run("no-unsafe-type-assertion", rule, {
       filename: "file.ts",
       code:
         "type Foo = { readonly foo: string }; const foo = {}; const bar = foo as Foo;",
+      errors: [
+        {
+          messageId: "errorStringGeneric",
+          type: AST_NODE_TYPES.TSAsExpression,
+        },
+      ],
+    },
+    // as incompatible type (source prop is present but its value is undefined)
+    {
+      filename: "file.ts",
+      code:
+        "type Foo = { readonly foo: string }; type Bar = { readonly foo: string | undefined }; const bar: Bar = { foo: undefined }; const foobar = bar as Foo;",
       errors: [
         {
           messageId: "errorStringGeneric",

@@ -66,12 +66,13 @@ const noUnsafeTypeAssertion: RuleModule<
           return;
         }
 
-        // TODO allow safe type assertions.
+        // The right hand side of the "as".
         const destinationNode = parserServices.esTreeNodeToTSNodeMap.get(node);
         const destinationType = checker.getTypeAtLocation(destinationNode);
-        const sourceType = checker.getTypeAtLocation(
-          destinationNode.expression
-        );
+
+        // The left hand side of the "as".
+        const sourceNode = destinationNode.expression;
+        const sourceType = checker.getTypeAtLocation(sourceNode);
 
         // eslint-disable-next-line functional/no-conditional-statement
         if (
@@ -83,17 +84,34 @@ const noUnsafeTypeAssertion: RuleModule<
               destinationNode
             );
             const destinationPropertyAllowsUndefined =
-              propertyType.isUnion() &&
-              propertyType.types.some((t) => t.flags & ts.TypeFlags.Undefined);
+              (propertyType.isUnion() &&
+                propertyType.types.some(
+                  (t) => t.flags & ts.TypeFlags.Undefined
+                )) ||
+              propertyType.flags & ts.TypeFlags.Undefined;
+
             const destinationPropertyIsOptional =
               p.flags & ts.SymbolFlags.Optional;
-            const sourcePropertyIsNotUndefined =
-              sourceType.getProperty(p.name) !== undefined;
+
+            const sourceProperty = sourceType.getProperty(p.name);
+
+            const sourcePropertyType =
+              sourceProperty === undefined
+                ? undefined
+                : checker.getTypeOfSymbolAtLocation(sourceProperty, sourceNode);
+
+            const sourcePropertyIsUndefined =
+              sourcePropertyType === undefined ||
+              (sourcePropertyType.isUnion() &&
+                sourcePropertyType.types.some(
+                  (t) => t.flags & ts.TypeFlags.Undefined
+                )) ||
+              sourcePropertyType.flags & ts.TypeFlags.Undefined;
 
             return (
               destinationPropertyAllowsUndefined ||
               destinationPropertyIsOptional ||
-              sourcePropertyIsNotUndefined
+              !sourcePropertyIsUndefined
             );
           })
         ) {
