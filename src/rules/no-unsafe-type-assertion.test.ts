@@ -62,6 +62,12 @@ ruleTester.run("no-unsafe-type-assertion", rule, {
       filename: "file.ts",
       code: "type Foo = { readonly foo?: string }; const foo = {} as Foo;",
     },
+    // as compatible type (prop that includes undefined not provided)
+    {
+      filename: "file.ts",
+      code:
+        "type Foo = { readonly foo: string | undefined }; const foo = {} as Foo;",
+    },
   ],
   invalid: [
     // deprecated type assertion style
@@ -113,19 +119,6 @@ ruleTester.run("no-unsafe-type-assertion", rule, {
       filename: "file.ts",
       code:
         "type Foo = { readonly foo: string }; const foo = {}; const bar = foo as Foo;",
-      errors: [
-        {
-          messageId: "errorStringGeneric",
-          type: AST_NODE_TYPES.TSAsExpression,
-        },
-      ],
-    },
-    // as compatible type (prop that includes undefined not provided)
-    // TODO this should be valid.
-    {
-      filename: "file.ts",
-      code:
-        "type Foo = { readonly foo: string | undefined }; const foo = {} as Foo;",
       errors: [
         {
           messageId: "errorStringGeneric",
