@@ -281,7 +281,7 @@ ruleTester.run("no-array-subscript", rule, {
         },
       ],
     },
-    // Const array property access with non-literal key;
+    // Const array property access with non-literal (but const) key;
     // TODO this should be valid.
     {
       filename: "file.ts",

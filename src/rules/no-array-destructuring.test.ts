@@ -36,6 +36,12 @@ ruleTester.run("no-array-destructuring", rule, {
       code:
         "const arr = [0, 1, 2] as Array<number | undefined>; const [foo] = arr;",
     },
+    // Destructuring a regular array with type annotation that adds undefined.
+    {
+      filename: "file.ts",
+      code:
+        "const array = [0]; const [foo]: ReadonlyArray<number | undefined> = array;",
+    },
     // Object destructuring (all fields exist).
     {
       filename: "file.ts",
@@ -52,6 +58,17 @@ ruleTester.run("no-array-destructuring", rule, {
     {
       filename: "file.ts",
       code: "const array = [0, 1, 2] as number[]; const [foo] = array;",
+      errors: [
+        {
+          messageId: "errorStringGeneric",
+          type: AST_NODE_TYPES.ArrayPattern,
+        },
+      ],
+    },
+    // Destructuring a regular array with type annotation that doesn't add undefined.
+    {
+      filename: "file.ts",
+      code: "const array = [0]; const [foo]: ReadonlyArray<number> = array;",
       errors: [
         {
           messageId: "errorStringGeneric",
