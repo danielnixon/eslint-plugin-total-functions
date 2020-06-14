@@ -73,6 +73,11 @@ ruleTester.run("no-unsafe-type-assertion", rule, {
       filename: "file.ts",
       code: "type Foo = { readonly foo: undefined }; const foo = {} as Foo;",
     },
+    // as exact same type
+    {
+      filename: "file.ts",
+      code: "const foo = 'foo' as 'foo';",
+    },
   ],
   invalid: [
     // deprecated type assertion style

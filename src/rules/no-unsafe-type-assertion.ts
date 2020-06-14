@@ -75,6 +75,12 @@ const noUnsafeTypeAssertion: RuleModule<
         const sourceType = checker.getTypeAtLocation(sourceNode);
 
         // eslint-disable-next-line functional/no-conditional-statement
+        if (sourceType === destinationType) {
+          // Don't flag when type assertion isn't actually changing the type.
+          return;
+        }
+
+        // eslint-disable-next-line functional/no-conditional-statement
         if (
           isObjectType(destinationType) &&
           isObjectType(sourceType) &&
