@@ -72,7 +72,19 @@ For examples of subscript access that this rule considers valid and invalid, see
 
 ### total-functions/no-array-destructuring
 
-Bans unsafe array and object destructuring. Destructuring tuples is allowed, as long as you're within the length of the tuple.
+Bans unsafe array and object destructuring, for example:
+
+```typescript
+const array: readonly number[] = [];
+const [foo] = array; // foo has type number, not number | undefined
+foo.toString(); // This explodes at runtime
+
+const obj: Record<string, string> = { a: "a" };
+const { b } = obj; // b has type string, not string | undefined
+b.toUpperCase(); // This explodes at runtime
+```
+
+Destructuring tuples is allowed, as long as you're within the length of the tuple.
 
 For examples of destructuring that this rule considers valid and invalid, see [no-array-destructuring.test.ts](https://github.com/danielnixon/eslint-plugin-total-functions/blob/master/src/rules/no-array-destructuring.test.ts).
 
