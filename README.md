@@ -83,7 +83,7 @@ const foo2 = foo as Foo; // Flagged by this rule, but not by consistent-type-ass
 foo2.bar.toString(); // This explodes at runtime
 ```
 
-For examples of type assertions that this rule considers valid and invalid, see no-unsafe-type-assertion.test.ts.
+For examples of type assertions that this rule considers valid and invalid, see [no-unsafe-type-assertion.test.ts](https://github.com/danielnixon/eslint-plugin-total-functions/blob/master/src/rules/no-unsafe-type-assertion.test.ts).
 
 Note that this rule is not (yet?) included in the `recommended` config, so you'll have to enable it individually in your ESLint config. So this project's own ESLint config for an example.
 
