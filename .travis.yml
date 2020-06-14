@@ -7,3 +7,6 @@ script:
   - yarn type-coverage
   - yarn test
   - yarn stryker run
+after_success:
+  - yarn codecov
+  
