@@ -33,5 +33,13 @@ module.exports = {
     "no-await-in-loop": "error",
     "no-new-wrappers": "error",
     "eqeqeq": "error",
+    "no-caller": "error",
+    "require-unicode-regexp": "error",
+    "no-loss-of-precision": "error",
+    // Make typescript-eslint rules more aggressive.
+    "@typescript-eslint/consistent-type-assertions": ["error", {
+      "assertionStyle": "as",
+      "objectLiteralTypeAssertions": "never"
+    }]
   }
 };

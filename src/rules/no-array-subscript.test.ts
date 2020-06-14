@@ -83,7 +83,7 @@ ruleTester.run("no-array-subscript", rule, {
       filename: "file.ts",
       code: "const arr = [0, 1, 2]; const foo: number | undefined = arr[0];",
     },
-    // Type cast to add undefined.
+    // Type assertion to add undefined.
     {
       filename: "file.ts",
       code: "const arr = [0]; const foo = arr[0] as number | undefined;",
@@ -346,7 +346,7 @@ ruleTester.run("no-array-subscript", rule, {
         },
       ],
     },
-    // Object expression with cast to type that includes undefined for the property being assigned to by the array access.
+    // Object expression with type assertion that includes undefined for the property being assigned to by the array access.
     // TODO this should be valid.
     {
       filename: "file.ts",
@@ -359,7 +359,7 @@ ruleTester.run("no-array-subscript", rule, {
         },
       ],
     },
-    // Type cast but doesn't add undefined.
+    // Type assertion but doesn't add undefined.
     {
       filename: "file.ts",
       code: "const arr = [0]; const foo = arr[0] as number;",
