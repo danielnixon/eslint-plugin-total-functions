@@ -28,6 +28,40 @@ ruleTester.run("no-unsafe-type-assertion", rule, {
       filename: "file.ts",
       code: "const foo = 'foo' as any;",
     },
+    // as compatible type (object literal as type name)
+    {
+      filename: "file.ts",
+      code:
+        "type Foo = { readonly foo: string }; const foo = {foo: 'foo'} as Foo;",
+    },
+    // as compatible type (object literal as type literal)
+    {
+      filename: "file.ts",
+      code: "const foo = {foo: 'foo'} as { readonly foo: string };",
+    },
+    // as compatible type (value as type name)
+    {
+      filename: "file.ts",
+      code:
+        "const foo = {foo: 'foo'}; const bar = foo as { readonly foo: string };",
+    },
+    // as compatible type (value as type literal)
+    {
+      filename: "file.ts",
+      code:
+        "type Foo = { readonly foo: string }; const foo = {foo: 'foo'}; const bar = foo as Foo;",
+    },
+    // as compatible type (extra prop)
+    {
+      filename: "file.ts",
+      code:
+        "type Foo = { readonly foo: string }; const foo = {foo: 'foo', bar: 'bar'} as Foo;",
+    },
+    // as compatible type (optional prop not provided)
+    {
+      filename: "file.ts",
+      code: "type Foo = { readonly foo?: string }; const foo = {} as Foo;",
+    },
   ],
   invalid: [
     // deprecated type assertion style
@@ -86,50 +120,12 @@ ruleTester.run("no-unsafe-type-assertion", rule, {
         },
       ],
     },
-    // as compatible type (object literal as type name)
+    // as compatible type (prop that includes undefined not provided)
     // TODO this should be valid.
     {
       filename: "file.ts",
       code:
-        "type Foo = { readonly foo: string }; const foo = {foo: 'foo'} as Foo;",
-      errors: [
-        {
-          messageId: "errorStringGeneric",
-          type: AST_NODE_TYPES.TSAsExpression,
-        },
-      ],
-    },
-    // as compatible type (object literal as type literal)
-    // TODO this should be valid.
-    {
-      filename: "file.ts",
-      code: "const foo = {foo: 'foo'} as { readonly foo: string };",
-      errors: [
-        {
-          messageId: "errorStringGeneric",
-          type: AST_NODE_TYPES.TSAsExpression,
-        },
-      ],
-    },
-    // as compatible type (value as type name)
-    // TODO this should be valid.
-    {
-      filename: "file.ts",
-      code:
-        "const foo = {foo: 'foo'}; const bar = foo as { readonly foo: string };",
-      errors: [
-        {
-          messageId: "errorStringGeneric",
-          type: AST_NODE_TYPES.TSAsExpression,
-        },
-      ],
-    },
-    // as compatible type (value as type literal)
-    // TODO this should be valid.
-    {
-      filename: "file.ts",
-      code:
-        "type Foo = { readonly foo: string }; const foo = {foo: 'foo'}; const bar = foo as Foo;",
+        "type Foo = { readonly foo: string | undefined }; const foo = {} as Foo;",
       errors: [
         {
           messageId: "errorStringGeneric",
