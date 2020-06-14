@@ -57,7 +57,7 @@ const a: object[] = [];
 const b = a[0]; // b has type object, not object | undefined as you might expect
 b.toString(); // This explodes at runtime
 
-const record = { foo: "foo" } as Record<string, string>;
+const record: Record<string, string> = { foo: "foo" };
 const bar = record["bar"]; // bar has type string, not string | undefined
 bar.toUpperCase(); // This explodes at runtime
 ```
