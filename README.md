@@ -112,7 +112,7 @@ For examples of type assertions that this rule considers valid and invalid, see 
 
 Note that this rule is not (yet?) included in the `recommended` config, so you'll have to enable it individually in your ESLint config. So this project's own ESLint config for an example.
 
-See [TypeScript issue #7481](https://github.com/microsoft/TypeScript/issues/7481).
+See [TypeScript issue #7481](https://github.com/microsoft/TypeScript/issues/7481) for a request to fix this at the language level.
 
 # See Also
 * https://github.com/danielnixon/readonly-types
