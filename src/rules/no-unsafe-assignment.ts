@@ -1,5 +1,8 @@
 import { RuleModule } from "@typescript-eslint/experimental-utils/dist/ts-eslint";
-import { ESLintUtils } from "@typescript-eslint/experimental-utils";
+import {
+  ESLintUtils,
+  AST_NODE_TYPES,
+} from "@typescript-eslint/experimental-utils";
 import { isObjectType, isPropertyReadonlyInType } from "tsutils";
 import { get } from "total-functions";
 
@@ -34,6 +37,12 @@ const noUnsafeAssignment: RuleModule<
       // },
       // // eslint-disable-next-line functional/no-return-void
       // AssignmentExpression: (node): void => {
+      // },
+      // eslint-disable-next-line functional/no-return-void
+      // ReturnStatement: (node): void => {
+      // },
+      // // eslint-disable-next-line functional/no-return-void
+      // ArrowFunctionExpression: (node): void => {
       // },
       // eslint-disable-next-line functional/no-return-void, sonarjs/cognitive-complexity
       CallExpression: (node): void => {
@@ -70,7 +79,9 @@ const noUnsafeAssignment: RuleModule<
               argument !== undefined &&
               argumentType !== undefined &&
               isObjectType(argumentType) &&
-              isObjectType(paramType)
+              isObjectType(paramType) &&
+              // object expressions are allowed because we won't retain a reference to the object to get out of sync.
+              argument.type !== AST_NODE_TYPES.ObjectExpression
             ) {
               // eslint-disable-next-line functional/no-expression-statement
               paramType.getProperties().forEach((property) => {

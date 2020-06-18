@@ -57,6 +57,28 @@ ruleTester.run("no-unsafe-assignment", rule, {
         foo(mut);
       `,
     },
+    // object literal -> mutable (no reference to object retained)
+    {
+      filename: "file.ts",
+      code: `
+        type MutableA = {a: string};
+        const foo = (mut: MutableA) => {
+          mut.a = "whoops";
+        };
+        foo({ a: "" });
+      `,
+    },
+    // object literal -> readonly (no reference to object retained)
+    {
+      filename: "file.ts",
+      code: `
+        type ReadonlyA = { readonly a: string };
+        const func = (param: ReadonlyA): void => {
+          return undefined;
+        };
+        func({ a: "" });
+      `,
+    },
   ],
   invalid: [
     // mutable -> mutable (type changes)
