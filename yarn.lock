@@ -4281,6 +4281,11 @@ to-regex@^3.0.1, to-regex@^3.0.2:
     regex-not "^1.0.2"
     safe-regex "^1.1.0"
 
+total-functions@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/total-functions/-/total-functions-3.0.0.tgz#cf32d787e839cd5eb0439550d9451a3d17105bad"
+  integrity sha512-qi/5OALj6eiZpXJ45P9dSRf0uDnDErgEKqHAFWGZlY7BRZdR69WLJv61UYb9JeospAwyQpIVJ6S+yelNajXAxA==
+
 tough-cookie@^2.3.3, tough-cookie@~2.5.0:
   version "2.5.0"
   resolved "https://registry.yarnpkg.com/tough-cookie/-/tough-cookie-2.5.0.tgz#cd9fb2a0aa1d5a12b473bd9fb96fa3dcff65ade2"

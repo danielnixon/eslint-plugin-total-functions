@@ -32,6 +32,7 @@
     "@typescript-eslint/eslint-plugin": "^3.2.0",
     "@typescript-eslint/experimental-utils": "^3.2.0",
     "@typescript-eslint/parser": "^3.2.0",
+    "total-functions": "^3.0.0",
     "tsutils": "^3.17.1"
   },
   "peerDependencies": {
