@@ -44,18 +44,20 @@ const noArrayDestructuring: RuleModule<"errorStringGeneric", readonly []> = {
           return;
         }
 
-        // We can be confident that this will be defined because we're in an `ArrayPattern`.
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        const numberIndexType = type.getNumberIndexType()!;
-        const typeParts = numberIndexType.isUnion()
-          ? numberIndexType.types
-          : [numberIndexType];
+        const numberIndexType = type.getNumberIndexType();
         // eslint-disable-next-line functional/no-conditional-statement
-        if (
-          typeParts.find((t) => t.flags & ts.TypeFlags.Undefined) !== undefined
-        ) {
-          // Allow destructuring if undefined is already in the array type.
-          return;
+        if (numberIndexType !== undefined) {
+          const typeParts = numberIndexType.isUnion()
+            ? numberIndexType.types
+            : [numberIndexType];
+          // eslint-disable-next-line functional/no-conditional-statement
+          if (
+            typeParts.find((t) => t.flags & ts.TypeFlags.Undefined) !==
+            undefined
+          ) {
+            // Allow destructuring if undefined is already in the array type.
+            return;
+          }
         }
 
         // eslint-disable-next-line functional/no-expression-statement

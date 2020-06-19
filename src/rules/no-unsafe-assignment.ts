@@ -103,6 +103,7 @@ const noUnsafeAssignment: RuleModule<
                 const bothMutableButDifferentTypes =
                   !argumentPropsIsReadonly &&
                   !parameterPropIsReadonly &&
+                  // TODO: this needs to consider unions.
                   argumentType !== paramType;
 
                 // eslint-disable-next-line functional/no-conditional-statement
