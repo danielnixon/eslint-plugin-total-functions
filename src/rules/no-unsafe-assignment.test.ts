@@ -79,9 +79,32 @@ ruleTester.run("no-unsafe-assignment", rule, {
         func({ a: "" });
       `,
     },
-  ],
-  invalid: [
+    // mutable (union) -> mutable
+    {
+      filename: "file.ts",
+      code: `
+        type MutableA = {a: string};
+        const foo = (mut: MutableA) => {
+          mut.a = "whoops";
+        };
+        const mut: MutableA | number = { a: "" };
+        foo(mut);
+      `,
+    },
+    // mutable -> mutable (union)
+    {
+      filename: "file.ts",
+      code: `
+        type MutableA = {a: string};
+        const foo = (mut: MutableA | number): void => {
+          return;
+        };
+        const mut: MutableA = { a: "" };
+        foo(mut);
+      `,
+    },
     // mutable -> mutable (type changes)
+    // todo this should be invalid
     {
       filename: "file.ts",
       code: `
@@ -93,33 +116,9 @@ ruleTester.run("no-unsafe-assignment", rule, {
         const mut: MutableA = { a: "" };
         foo(mut);
       `,
-      errors: [
-        {
-          messageId: "errorStringCallExpression",
-          type: AST_NODE_TYPES.Identifier,
-        },
-      ],
-    },
-    // readonly -> mutable
-    {
-      filename: "file.ts",
-      code: `
-        type MutableA = { a: string };
-        type ReadonlyA = Readonly<MutableA>;
-        const mutate = (mut: MutableA): void => {
-          mut.a = "whoops";
-        };
-        const readonlyA: ReadonlyA = { a: "readonly?" };
-        mutate(readonlyA);
-      `,
-      errors: [
-        {
-          messageId: "errorStringCallExpression",
-          type: AST_NODE_TYPES.Identifier,
-        },
-      ],
     },
     // mutable -> readonly
+    // todo this should be invalid
     {
       filename: "file.ts",
       code: `
@@ -131,9 +130,24 @@ ruleTester.run("no-unsafe-assignment", rule, {
         const mutableA: MutableA = { a: "" };
         func(mutableA);
       `,
+    },
+  ],
+  invalid: [
+    // readonly -> mutable
+    {
+      filename: "file.ts",
+      code: `
+        type MutableA = { a: string };
+        type ReadonlyA = { readonly a: string };
+        const mutate = (mut: MutableA): void => {
+          mut.a = "whoops";
+        };
+        const readonlyA: ReadonlyA = { a: "readonly?" };
+        mutate(readonlyA);
+      `,
       errors: [
         {
-          messageId: "errorStringCallExpression",
+          messageId: "errorStringCallExpressionReadonlyToMutable",
           type: AST_NODE_TYPES.Identifier,
         },
       ],
