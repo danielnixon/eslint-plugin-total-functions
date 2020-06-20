@@ -2,7 +2,6 @@ import { RuleModule } from "@typescript-eslint/experimental-utils/dist/ts-eslint
 import {
   ESLintUtils,
   AST_NODE_TYPES,
-  TSESTree,
 } from "@typescript-eslint/experimental-utils";
 import { isObjectType, isPropertyReadonlyInType } from "tsutils";
 import { get } from "total-functions";
@@ -33,52 +32,80 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
     const parserServices = ESLintUtils.getParserServices(context);
     const checker = parserServices.program.getTypeChecker();
 
-    const reportIfUnsafeAssignment = (
-      node: TSESTree.Node,
-      messageId: MessageId,
+    const isUnsafeAssignment = (
       destinationType: Type,
       sourceType: Type
-      // eslint-disable-next-line functional/no-return-void
-    ): void => {
+      // eslint-disable-next-line sonarjs/cognitive-complexity
+    ): boolean => {
       // eslint-disable-next-line functional/no-conditional-statement
-      if (isObjectType(sourceType) && isObjectType(destinationType)) {
+      if (
+        // TODO what if the source type is a union that contains a mix of mutable and readonly types?
+        !sourceType.isUnion() &&
+        // TODO what if the destination type is a union that contains a mix of mutable and readonly types?
+        // If the source type is mutable and corresponds to the (safe) mutable destination type, this will still be flagged
+        // as unsafe (due to the readonly portion of the destination type union).
+        !destinationType.isUnion() &&
+        isObjectType(sourceType) &&
+        isObjectType(destinationType)
+      ) {
         // TODO this needs to check arrays too (the array itself being readonly AND its generic type being readonly)
         // TODO how to handle tuples?
-        const assigningReadonlyToMutable = destinationType
-          .getProperties()
-          .some((parameterProperty) => {
-            const parameterPropIsReadonly = isPropertyReadonlyInType(
-              destinationType,
-              parameterProperty.getEscapedName(),
+        return destinationType.getProperties().some((destinationProperty) => {
+          const destinationPropIsReadonly = isPropertyReadonlyInType(
+            destinationType,
+            destinationProperty.getEscapedName(),
+            checker
+          );
+
+          const sourceProperty = sourceType.getProperty(
+            destinationProperty.name
+          );
+
+          const sourcePropIsReadonly =
+            sourceProperty !== undefined &&
+            isPropertyReadonlyInType(
+              sourceType,
+              sourceProperty.getEscapedName(),
               checker
             );
 
-            const argumentProperty = sourceType.getProperty(
-              parameterProperty.name
-            );
+          const destinationPropertyDeclarations =
+            destinationProperty.getDeclarations() || [];
+          // TODO: How to choose declaration when there are multiple? `checker.getResolvedSignature()`?
+          const destinationPropertyDeclaration =
+            destinationPropertyDeclarations.length > 1
+              ? undefined
+              : get(destinationPropertyDeclarations, 0);
+          const destinationPropertyType =
+            destinationPropertyDeclaration !== undefined
+              ? checker.getTypeAtLocation(destinationPropertyDeclaration)
+              : undefined;
 
-            const argumentPropIsReadonly =
-              argumentProperty !== undefined &&
-              isPropertyReadonlyInType(
-                sourceType,
-                argumentProperty.getEscapedName(),
-                checker
-              );
+          const sourcePropertyDeclarations =
+            sourceProperty === undefined
+              ? []
+              : sourceProperty.getDeclarations() || [];
+          // TODO: How to choose declaration when there are multiple? `checker.getResolvedSignature()`?
+          const sourcePropertyDeclaration =
+            sourcePropertyDeclarations.length > 1
+              ? undefined
+              : get(sourcePropertyDeclarations, 0);
+          const sourcePropertyType =
+            sourcePropertyDeclaration !== undefined
+              ? checker.getTypeAtLocation(sourcePropertyDeclaration)
+              : undefined;
 
-            // TODO this needs to recursively check objects and arrays.
-            // For arrays we need to check the array itself being readonly AND its generic type being readonly.
+          const isUnsafeAssignmentRecursively =
+            destinationPropertyType !== undefined &&
+            sourcePropertyType !== undefined &&
+            isUnsafeAssignment(destinationPropertyType, sourcePropertyType);
 
-            return argumentPropIsReadonly && !parameterPropIsReadonly;
-          });
-
-        // eslint-disable-next-line functional/no-conditional-statement
-        if (assigningReadonlyToMutable) {
-          // eslint-disable-next-line functional/no-expression-statement
-          context.report({
-            node,
-            messageId,
-          });
-        }
+          const assigningReadonlyToMutable =
+            sourcePropIsReadonly && !destinationPropIsReadonly;
+          return assigningReadonlyToMutable || isUnsafeAssignmentRecursively;
+        });
+      } else {
+        return false;
       }
     };
 
@@ -133,20 +160,13 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
               // object expressions are allowed because we won't retain a reference to the object to get out of sync.
               // TODO but what about properties in the object literal that are references to values we _do_ retain a reference to?
               argument.type !== AST_NODE_TYPES.ObjectExpression &&
-              // TODO what if the argument type is a union that contains a mix of mutable and readonly types?
-              !argumentType.isUnion() &&
-              // TODO what if the parameter type is a union that contains a mix of mutable and readonly types?
-              // If the argument type is mutable and corresponds to the (safe) mutable parameter type, this will still be flagged
-              // as unsafe (due to the readonly portion of the parameter type union).
-              !paramType.isUnion()
+              isUnsafeAssignment(paramType, argumentType)
             ) {
               // eslint-disable-next-line functional/no-expression-statement
-              reportIfUnsafeAssignment(
-                argument,
-                "errorStringCallExpressionReadonlyToMutable",
-                paramType,
-                argumentType
-              );
+              context.report({
+                node: argument,
+                messageId: "errorStringCallExpressionReadonlyToMutable",
+              });
             }
           });
         }

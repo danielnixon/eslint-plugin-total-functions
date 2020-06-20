@@ -45,6 +45,18 @@ ruleTester.run("no-unsafe-assignment", rule, {
         func(readonlyA);
       `,
     },
+    // readonly -> readonly (nested object; type doesn't change)
+    {
+      filename: "file.ts",
+      code: `
+        type ReadonlyA = { readonly a: { readonly b: string } };
+        const func = (param: ReadonlyA): void => {
+          return undefined;
+        };
+        const readonlyA: ReadonlyA = { a: { b: "" } };
+        func(readonlyA);
+      `,
+    },
     // mutable -> mutable (type doesn't change)
     {
       filename: "file.ts",
@@ -144,6 +156,25 @@ ruleTester.run("no-unsafe-assignment", rule, {
         };
         const readonlyA: ReadonlyA = { a: "readonly?" };
         mutate(readonlyA);
+      `,
+      errors: [
+        {
+          messageId: "errorStringCallExpressionReadonlyToMutable",
+          type: AST_NODE_TYPES.Identifier,
+        },
+      ],
+    },
+    // readonly -> mutable (nested object)
+    {
+      filename: "file.ts",
+      code: `
+        type MutableA = { readonly a: { b: string } };
+        type ReadonlyA = { readonly a: { readonly b: string } };
+        const mutate = (mut: MutableA): void => {
+          mut.a.b = "whoops";
+        };
+        const readonlyA: ReadonlyA = { a: { b: "readonly?" } };
+        mutate(readonlyA);      
       `,
       errors: [
         {
