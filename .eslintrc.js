@@ -26,7 +26,7 @@ module.exports = {
   },
   plugins: ["jest", "sonarjs", "functional", "@typescript-eslint", "prettier", "total-functions"],
   rules: {
-    // "total-functions/no-unsafe-assignment": "error",
+    "total-functions/no-unsafe-assignment": "error",
     // Additional rules that are not part of `eslint:recommended`.
     // See https://eslint.org/docs/rules/
     "no-eval": "error",

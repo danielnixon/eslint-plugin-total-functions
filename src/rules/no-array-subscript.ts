@@ -27,6 +27,7 @@ const noArraySubscript: RuleModule<"errorStringGeneric", readonly []> = {
     schema: [],
   },
   create: (context) => {
+    // eslint-disable-next-line total-functions/no-unsafe-assignment
     const parserServices = ESLintUtils.getParserServices(context);
     const checker = parserServices.program.getTypeChecker();
 
