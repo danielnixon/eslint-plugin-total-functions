@@ -1549,10 +1549,10 @@ eslint-plugin-functional@^3.0.1:
     deepmerge "^4.2.2"
     escape-string-regexp "^2.0.0"
 
-eslint-plugin-jest@^23.13.2:
-  version "23.13.2"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-jest/-/eslint-plugin-jest-23.13.2.tgz#7b7993b4e09be708c696b02555083ddefd7e4cc7"
-  integrity sha512-qZit+moTXTyZFNDqSIR88/L3rdBlTU7CuW6XmyErD2FfHEkdoLgThkRbiQjzgYnX6rfgLx3Ci4eJmF4Ui5v1Cw==
+eslint-plugin-jest@^23.14.0:
+  version "23.14.0"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-jest/-/eslint-plugin-jest-23.14.0.tgz#3b959552e18e12b0a8bc41ff2943f66da88326ba"
+  integrity sha512-C5iarOq3/czE81FkxxOHqaRBck5tz0CWnZjPNR66ZduMLMGMED7Qvorp++pO3R0J1iAdLPKR9gm6kQTx3J7hGg==
   dependencies:
     "@typescript-eslint/experimental-utils" "^2.5.0"
 
@@ -4389,23 +4389,23 @@ type-check@~0.3.2:
   dependencies:
     prelude-ls "~1.1.2"
 
-type-coverage-core@^2.7.2:
-  version "2.7.2"
-  resolved "https://registry.yarnpkg.com/type-coverage-core/-/type-coverage-core-2.7.2.tgz#61dd29c7711e84cbce1004bce8b866a80a3512df"
-  integrity sha512-8g+449qCsA7LyWTaubzK0m6zLotyBO7rX5WDktAelLFdE6rWpMQ//ake+OWrZpdzWTijiFi/Jl8BlKO2uX7A1Q==
+type-coverage-core@^2.8.0:
+  version "2.8.0"
+  resolved "https://registry.yarnpkg.com/type-coverage-core/-/type-coverage-core-2.8.0.tgz#f20c5d31a93971fc84e09a33f242d3f4152b4753"
+  integrity sha512-J6E/s81cQK5xE2AmE1PzySceElhmwZBpoDXpDMVjmK010uVPWdBhiaoej32vYS+IRennVE10amVDMYCwL4IO2Q==
   dependencies:
     minimatch "3"
     ts-lib-utils "^2.7.2"
     tslib "1 || 2"
     tsutils "3"
 
-type-coverage@^2.7.2:
-  version "2.7.2"
-  resolved "https://registry.yarnpkg.com/type-coverage/-/type-coverage-2.7.2.tgz#e2ea2b033668b5076d5f3a23a703907689748353"
-  integrity sha512-duKK/Zcpel52a3hkbw5Qz+QOzWRAnKzkop368TvAcxwbiIV2dBgdlimeA5oN90JrkCKvDBk/cFWMgOkO+szsJA==
+type-coverage@^2.8.0:
+  version "2.8.0"
+  resolved "https://registry.yarnpkg.com/type-coverage/-/type-coverage-2.8.0.tgz#ccaa7a07435d90f266c4c1ae6361fe0e837be1a1"
+  integrity sha512-n2TnL0L1xxjMZBjA/TTZU20iQIu32dGTpu1H9z32aqoqL9INzDYZ/xivmTU1tvNTUJoyauBmLZwPzG29tM9iIQ==
   dependencies:
     minimist "1"
-    type-coverage-core "^2.7.2"
+    type-coverage-core "^2.8.0"
 
 type-detect@4.0.8:
   version "4.0.8"
