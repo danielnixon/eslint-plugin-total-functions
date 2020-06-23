@@ -370,5 +370,19 @@ ruleTester.run("no-array-subscript", rule, {
         },
       ],
     },
+    // optional member array access
+    {
+      filename: "file.ts",
+      code: `
+        const arr: ReadonlyArray<number> = [];
+        const foo = arr?.[0];
+      `,
+      errors: [
+        {
+          messageId: "errorStringGeneric",
+          type: AST_NODE_TYPES.OptionalMemberExpression,
+        },
+      ],
+    },
   ],
 });
