@@ -98,6 +98,9 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
           const isUnsafeAssignmentRecursively =
             destinationPropertyType !== undefined &&
             sourcePropertyType !== undefined &&
+            // Try to avoid infinite recursion...
+            destinationPropertyType !== destinationType &&
+            sourcePropertyType !== sourceType &&
             isUnsafeAssignment(destinationPropertyType, sourcePropertyType);
 
           const assigningReadonlyToMutable =
