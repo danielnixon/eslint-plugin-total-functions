@@ -153,7 +153,18 @@ ruleTester.run("no-unsafe-assignment", rule, {
     /**
      * Variable declaration
      */
-    // TODO
+    // readonly array prop with readonly generic type -> readonly array prop with mutable generic type
+    // TODO this should be invalid
+    {
+      filename: "file.ts",
+      code: `
+        type MutableA = { readonly a: ReadonlyArray<{ b: string }> };
+        type ReadonlyA = { readonly a: ReadonlyArray<{ readonly b: string }> };
+        
+        const readonlyA: ReadonlyA = { a: [] };
+        const mutableA: MutableA = readonlyA;      
+      `,
+    },
   ],
   invalid: [
     /**

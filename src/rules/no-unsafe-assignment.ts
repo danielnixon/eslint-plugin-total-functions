@@ -41,7 +41,11 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
 
     const isUnsafeAssignment = (
       destinationType: Type,
-      sourceType: Type
+      sourceType: Type,
+      seenTypes: ReadonlyArray<{
+        readonly destinationType: Type;
+        readonly sourceType: Type;
+      }> = []
       // eslint-disable-next-line sonarjs/cognitive-complexity
     ): boolean => {
       // eslint-disable-next-line functional/no-conditional-statement
@@ -106,9 +110,16 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
             destinationPropertyType !== undefined &&
             sourcePropertyType !== undefined &&
             // Try to avoid infinite recursion...
-            destinationPropertyType !== destinationType &&
-            sourcePropertyType !== sourceType &&
-            isUnsafeAssignment(destinationPropertyType, sourcePropertyType);
+            seenTypes.every(
+              (t) =>
+                t.destinationType !== destinationPropertyType &&
+                t.sourceType !== sourcePropertyType
+            ) &&
+            isUnsafeAssignment(
+              destinationPropertyType,
+              sourcePropertyType,
+              seenTypes.concat([{ destinationType, sourceType }])
+            );
 
           const assigningReadonlyToMutable =
             sourcePropIsReadonly && !destinationPropIsReadonly;
