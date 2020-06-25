@@ -221,7 +221,7 @@ ruleTester.run("no-unsafe-assignment", rule, {
     /**
      * Variable declaration
      */
-    // readonly -> mutable
+    // readonly (type) -> mutable
     {
       filename: "file.ts",
       code: `
@@ -230,6 +230,28 @@ ruleTester.run("no-unsafe-assignment", rule, {
 
         const readonlyA: ReadonlyA = { a: "readonly?" };
         const mutableA: MutableA = readonlyA;
+      `,
+      errors: [
+        {
+          messageId: "errorStringVariableDeclarationReadonlyToMutable",
+          type: AST_NODE_TYPES.VariableDeclaration,
+        },
+      ],
+    },
+    // readonly (class) -> mutable
+    // this is arguably worse than the above because instead of surprise mutation it results in a TypeError
+    {
+      filename: "file.ts",
+      code: `
+        class Box {
+          get area(): number {
+            return 42;
+          }
+        }
+        type Area = {
+          area: number;
+        };
+        const a: Area = new Box();
       `,
       errors: [
         {
