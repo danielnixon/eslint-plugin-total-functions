@@ -13,6 +13,9 @@ const ruleTester = new RuleTester({
 // eslint-disable-next-line functional/no-expression-statement
 ruleTester.run("no-unsafe-assignment", rule, {
   valid: [
+    /**
+     * Call expressions
+     */
     // zero parameters
     {
       filename: "file.ts",
@@ -143,8 +146,19 @@ ruleTester.run("no-unsafe-assignment", rule, {
         func(mutableA);
       `,
     },
+    /**
+     * Assignment expressions
+     */
+    // TODO
+    /**
+     * Variable declaration
+     */
+    // TODO
   ],
   invalid: [
+    /**
+     * Call expressions
+     */
     // readonly -> mutable
     {
       filename: "file.ts",
@@ -180,6 +194,47 @@ ruleTester.run("no-unsafe-assignment", rule, {
         {
           messageId: "errorStringCallExpressionReadonlyToMutable",
           type: AST_NODE_TYPES.Identifier,
+        },
+      ],
+    },
+    /**
+     * Assignment expressions
+     */
+    // readonly -> mutable
+    {
+      filename: "file.ts",
+      code: `
+        type MutableA = { a: string };
+        type ReadonlyA = { readonly a: string };
+
+        const readonlyA: ReadonlyA = { a: "readonly?" };
+        let mutableA: MutableA;
+        mutableA = readonlyA;
+      `,
+      errors: [
+        {
+          messageId: "errorStringAssignmentExpressionReadonlyToMutable",
+          type: AST_NODE_TYPES.AssignmentExpression,
+        },
+      ],
+    },
+    /**
+     * Variable declaration
+     */
+    // readonly -> mutable
+    {
+      filename: "file.ts",
+      code: `
+        type MutableA = { a: string };
+        type ReadonlyA = { readonly a: string };
+
+        const readonlyA: ReadonlyA = { a: "readonly?" };
+        const mutableA: MutableA = readonlyA;
+      `,
+      errors: [
+        {
+          messageId: "errorStringVariableDeclarationReadonlyToMutable",
+          type: AST_NODE_TYPES.VariableDeclaration,
         },
       ],
     },

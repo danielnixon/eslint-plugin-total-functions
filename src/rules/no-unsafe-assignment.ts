@@ -7,7 +7,10 @@ import { isObjectType, isPropertyReadonlyInType } from "tsutils";
 import { get } from "total-functions";
 import { Type } from "typescript";
 
-type MessageId = "errorStringCallExpressionReadonlyToMutable";
+type MessageId =
+  | "errorStringCallExpressionReadonlyToMutable"
+  | "errorStringAssignmentExpressionReadonlyToMutable"
+  | "errorStringVariableDeclarationReadonlyToMutable";
 
 /**
  * An ESLint rule to ban unsafe assignment and declarations.
@@ -24,6 +27,10 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
     messages: {
       errorStringCallExpressionReadonlyToMutable:
         "Passing a readonly type to a function that expects a mutable type can lead to unexpected mutation in the readonly value.",
+      errorStringAssignmentExpressionReadonlyToMutable:
+        "Assigning a readonly type to a mutable type can lead to unexpected mutation in the readonly value.",
+      errorStringVariableDeclarationReadonlyToMutable:
+        "Using a readonly type to initialize a mutable type can lead to unexpected mutation in the readonly value.",
     },
     schema: [],
   },
@@ -113,13 +120,66 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
     };
 
     return {
+      // eslint-disable-next-line functional/no-return-void
+      VariableDeclaration: (node): void => {
+        // eslint-disable-next-line functional/no-expression-statement
+        node.declarations.forEach((declaration) => {
+          const leftTsNode = parserServices.esTreeNodeToTSNodeMap.get(
+            declaration.id
+          );
+          const rightTsNode =
+            declaration.init !== null
+              ? parserServices.esTreeNodeToTSNodeMap.get(declaration.init)
+              : undefined;
+
+          const leftType = checker.getTypeAtLocation(leftTsNode);
+          const rightType =
+            rightTsNode !== undefined
+              ? checker.getTypeAtLocation(rightTsNode)
+              : undefined;
+
+          // eslint-disable-next-line functional/no-conditional-statement
+          if (
+            declaration.init !== null &&
+            rightType !== undefined &&
+            // object expressions are allowed because we won't retain a reference to the object to get out of sync.
+            // TODO but what about properties in the object literal that are references to values we _do_ retain a reference to?
+            declaration.init.type !== AST_NODE_TYPES.ObjectExpression &&
+            isUnsafeAssignment(leftType, rightType)
+          ) {
+            // eslint-disable-next-line functional/no-expression-statement
+            context.report({
+              node: node,
+              messageId: "errorStringVariableDeclarationReadonlyToMutable",
+            });
+          }
+        });
+      },
+      // eslint-disable-next-line functional/no-return-void
+      AssignmentExpression: (node): void => {
+        const leftTsNode = parserServices.esTreeNodeToTSNodeMap.get(node.left);
+        const rightTsNode = parserServices.esTreeNodeToTSNodeMap.get(
+          node.right
+        );
+
+        const leftType = checker.getTypeAtLocation(leftTsNode);
+        const rightType = checker.getTypeAtLocation(rightTsNode);
+
+        // eslint-disable-next-line functional/no-conditional-statement
+        if (
+          // object expressions are allowed because we won't retain a reference to the object to get out of sync.
+          // TODO but what about properties in the object literal that are references to values we _do_ retain a reference to?
+          node.right.type !== AST_NODE_TYPES.ObjectExpression &&
+          isUnsafeAssignment(leftType, rightType)
+        ) {
+          // eslint-disable-next-line functional/no-expression-statement
+          context.report({
+            node: node,
+            messageId: "errorStringAssignmentExpressionReadonlyToMutable",
+          });
+        }
+      },
       // TODO
-      // // eslint-disable-next-line functional/no-return-void
-      // VariableDeclaration: (node): void => {
-      // },
-      // // eslint-disable-next-line functional/no-return-void
-      // AssignmentExpression: (node): void => {
-      // },
       // eslint-disable-next-line functional/no-return-void
       // ReturnStatement: (node): void => {
       // },
