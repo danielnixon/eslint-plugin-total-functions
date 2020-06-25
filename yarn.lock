@@ -630,10 +630,10 @@
     "@types/istanbul-lib-coverage" "*"
     "@types/istanbul-lib-report" "*"
 
-"@types/jest@^26.0.1":
-  version "26.0.1"
-  resolved "https://registry.yarnpkg.com/@types/jest/-/jest-26.0.1.tgz#78416d00499c5a9a839b937000483f7647a16cb9"
-  integrity sha512-KumByIAlAh/uczr7WjdKHs5cUWhwOeRnsfjI/T/tQP1xvVBSgnRPAZ8VZjp26pQmE79d+n7X1AuTUu0IWHrfWg==
+"@types/jest@^26.0.3":
+  version "26.0.3"
+  resolved "https://registry.yarnpkg.com/@types/jest/-/jest-26.0.3.tgz#79534e0e94857171c0edc596db0ebe7cb7863251"
+  integrity sha512-v89ga1clpVL/Y1+YI0eIu1VMW+KU7Xl8PhylVtDKVWaSUHBHYPLXMQGBdrpHewaKoTvlXkksbYqPgz8b4cmRZg==
   dependencies:
     jest-diff "^25.2.1"
     pretty-format "^25.2.1"
@@ -675,7 +675,7 @@
   dependencies:
     "@types/yargs-parser" "*"
 
-"@typescript-eslint/eslint-plugin@^3.3.0", "@typescript-eslint/eslint-plugin@^3.4.0":
+"@typescript-eslint/eslint-plugin@^3.4.0":
   version "3.4.0"
   resolved "https://registry.yarnpkg.com/@typescript-eslint/eslint-plugin/-/eslint-plugin-3.4.0.tgz#8378062e6be8a1d049259bdbcf27ce5dfbeee62b"
   integrity sha512-wfkpiqaEVhZIuQRmudDszc01jC/YR7gMSxa6ulhggAe/Hs0KVIuo9wzvFiDbG3JD5pRFQoqnf4m7REDsUvBnMQ==
@@ -687,7 +687,7 @@
     semver "^7.3.2"
     tsutils "^3.17.1"
 
-"@typescript-eslint/experimental-utils@3.4.0", "@typescript-eslint/experimental-utils@^3.3.0", "@typescript-eslint/experimental-utils@^3.4.0":
+"@typescript-eslint/experimental-utils@3.4.0", "@typescript-eslint/experimental-utils@^3.4.0":
   version "3.4.0"
   resolved "https://registry.yarnpkg.com/@typescript-eslint/experimental-utils/-/experimental-utils-3.4.0.tgz#8a44dfc6fb7f1d071937b390fe27608ebda122b8"
   integrity sha512-rHPOjL43lOH1Opte4+dhC0a/+ks+8gOBwxXnyrZ/K4OTAChpSjP76fbI8Cglj7V5GouwVAGaK+xVwzqTyE/TPw==
@@ -707,7 +707,7 @@
     eslint-scope "^5.0.0"
     eslint-utils "^2.0.0"
 
-"@typescript-eslint/parser@^3.3.0", "@typescript-eslint/parser@^3.4.0":
+"@typescript-eslint/parser@^3.4.0":
   version "3.4.0"
   resolved "https://registry.yarnpkg.com/@typescript-eslint/parser/-/parser-3.4.0.tgz#fe52b68c5cb3bba3f5d875bd17adb70420d49d8d"
   integrity sha512-ZUGI/de44L5x87uX5zM14UYcbn79HSXUR+kzcqU42gH0AgpdB/TjuJy3m4ezI7Q/jk3wTQd755mxSDLhQP79KA==
@@ -1570,14 +1570,14 @@ eslint-plugin-sonarjs@^0.5.0:
   resolved "https://registry.yarnpkg.com/eslint-plugin-sonarjs/-/eslint-plugin-sonarjs-0.5.0.tgz#ce17b2daba65a874c2862213a9e38e8986ad7d7d"
   integrity sha512-XW5MnzlRjhXpIdbULC/qAdJYHWw3rRLws/DyawdlPU/IdVr9AmRK1r2LaCvabwKOAW2XYYSo3kDX58E4MrB7PQ==
 
-eslint-plugin-total-functions@^1.21.0:
-  version "1.21.0"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-total-functions/-/eslint-plugin-total-functions-1.21.0.tgz#973908f2b91ce67255e0f0cc70ab2e2fd7ff27d4"
-  integrity sha512-JZmgORkJgaDXbTXG+eOzVFp3SxSIm3BzRrcG2i2KBvm7GgJDsn8vUUU4/h77mJwBW06nvt7AAIN6h3QombofOg==
+eslint-plugin-total-functions@^1.22.0:
+  version "1.22.0"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-total-functions/-/eslint-plugin-total-functions-1.22.0.tgz#dfd3c6900ea91b9a665744ec6c4c186e91961c5e"
+  integrity sha512-BpEyY2wz/YBaeTP7ZTOsO9Lh6/VL9PY91VlQ6752Olx12t0uq/2Buoy2w7qhaE5xXX/sOevySrhGMWMjbbxB7Q==
   dependencies:
-    "@typescript-eslint/eslint-plugin" "^3.3.0"
-    "@typescript-eslint/experimental-utils" "^3.3.0"
-    "@typescript-eslint/parser" "^3.3.0"
+    "@typescript-eslint/eslint-plugin" "^3.4.0"
+    "@typescript-eslint/experimental-utils" "^3.4.0"
+    "@typescript-eslint/parser" "^3.4.0"
     total-functions "^3.0.0"
     tsutils "^3.17.1"
 
@@ -2701,9 +2701,9 @@ jest-mock@^26.1.0:
     "@jest/types" "^26.1.0"
 
 jest-pnp-resolver@^1.2.1:
-  version "1.2.1"
-  resolved "https://registry.yarnpkg.com/jest-pnp-resolver/-/jest-pnp-resolver-1.2.1.tgz#ecdae604c077a7fbc70defb6d517c3c1c898923a"
-  integrity sha512-pgFw2tm54fzgYvc/OHrnysABEObZCUNFnhjoRjaVOCN8NYc032/gVjPaHD4Aq6ApkSieWtfKAFQtmDKAmhupnQ==
+  version "1.2.2"
+  resolved "https://registry.yarnpkg.com/jest-pnp-resolver/-/jest-pnp-resolver-1.2.2.tgz#b704ac0ae028a89108a4d040b3f919dfddc8e33c"
+  integrity sha512-olV41bKSMm8BdnuMsewT4jqlZ8+3TCARAXjZGT9jcoSnrfUnRCqnMoF9XEeoWjbzObpqF9dRhHQj0Xb9QdF6/w==
 
 jest-regex-util@^26.0.0:
   version "26.0.0"
