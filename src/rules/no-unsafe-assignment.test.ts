@@ -146,6 +146,41 @@ ruleTester.run("no-unsafe-assignment", rule, {
         func(mutableA);
       `,
     },
+    // multiple type signatures (readonly -> readonly)
+    {
+      filename: "file.ts",
+      code: `
+        type MutableA = { a: string };
+        type ReadonlyA = { readonly a: string };
+        
+        export function func(a: MutableA): MutableA;
+        export function func(a: ReadonlyA): ReadonlyA;
+        export function func(a: any): any {
+          return a;
+        }
+        
+        const readonlyA: ReadonlyA = { a: "" };
+        func(readonlyA);
+      `,
+    },
+    // multiple type signatures (readonly -> mutable)
+    // TODO this should be invalid
+    {
+      filename: "file.ts",
+      code: `
+        type MutableA = { a: string };
+        type ReadonlyA = { readonly a: string };
+        
+        export function func(a: MutableA): MutableA;
+        export function func(a: number): number;
+        export function func(a: any): any {
+          return a;
+        }
+        
+        const readonlyA: ReadonlyA = { a: "" };
+        func(readonlyA);
+      `,
+    },
     /**
      * Assignment expressions
      */
