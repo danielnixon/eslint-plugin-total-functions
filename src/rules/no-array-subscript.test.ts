@@ -23,6 +23,12 @@ ruleTester.run("no-array-subscript", rule, {
       filename: "file.ts",
       code: "const arr = [0, 1, 2] as const; const foo = arr[0];",
     },
+    // Const array property access with non-literal (but const) key.
+    {
+      filename: "file.ts",
+      code:
+        "const arr = [0, 1, 2] as const; const key = 0 as const; const foo = arr[key];"
+    },
     // Tuple (within range).
     {
       filename: "file.ts",
@@ -35,11 +41,18 @@ ruleTester.run("no-array-subscript", rule, {
       code:
         "const arr = [0, 1, 2] as [number, number, number]; const foo = arr[2];",
     },
-    // Partial tuple (within range).
+    // Partial tuple (within range of tuple portion).
     {
       filename: "file.ts",
       code:
         "const arr = [0, 1, 2] as [number, number, ...number[]]; const foo = arr[0];",
+    },
+    // Tuple (outside range)
+    // Not flagged by this rule because TypeScript itself will complain about it.
+    {
+      filename: "file.ts",
+      code:
+        "const arr = [0, 1, 2] as [number, number, number]; const foo = arr[42];",
     },
     // Array subscript access where array generic type is union including undefined.
     {
@@ -160,18 +173,6 @@ ruleTester.run("no-array-subscript", rule, {
         },
       ],
     },
-    // Tuple (outside range)
-    {
-      filename: "file.ts",
-      code:
-        "const arr = [0, 1, 2] as [number, number, number]; const foo = arr[42];",
-      errors: [
-        {
-          messageId: "errorStringGeneric",
-          type: AST_NODE_TYPES.MemberExpression,
-        },
-      ],
-    },
     // Record
     {
       filename: "file.ts",
@@ -271,12 +272,24 @@ ruleTester.run("no-array-subscript", rule, {
         },
       ],
     },
-    // Const array property access with non-literal (but const) key;
+    // Partial tuple property access with non-literal (but const) key (outside range of tuple portion).
+    {
+      filename: "file.ts",
+      code:
+        "const arr: readonly [0, 1, 2, ...(readonly number[])] = [0, 1, 2]; const key = 42; const foo = arr[key];",
+      errors: [
+        {
+          messageId: "errorStringGeneric",
+          type: AST_NODE_TYPES.MemberExpression,
+        },
+      ],
+    },
+    // Partial tuple property access with non-literal (but const) key (within range of tuple portion).
     // TODO this should be valid.
     {
       filename: "file.ts",
       code:
-        "const arr = [0, 1, 2] as const; const key = 0 as const; const foo = arr[key];",
+        "const arr: readonly [0, 1, 2, ...(readonly number[])] = [0, 1, 2]; const key = 1; const foo = arr[key];",
       errors: [
         {
           messageId: "errorStringGeneric",
@@ -285,7 +298,6 @@ ruleTester.run("no-array-subscript", rule, {
       ],
     },
     // Object expression where result of array access is assigned to optional property (type name).
-    // TODO this should be valid.
     {
       filename: "file.ts",
       code:

@@ -151,6 +151,13 @@ const noArraySubscript: RuleModule<"errorStringGeneric", readonly []> = {
       }
 
       // eslint-disable-next-line functional/no-conditional-statement
+      if (isTupleTypeReference(type) && type.target.hasRestElement === false) {
+        // Always allow tuples without a ...rest element.
+        // If this access is invalid TypeScript itself will catch it.
+        return;
+      }
+
+      // eslint-disable-next-line functional/no-conditional-statement
       if (
         type.getStringIndexType() === undefined &&
         type.getNumberIndexType() === undefined
