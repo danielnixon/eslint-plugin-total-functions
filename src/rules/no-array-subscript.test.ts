@@ -298,6 +298,7 @@ ruleTester.run("no-array-subscript", rule, {
       ],
     },
     // Object expression where result of array access is assigned to optional property (type name).
+    // TODO this should be valid.
     {
       filename: "file.ts",
       code:

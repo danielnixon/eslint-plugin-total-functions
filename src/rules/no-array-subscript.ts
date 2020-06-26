@@ -166,7 +166,6 @@ const noArraySubscript: RuleModule<"errorStringGeneric", readonly []> = {
         return;
       }
 
-      // TODO: https://github.com/danielnixon/eslint-plugin-total-functions/issues/16
       // TODO: https://github.com/danielnixon/eslint-plugin-total-functions/issues/11
 
       // eslint-disable-next-line functional/no-expression-statement
