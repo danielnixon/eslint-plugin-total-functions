@@ -79,11 +79,6 @@ const noArraySubscript: RuleModule<"errorStringGeneric", readonly []> = {
       const tsNode = parserServices.esTreeNodeToTSNodeMap.get(node.object);
       const type = checker.getTypeAtLocation(tsNode);
 
-      const propertyNode = parserServices.esTreeNodeToTSNodeMap.get(
-        node.property
-      );
-      const propertyType = checker.getTypeAtLocation(propertyNode);
-
       // eslint-disable-next-line functional/no-conditional-statement
       if (
         node.parent !== undefined &&
@@ -157,20 +152,10 @@ const noArraySubscript: RuleModule<"errorStringGeneric", readonly []> = {
 
       // eslint-disable-next-line functional/no-conditional-statement
       if (
-        node.property.type === AST_NODE_TYPES.Literal &&
-        (typeof node.property.value === "string" ||
-          typeof node.property.value === "number") &&
-        type.getProperty(node.property.value.toString()) !== undefined
+        type.getStringIndexType() === undefined &&
+        type.getNumberIndexType() === undefined
       ) {
-        // Allow object subscript access when it is known to be safe (this excludes records).
-        return;
-      }
-
-      // eslint-disable-next-line functional/no-conditional-statement, @typescript-eslint/no-unsafe-member-access
-      if (propertyType.flags & ts.TypeFlags.ESSymbolLike) {
-        // Using array subscript with a symbol that isn't actually a property on this object
-        // will return `any`, so type-coverage and typescript-eslint's no-unsafe-assignment rule will catch it.
-        // TODO: Figure out how to determine if this symbol is a valid key into this object and report error if not.
+        // Allow object subscript access when there is no index signature in the object (i.e. when this object is not a Record<A, B>).
         return;
       }
 

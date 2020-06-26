@@ -88,6 +88,18 @@ ruleTester.run("no-array-subscript", rule, {
       filename: "file.ts",
       code: "const arr = [0]; const foo = arr[0] as number | undefined;",
     },
+    // Object subscript property access (invalid string property name).
+    // TypeScript catches this and our rule only cares about objects with index signatures.
+    {
+      filename: "file.ts",
+      code: "const obj = { 'a': 'a' }; const foo = obj['b'];",
+    },
+    // Object subscript property access (invalid number property name).
+    // TypeScript catches this and our rule only cares about objects with index signatures.
+    {
+      filename: "file.ts",
+      code: "const obj = { 100: 'a' }; const foo = obj[200];",
+    },
   ],
   invalid: [
     // Array subscript access.
@@ -153,28 +165,6 @@ ruleTester.run("no-array-subscript", rule, {
       filename: "file.ts",
       code:
         "const arr = [0, 1, 2] as [number, number, number]; const foo = arr[42];",
-      errors: [
-        {
-          messageId: "errorStringGeneric",
-          type: AST_NODE_TYPES.MemberExpression,
-        },
-      ],
-    },
-    // Object subscript property access (invalid string property name).
-    {
-      filename: "file.ts",
-      code: "const obj = { 'a': 'a' }; const foo = obj['b'];",
-      errors: [
-        {
-          messageId: "errorStringGeneric",
-          type: AST_NODE_TYPES.MemberExpression,
-        },
-      ],
-    },
-    // Object subscript property access (invalid number property name).
-    {
-      filename: "file.ts",
-      code: "const obj = { 100: 'a' }; const foo = obj[200];",
       errors: [
         {
           messageId: "errorStringGeneric",
