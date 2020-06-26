@@ -27,7 +27,7 @@ ruleTester.run("no-array-subscript", rule, {
     {
       filename: "file.ts",
       code:
-        "const arr = [0, 1, 2] as const; const key = 0 as const; const foo = arr[key];"
+        "const arr = [0, 1, 2] as const; const key = 0 as const; const foo = arr[key];",
     },
     // Tuple (within range).
     {
