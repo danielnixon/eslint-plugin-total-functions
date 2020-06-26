@@ -387,5 +387,19 @@ ruleTester.run("no-array-subscript", rule, {
         },
       ],
     },
+    // string
+    {
+      filename: "file.ts",
+      code: `
+        const str = "a string";
+        const bar = str[42];
+      `,
+      errors: [
+        {
+          messageId: "errorStringGeneric",
+          type: AST_NODE_TYPES.MemberExpression,
+        },
+      ],
+    },
   ],
 });

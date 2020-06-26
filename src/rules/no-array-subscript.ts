@@ -163,6 +163,7 @@ const noArraySubscript: RuleModule<"errorStringGeneric", readonly []> = {
         type.getNumberIndexType() === undefined
       ) {
         // Allow object subscript access when there is no index signature in the object (i.e. when this object is not a Record<A, B>).
+        // If this access is invalid TypeScript itself will catch it.
         return;
       }
 

@@ -46,19 +46,19 @@ const noArrayDestructuring: RuleModule<"errorStringGeneric", readonly []> = {
         }
 
         const numberIndexType = type.getNumberIndexType();
+        const typeParts =
+          numberIndexType !== undefined
+            ? numberIndexType.isUnion()
+              ? numberIndexType.types
+              : [numberIndexType]
+            : [];
+
         // eslint-disable-next-line functional/no-conditional-statement
-        if (numberIndexType !== undefined) {
-          const typeParts = numberIndexType.isUnion()
-            ? numberIndexType.types
-            : [numberIndexType];
-          // eslint-disable-next-line functional/no-conditional-statement
-          if (
-            typeParts.find((t) => t.flags & ts.TypeFlags.Undefined) !==
-            undefined
-          ) {
-            // Allow destructuring if undefined is already in the array type.
-            return;
-          }
+        if (
+          typeParts.find((t) => t.flags & ts.TypeFlags.Undefined) !== undefined
+        ) {
+          // Allow destructuring if undefined is already in the array type.
+          return;
         }
 
         // eslint-disable-next-line functional/no-expression-statement

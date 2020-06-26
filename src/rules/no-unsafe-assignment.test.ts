@@ -162,7 +162,7 @@ ruleTester.run("no-unsafe-assignment", rule, {
         type ReadonlyA = { readonly a: ReadonlyArray<{ readonly b: string }> };
         
         const readonlyA: ReadonlyA = { a: [] };
-        const mutableA: MutableA = readonlyA;      
+        const mutableA: MutableA = readonlyA;
       `,
     },
   ],

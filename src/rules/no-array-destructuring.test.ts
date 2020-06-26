@@ -135,5 +135,33 @@ ruleTester.run("no-array-destructuring", rule, {
         },
       ],
     },
+    // string
+    {
+      filename: "file.ts",
+      code: `
+        const str = "a string";
+        const [foo] = str;
+      `,
+      errors: [
+        {
+          messageId: "errorStringGeneric",
+          type: AST_NODE_TYPES.ArrayPattern,
+        },
+      ],
+    },
+    // no number index type
+    {
+      filename: "file.ts",
+      code: `
+        const arr: any = [];
+        const [foo] = arr;
+      `,
+      errors: [
+        {
+          messageId: "errorStringGeneric",
+          type: AST_NODE_TYPES.ArrayPattern,
+        },
+      ],
+    },
   ],
 });

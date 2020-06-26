@@ -57,13 +57,17 @@ Alternatively you can configure individual rules separately (see below).
 Bans unsafe array and object subscript access, for example:
 
 ```typescript
-const a: object[] = [];
+const a: string[] = [];
 const b = a[0]; // b has type object, not object | undefined as you might expect
-b.toString(); // This explodes at runtime
+b.toUpperCase(); // This explodes at runtime
 
 const record: Record<string, string> = { foo: "foo" };
 const bar = record["bar"]; // bar has type string, not string | undefined
 bar.toUpperCase(); // This explodes at runtime
+
+const str = "a string";
+const baz = str[42]; // bar has type string, not string | undefined
+baz.toUpperCase(); // This explodes at runtime
 ```
 
 See [TypeScript issue #13778](https://github.com/Microsoft/TypeScript/issues/13778) for the corresponding issue and [total-functions](https://github.com/danielnixon/total-functions#get-type-safe-array-index-operator) for a safe (total) alternative.
@@ -79,13 +83,17 @@ For examples of subscript access that this rule considers valid and invalid, see
 Bans unsafe array and object destructuring, for example:
 
 ```typescript
-const array: readonly number[] = [];
-const [foo] = array; // foo has type number, not number | undefined
-foo.toString(); // This explodes at runtime
+const array: readonly string[] = [];
+const [foo] = array; // foo has type string, not string | undefined
+foo.toUpperCase(); // This explodes at runtime
 
 const obj: Record<string, string> = { a: "a" };
 const { b } = obj; // b has type string, not string | undefined
 b.toUpperCase(); // This explodes at runtime
+
+const str = "a string";
+const [bar] = str; // bar has type string, not string | undefined
+bar.toUpperCase(); // This explodes at runtime
 ```
 
 Destructuring tuples is allowed, as long as you're within the length of the tuple.
