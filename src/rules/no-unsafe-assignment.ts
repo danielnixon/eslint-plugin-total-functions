@@ -5,7 +5,7 @@ import {
 } from "@typescript-eslint/experimental-utils";
 import { isObjectType, isPropertyReadonlyInType } from "tsutils";
 import { get } from "total-functions";
-import { Type, isCallLikeExpression } from "typescript";
+import { Type } from "typescript";
 
 type MessageId =
   | "errorStringCallExpressionReadonlyToMutable"
@@ -201,9 +201,7 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
         const callExpressionNode = parserServices.esTreeNodeToTSNodeMap.get(
           node
         );
-        const signature = isCallLikeExpression(callExpressionNode)
-          ? checker.getResolvedSignature(callExpressionNode)
-          : undefined;
+        const signature = checker.getResolvedSignature(callExpressionNode);
 
         // eslint-disable-next-line functional/no-conditional-statement
         if (signature !== undefined) {
