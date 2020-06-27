@@ -202,46 +202,43 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
           node
         );
         const signature = checker.getResolvedSignature(callExpressionNode);
+        const parameters = signature !== undefined ? signature.parameters : [];
+        const tsNode = parserServices.esTreeNodeToTSNodeMap.get(node.callee);
 
-        // eslint-disable-next-line functional/no-conditional-statement
-        if (signature !== undefined) {
-          const tsNode = parserServices.esTreeNodeToTSNodeMap.get(node.callee);
+        // eslint-disable-next-line functional/no-expression-statement
+        parameters.forEach((parameter, i) => {
+          const paramType = checker.getTypeOfSymbolAtLocation(
+            parameter,
+            tsNode
+          );
 
-          // eslint-disable-next-line functional/no-expression-statement
-          signature.parameters.forEach((parameter, i) => {
-            const paramType = checker.getTypeOfSymbolAtLocation(
-              parameter,
-              tsNode
-            );
+          // This is the argument that corresponds to the current parameter.
+          const argument = get(node.arguments, i);
+          const argumentTsNode =
+            argument !== undefined
+              ? parserServices.esTreeNodeToTSNodeMap.get(argument)
+              : undefined;
+          const argumentType =
+            argumentTsNode !== undefined
+              ? checker.getTypeAtLocation(argumentTsNode)
+              : undefined;
 
-            // This is the argument that corresponds to the current parameter.
-            const argument = get(node.arguments, i);
-            const argumentTsNode =
-              argument !== undefined
-                ? parserServices.esTreeNodeToTSNodeMap.get(argument)
-                : undefined;
-            const argumentType =
-              argumentTsNode !== undefined
-                ? checker.getTypeAtLocation(argumentTsNode)
-                : undefined;
-
-            // eslint-disable-next-line functional/no-conditional-statement
-            if (
-              argument !== undefined &&
-              argumentType !== undefined &&
-              // object expressions are allowed because we won't retain a reference to the object to get out of sync.
-              // TODO but what about properties in the object literal that are references to values we _do_ retain a reference to?
-              argument.type !== AST_NODE_TYPES.ObjectExpression &&
-              isUnsafeAssignment(paramType, argumentType)
-            ) {
-              // eslint-disable-next-line functional/no-expression-statement
-              context.report({
-                node: argument,
-                messageId: "errorStringCallExpressionReadonlyToMutable",
-              });
-            }
-          });
-        }
+          // eslint-disable-next-line functional/no-conditional-statement
+          if (
+            argument !== undefined &&
+            argumentType !== undefined &&
+            // object expressions are allowed because we won't retain a reference to the object to get out of sync.
+            // TODO but what about properties in the object literal that are references to values we _do_ retain a reference to?
+            argument.type !== AST_NODE_TYPES.ObjectExpression &&
+            isUnsafeAssignment(paramType, argumentType)
+          ) {
+            // eslint-disable-next-line functional/no-expression-statement
+            context.report({
+              node: argument,
+              messageId: "errorStringCallExpressionReadonlyToMutable",
+            });
+          }
+        });
       },
     };
   },
