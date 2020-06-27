@@ -36,6 +36,16 @@ ruleTester.run("no-unsafe-assignment", rule, {
         foo("a");
       `,
     },
+    // missing arguments (TypeScript will catch this so we don't flag it)
+    {
+      filename: "file.ts",
+      code: `
+        const foo = (a: string) => {
+          return undefined;
+        };
+        foo();
+      `,
+    },
     // readonly -> readonly (type doesn't change)
     {
       filename: "file.ts",
