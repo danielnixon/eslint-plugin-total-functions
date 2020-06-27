@@ -65,8 +65,8 @@ const record: Record<string, string> = { foo: "foo" };
 const bar = record["bar"]; // bar has type string, not string | undefined
 bar.toUpperCase(); // This explodes at runtime
 
-const str = "a string";
-const baz = str[42]; // bar has type string, not string | undefined
+const str = "";
+const baz = str[0]; // bar has type string, not string | undefined
 baz.toUpperCase(); // This explodes at runtime
 ```
 
@@ -91,7 +91,7 @@ const obj: Record<string, string> = { a: "a" };
 const { b } = obj; // b has type string, not string | undefined
 b.toUpperCase(); // This explodes at runtime
 
-const str = "a string";
+const str = "";
 const [bar] = str; // bar has type string, not string | undefined
 bar.toUpperCase(); // This explodes at runtime
 ```
