@@ -58,7 +58,7 @@ Bans unsafe array and object subscript access, for example:
 
 ```typescript
 const a: string[] = [];
-const b = a[0]; // b has type object, not object | undefined as you might expect
+const b = a[0]; // b has type string, not string | undefined as you might expect
 b.toUpperCase(); // This explodes at runtime
 
 const record: Record<string, string> = { foo: "foo" };
