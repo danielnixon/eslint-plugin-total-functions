@@ -123,6 +123,16 @@ For examples of type assertions that this rule considers valid and invalid, see 
 
 See [TypeScript issue #7481](https://github.com/microsoft/TypeScript/issues/7481) for a request to fix this at the language level.
 
+### total-functions/no-unsafe-assignment
+
+Bans unsafe assignment of readonly values to mutable values (which can lead to surprising mutation in the readonly value). This includes passing readonly values as arguments to functions that expect mutable parameters.
+
+See [TypeScript issue #13347](https://github.com/microsoft/TypeScript/issues/13347) for a request to fix this at the language level.
+
+See also:
+* https://github.com/danielnixon/eslint-plugin-total-functions/issues/21
+* https://github.com/jonaskello/eslint-plugin-functional/issues/113
+
 # See Also
 * https://github.com/danielnixon/readonly-types
 * https://github.com/danielnixon/total-functions
