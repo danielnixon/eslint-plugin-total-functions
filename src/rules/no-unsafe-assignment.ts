@@ -5,7 +5,7 @@ import {
 } from "@typescript-eslint/experimental-utils";
 import { isObjectType, isPropertyReadonlyInType } from "tsutils";
 import { get } from "total-functions";
-import { Type } from "typescript";
+import { Type, isCallLikeExpression } from "typescript";
 
 type MessageId =
   | "errorStringCallExpressionReadonlyToMutable"
@@ -199,16 +199,17 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
       // },
       // eslint-disable-next-line functional/no-return-void, sonarjs/cognitive-complexity
       CallExpression: (node): void => {
-        const tsNode = parserServices.esTreeNodeToTSNodeMap.get(node.callee);
-        const tsType = checker.getTypeAtLocation(tsNode);
-        const signatures = tsType.getCallSignatures();
-
-        // TODO: if a function has more than one signature, how do we know which
-        // one applies for this call? `checker.getResolvedSignature()`?
-        const signature = get(signatures, 0);
+        const callExpressionNode = parserServices.esTreeNodeToTSNodeMap.get(
+          node
+        );
+        const signature = isCallLikeExpression(callExpressionNode)
+          ? checker.getResolvedSignature(callExpressionNode)
+          : undefined;
 
         // eslint-disable-next-line functional/no-conditional-statement
-        if (signatures.length === 1 && signature !== undefined) {
+        if (signature !== undefined) {
+          const tsNode = parserServices.esTreeNodeToTSNodeMap.get(node.callee);
+
           // eslint-disable-next-line functional/no-expression-statement
           signature.parameters.forEach((parameter, i) => {
             const paramType = checker.getTypeOfSymbolAtLocation(

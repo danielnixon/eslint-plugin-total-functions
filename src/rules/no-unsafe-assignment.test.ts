@@ -160,10 +160,9 @@ ruleTester.run("no-unsafe-assignment", rule, {
     {
       filename: "file.ts",
       code: `
-        type MutableA = { a: string };
         type ReadonlyA = { readonly a: string };
         
-        export function func(a: MutableA): MutableA;
+        export function func(a: number): number;
         export function func(a: ReadonlyA): ReadonlyA;
         export function func(a: any): any {
           return a;
@@ -173,16 +172,15 @@ ruleTester.run("no-unsafe-assignment", rule, {
         func(readonlyA);
       `,
     },
-    // multiple type signatures (readonly -> mutable)
-    // TODO this should be invalid
+    // multiple type signatures (no matching signature)
+    // we don't bother flagging this because TypeScript itself will catch it
     {
       filename: "file.ts",
       code: `
-        type MutableA = { a: string };
         type ReadonlyA = { readonly a: string };
         
-        export function func(a: MutableA): MutableA;
         export function func(a: number): number;
+        export function func(a: string): string;
         export function func(a: any): any {
           return a;
         }
@@ -226,6 +224,29 @@ ruleTester.run("no-unsafe-assignment", rule, {
         };
         const readonlyA: ReadonlyA = { a: "readonly?" };
         mutate(readonlyA);
+      `,
+      errors: [
+        {
+          messageId: "errorStringCallExpressionReadonlyToMutable",
+          type: AST_NODE_TYPES.Identifier,
+        },
+      ],
+    },
+    // multiple type signatures (readonly -> mutable)
+    {
+      filename: "file.ts",
+      code: `
+        type MutableA = { a: string };
+        type ReadonlyA = { readonly a: string };
+        
+        export function func(a: MutableA): MutableA;
+        export function func(a: number): number;
+        export function func(a: any): any {
+          return a;
+        }
+        
+        const readonlyA: ReadonlyA = { a: "" };
+        func(readonlyA);
       `,
       errors: [
         {
