@@ -127,6 +127,8 @@ See [TypeScript issue #7481](https://github.com/microsoft/TypeScript/issues/7481
 
 Bans unsafe assignment of readonly values to mutable values (which can lead to surprising mutation in the readonly value). This includes passing readonly values as arguments to functions that expect mutable parameters.
 
+For examples of assignment that this rule considers valid and invalid, see [no-unsafe-assignment.test.ts](https://github.com/danielnixon/eslint-plugin-total-functions/blob/master/src/rules/no-unsafe-assignment.test.ts).
+
 See [TypeScript issue #13347](https://github.com/microsoft/TypeScript/issues/13347) for a request to fix this at the language level.
 
 See also:
