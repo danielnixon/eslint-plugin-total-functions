@@ -251,10 +251,13 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
 
           const numberIndexType = rawParamType.getNumberIndexType();
 
+          // TODO: work out which declaration applies in this case.
+          // For now we just conclude that is a rest param if it's a rest param in _all_ declarations.
           const isRestParam =
-            // TODO: work out which declaration applies in this case.
-            // For now we just conclude that is a rest param if it's a rest param in _all_ declarations.
-            parameter.declarations.every((d) => d.kind & SyntaxKind.RestType) &&
+            rawParamType.symbol !== undefined &&
+            rawParamType.symbol.declarations.every(
+              (d) => d.kind & SyntaxKind.RestType
+            ) &&
             numberIndexType !== undefined;
 
           const paramType = isRestParam ? numberIndexType : rawParamType;
