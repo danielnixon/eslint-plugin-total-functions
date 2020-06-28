@@ -189,25 +189,36 @@ ruleTester.run("no-unsafe-assignment", rule, {
         func(readonlyA);
       `,
     },
+    // readonly array concat.
+    {
+      filename: "file.ts",
+      code: `
+        const arr: ReadonlyArray<never> = [];
+        const foo = arr.concat(arr, arr);
+      `,
+    },
+    // mutable array concat.
+    {
+      filename: "file.ts",
+      code: `
+        const arr: Array<never> = [];
+        const foo = arr.concat(arr, arr);
+      `,
+    },
+    // Mixed mutable and readonly array concat.
+    // TODO this should be invalid.
+    {
+      filename: "file.ts",
+      code: `
+        const ro: ReadonlyArray<never> = [];
+        const mut: Array<never> = [];
+        const foo = ro.concat(ro, mut);
+      `,
+    },
     /**
      * Assignment expressions
      */
     // TODO
-    /**
-     * Variable declaration
-     */
-    // readonly array prop with readonly generic type -> readonly array prop with mutable generic type
-    // TODO this should be invalid
-    {
-      filename: "file.ts",
-      code: `
-        type MutableA = { readonly a: ReadonlyArray<{ b: string }> };
-        type ReadonlyA = { readonly a: ReadonlyArray<{ readonly b: string }> };
-        
-        const readonlyA: ReadonlyA = { a: [] };
-        const mutableA: MutableA = readonlyA;
-      `,
-    },
   ],
   invalid: [
     /**
@@ -329,6 +340,23 @@ ruleTester.run("no-unsafe-assignment", rule, {
           area: number;
         };
         const a: Area = new Box();
+      `,
+      errors: [
+        {
+          messageId: "errorStringVariableDeclarationReadonlyToMutable",
+          type: AST_NODE_TYPES.VariableDeclaration,
+        },
+      ],
+    },
+    // readonly array prop with readonly generic type -> readonly array prop with mutable generic type
+    {
+      filename: "file.ts",
+      code: `
+        type MutableA = { readonly a: ReadonlyArray<{ b: string }> };
+        type ReadonlyA = { readonly a: ReadonlyArray<{ readonly b: string }> };
+        
+        const readonlyA: ReadonlyA = { a: [] };
+        const mutableA: MutableA = readonlyA;
       `,
       errors: [
         {

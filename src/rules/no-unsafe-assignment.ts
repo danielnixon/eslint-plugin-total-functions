@@ -5,7 +5,7 @@ import {
 } from "@typescript-eslint/experimental-utils";
 import { isObjectType, isPropertyReadonlyInType } from "tsutils";
 import { get } from "total-functions";
-import { Type } from "typescript";
+import { Type, SyntaxKind } from "typescript";
 
 type MessageId =
   | "errorStringCallExpressionReadonlyToMutable"
@@ -105,6 +105,30 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
               ? checker.getTypeAtLocation(sourcePropertyDeclaration)
               : undefined;
 
+          const destinationNumberIndexType =
+            destinationPropertyType !== undefined
+              ? destinationPropertyType.getNumberIndexType()
+              : undefined;
+          const sourceNumberIndexType =
+            sourcePropertyType !== undefined
+              ? sourcePropertyType.getNumberIndexType()
+              : undefined;
+
+          const isUnsafeArrayGenericType =
+            destinationNumberIndexType !== undefined &&
+            sourceNumberIndexType !== undefined &&
+            // Try to avoid infinite recursion...
+            seenTypes.every(
+              (t) =>
+                t.destinationType !== destinationNumberIndexType &&
+                t.sourceType !== sourceNumberIndexType
+            ) &&
+            isUnsafeAssignment(
+              destinationNumberIndexType,
+              sourceNumberIndexType,
+              seenTypes.concat([{ destinationType, sourceType }])
+            );
+
           const isUnsafeAssignmentRecursively =
             destinationPropertyType !== undefined &&
             sourcePropertyType !== undefined &&
@@ -122,7 +146,11 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
 
           const assigningReadonlyToMutable =
             sourcePropIsReadonly && !destinationPropIsReadonly;
-          return assigningReadonlyToMutable || isUnsafeAssignmentRecursively;
+          return (
+            assigningReadonlyToMutable ||
+            isUnsafeArrayGenericType ||
+            isUnsafeAssignmentRecursively
+          );
         });
       } else {
         return false;
@@ -206,14 +234,30 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
         const tsNode = parserServices.esTreeNodeToTSNodeMap.get(node.callee);
 
         // eslint-disable-next-line functional/no-expression-statement
-        parameters.forEach((parameter, i) => {
-          const paramType = checker.getTypeOfSymbolAtLocation(
+        node.arguments.forEach((argument, i) => {
+          // This is the argument that corresponds to the current parameter.
+          const parameter = get(parameters, i);
+
+          // eslint-disable-next-line functional/no-conditional-statement
+          if (parameter === undefined) {
+            // TODO: if we're deal with a rest parameter here we need to go back and get the last parameter.
+            return;
+          }
+
+          const rawParamType = checker.getTypeOfSymbolAtLocation(
             parameter,
             tsNode
           );
 
-          // This is the argument that corresponds to the current parameter.
-          const argument = get(node.arguments, i);
+          const numberIndexType = rawParamType.getNumberIndexType();
+
+          const isRestParam =
+            parameter.declarations.length === 1 &&
+            parameter.declarations.some((d) => d.kind & SyntaxKind.RestType) &&
+            numberIndexType !== undefined;
+
+          const paramType = isRestParam ? numberIndexType : rawParamType;
+
           const argumentTsNode =
             argument !== undefined
               ? parserServices.esTreeNodeToTSNodeMap.get(argument)
@@ -230,6 +274,7 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
             // object expressions are allowed because we won't retain a reference to the object to get out of sync.
             // TODO but what about properties in the object literal that are references to values we _do_ retain a reference to?
             argument.type !== AST_NODE_TYPES.ObjectExpression &&
+            paramType !== undefined &&
             isUnsafeAssignment(paramType, argumentType)
           ) {
             // eslint-disable-next-line functional/no-expression-statement
