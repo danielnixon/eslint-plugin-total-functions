@@ -39,122 +39,135 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
     const checker = parserServices.program.getTypeChecker();
 
     const isUnsafeAssignment = (
-      destinationType: Type,
-      sourceType: Type,
+      rawDestinationType: Type,
+      rawSourceType: Type,
       seenTypes: ReadonlyArray<{
         readonly destinationType: Type;
         readonly sourceType: Type;
       }> = []
       // eslint-disable-next-line sonarjs/cognitive-complexity
     ): boolean => {
+      // TODO if the destination is a union containing _all_ mutable types, we're assigning to mutable.
+      // TODO if the destination contains a mix of mutable and readonly types, we don't know if we're assigning
+      // to mutable unless we can narrow down which destination (parameter) types apply to the given source (argument) types.
+      const destinationTypes = rawDestinationType.isUnion()
+        ? rawDestinationType.types
+        : [rawDestinationType];
+      const filteredDestinationTypes = destinationTypes.filter((t) =>
+        isObjectType(t)
+      );
+      const destinationType =
+        filteredDestinationTypes.length === 1
+          ? get(filteredDestinationTypes, 0)
+          : undefined;
+
+      // TODO if the sourceType is a union containing _any_ readonly types, we're assigning from readonly.
+      const sourceTypes = rawSourceType.isUnion()
+        ? rawSourceType.types
+        : [rawSourceType];
+      const filteredSourceTypes = sourceTypes.filter((t) => isObjectType(t));
+      const sourceType =
+        filteredSourceTypes.length === 1
+          ? get(filteredSourceTypes, 0)
+          : undefined;
+
       // eslint-disable-next-line functional/no-conditional-statement
-      if (
-        // TODO what if the source type is a union that contains a mix of mutable and readonly types?
-        !sourceType.isUnion() &&
-        // TODO what if the destination type is a union that contains a mix of mutable and readonly types?
-        // If the source type is mutable and corresponds to the (safe) mutable destination type, this will still be flagged
-        // as unsafe (due to the readonly portion of the destination type union).
-        !destinationType.isUnion() &&
-        isObjectType(sourceType) &&
-        isObjectType(destinationType)
-      ) {
-        // TODO this needs to check arrays too (the array itself being readonly AND its generic type being readonly)
-        // TODO how to handle tuples?
-        return destinationType.getProperties().some((destinationProperty) => {
-          const destinationPropIsReadonly = isPropertyReadonlyInType(
-            destinationType,
-            destinationProperty.getEscapedName(),
+      if (destinationType === undefined || sourceType === undefined) {
+        return false;
+      }
+
+      // TODO this needs to check arrays too (the array itself being readonly AND its generic type being readonly)
+      // TODO how to handle tuples?
+      return destinationType.getProperties().some((destinationProperty) => {
+        const destinationPropIsReadonly = isPropertyReadonlyInType(
+          destinationType,
+          destinationProperty.getEscapedName(),
+          checker
+        );
+
+        const sourceProperty = sourceType.getProperty(destinationProperty.name);
+
+        const sourcePropIsReadonly =
+          sourceProperty !== undefined &&
+          isPropertyReadonlyInType(
+            sourceType,
+            sourceProperty.getEscapedName(),
             checker
           );
 
-          const sourceProperty = sourceType.getProperty(
-            destinationProperty.name
+        const destinationPropertyDeclarations =
+          destinationProperty.getDeclarations() || [];
+        // TODO: How to choose declaration when there are multiple? `checker.getResolvedSignature()`?
+        const destinationPropertyDeclaration =
+          destinationPropertyDeclarations.length > 1
+            ? undefined
+            : get(destinationPropertyDeclarations, 0);
+        const destinationPropertyType =
+          destinationPropertyDeclaration !== undefined
+            ? checker.getTypeAtLocation(destinationPropertyDeclaration)
+            : undefined;
+
+        const sourcePropertyDeclarations =
+          sourceProperty === undefined
+            ? []
+            : sourceProperty.getDeclarations() || [];
+        // TODO: How to choose declaration when there are multiple? `checker.getResolvedSignature()`?
+        const sourcePropertyDeclaration =
+          sourcePropertyDeclarations.length > 1
+            ? undefined
+            : get(sourcePropertyDeclarations, 0);
+        const sourcePropertyType =
+          sourcePropertyDeclaration !== undefined
+            ? checker.getTypeAtLocation(sourcePropertyDeclaration)
+            : undefined;
+
+        const destinationNumberIndexType =
+          destinationPropertyType !== undefined
+            ? destinationPropertyType.getNumberIndexType()
+            : undefined;
+        const sourceNumberIndexType =
+          sourcePropertyType !== undefined
+            ? sourcePropertyType.getNumberIndexType()
+            : undefined;
+
+        const isUnsafeArrayGenericType =
+          destinationNumberIndexType !== undefined &&
+          sourceNumberIndexType !== undefined &&
+          // Try to avoid infinite recursion...
+          seenTypes.every(
+            (t) =>
+              t.destinationType !== destinationNumberIndexType &&
+              t.sourceType !== sourceNumberIndexType
+          ) &&
+          isUnsafeAssignment(
+            destinationNumberIndexType,
+            sourceNumberIndexType,
+            seenTypes.concat([{ destinationType, sourceType }])
           );
 
-          const sourcePropIsReadonly =
-            sourceProperty !== undefined &&
-            isPropertyReadonlyInType(
-              sourceType,
-              sourceProperty.getEscapedName(),
-              checker
-            );
-
-          const destinationPropertyDeclarations =
-            destinationProperty.getDeclarations() || [];
-          // TODO: How to choose declaration when there are multiple? `checker.getResolvedSignature()`?
-          const destinationPropertyDeclaration =
-            destinationPropertyDeclarations.length > 1
-              ? undefined
-              : get(destinationPropertyDeclarations, 0);
-          const destinationPropertyType =
-            destinationPropertyDeclaration !== undefined
-              ? checker.getTypeAtLocation(destinationPropertyDeclaration)
-              : undefined;
-
-          const sourcePropertyDeclarations =
-            sourceProperty === undefined
-              ? []
-              : sourceProperty.getDeclarations() || [];
-          // TODO: How to choose declaration when there are multiple? `checker.getResolvedSignature()`?
-          const sourcePropertyDeclaration =
-            sourcePropertyDeclarations.length > 1
-              ? undefined
-              : get(sourcePropertyDeclarations, 0);
-          const sourcePropertyType =
-            sourcePropertyDeclaration !== undefined
-              ? checker.getTypeAtLocation(sourcePropertyDeclaration)
-              : undefined;
-
-          const destinationNumberIndexType =
-            destinationPropertyType !== undefined
-              ? destinationPropertyType.getNumberIndexType()
-              : undefined;
-          const sourceNumberIndexType =
-            sourcePropertyType !== undefined
-              ? sourcePropertyType.getNumberIndexType()
-              : undefined;
-
-          const isUnsafeArrayGenericType =
-            destinationNumberIndexType !== undefined &&
-            sourceNumberIndexType !== undefined &&
-            // Try to avoid infinite recursion...
-            seenTypes.every(
-              (t) =>
-                t.destinationType !== destinationNumberIndexType &&
-                t.sourceType !== sourceNumberIndexType
-            ) &&
-            isUnsafeAssignment(
-              destinationNumberIndexType,
-              sourceNumberIndexType,
-              seenTypes.concat([{ destinationType, sourceType }])
-            );
-
-          const isUnsafeAssignmentRecursively =
-            destinationPropertyType !== undefined &&
-            sourcePropertyType !== undefined &&
-            // Try to avoid infinite recursion...
-            seenTypes.every(
-              (t) =>
-                t.destinationType !== destinationPropertyType &&
-                t.sourceType !== sourcePropertyType
-            ) &&
-            isUnsafeAssignment(
-              destinationPropertyType,
-              sourcePropertyType,
-              seenTypes.concat([{ destinationType, sourceType }])
-            );
-
-          const assigningReadonlyToMutable =
-            sourcePropIsReadonly && !destinationPropIsReadonly;
-          return (
-            assigningReadonlyToMutable ||
-            isUnsafeArrayGenericType ||
-            isUnsafeAssignmentRecursively
+        const isUnsafeAssignmentRecursively =
+          destinationPropertyType !== undefined &&
+          sourcePropertyType !== undefined &&
+          // Try to avoid infinite recursion...
+          seenTypes.every(
+            (t) =>
+              t.destinationType !== destinationPropertyType &&
+              t.sourceType !== sourcePropertyType
+          ) &&
+          isUnsafeAssignment(
+            destinationPropertyType,
+            sourcePropertyType,
+            seenTypes.concat([{ destinationType, sourceType }])
           );
-        });
-      } else {
-        return false;
-      }
+
+        const assigningReadonlyToMutable =
+          sourcePropIsReadonly && !destinationPropIsReadonly;
+        return (
+          assigningReadonlyToMutable ||
+          isUnsafeArrayGenericType ||
+          isUnsafeAssignmentRecursively
+        );
+      });
     };
 
     return {
@@ -240,7 +253,7 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
 
           // eslint-disable-next-line functional/no-conditional-statement
           if (parameter === undefined) {
-            // TODO: if we're deal with a rest parameter here we need to go back and get the last parameter.
+            // TODO: if we're dealing with a rest parameter here we need to go back and get the last parameter.
             return;
           }
 
@@ -252,7 +265,7 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
           const numberIndexType = rawParamType.getNumberIndexType();
 
           // TODO: work out which declaration applies in this case.
-          // For now we just conclude that is a rest param if it's a rest param in _all_ declarations.
+          // For now we just conclude that this is a rest param if it's a rest param in _all_ declarations.
           const isRestParam =
             rawParamType.symbol !== undefined &&
             rawParamType.symbol.declarations.every(

@@ -161,13 +161,13 @@ ruleTester.run("no-unsafe-assignment", rule, {
       filename: "file.ts",
       code: `
         type ReadonlyA = { readonly a: string };
-        
+
         export function func(a: number): number;
         export function func(a: ReadonlyA): ReadonlyA;
         export function func(a: any): any {
           return a;
         }
-        
+
         const readonlyA: ReadonlyA = { a: "" };
         func(readonlyA);
       `,
@@ -178,13 +178,13 @@ ruleTester.run("no-unsafe-assignment", rule, {
       filename: "file.ts",
       code: `
         type ReadonlyA = { readonly a: string };
-        
+
         export function func(a: number): number;
         export function func(a: string): string;
         export function func(a: any): any {
           return a;
         }
-        
+
         const readonlyA: ReadonlyA = { a: "" };
         func(readonlyA);
       `,
@@ -215,6 +215,37 @@ ruleTester.run("no-unsafe-assignment", rule, {
         const foo = ro.concat(ro, mut);
       `,
     },
+    // readonly (union) -> mutable (union)
+    // TODO this should be invalid.
+    {
+      filename: "file.ts",
+      code: `
+        type MutableA = { a: string };
+        type ReadonlyA = { readonly a: string };
+        type MutableB = { b: string };
+        type ReadonlyB = { readonly b: string };
+        const mutate = (mut: MutableA | MutableB): void => {
+          return;
+        };
+        const ro: ReadonlyA | ReadonlyB = { a: "" };
+        mutate(ro);
+      `,
+    },
+    // mixed (union) -> mixed (union)
+    // The readonlys align and mutables align, so no surprising mutation can arise.
+    // TODO if/when the above is rendered invalid, this must remain valid.
+    {
+      filename: "file.ts",
+      code: `
+        type MutableA = { a: string };
+        type ReadonlyB = { readonly b: string };
+        const func = (foo: MutableA | ReadonlyB): void => {
+          return;
+        };
+        const foo: MutableA | ReadonlyB = { a: "" };
+        func(foo);
+      `,
+    },
     /**
      * Assignment expressions
      */
@@ -243,19 +274,59 @@ ruleTester.run("no-unsafe-assignment", rule, {
         },
       ],
     },
-    // multiple type signatures (readonly -> mutable)
+    // readonly -> mutable (union)
+    // this is invalid because it _could be_ readonly -> mutable
     {
       filename: "file.ts",
       code: `
         type MutableA = { a: string };
         type ReadonlyA = { readonly a: string };
-        
+        const mutate = (mixed: MutableA | undefined | null | number | string | boolean): void => {
+          return;
+        };
+        const mixedA: ReadonlyA = { a: "readonly?" };
+        mutate(mixedA);
+      `,
+      errors: [
+        {
+          messageId: "errorStringCallExpressionReadonlyToMutable",
+          type: AST_NODE_TYPES.Identifier,
+        },
+      ],
+    },
+    // readonly (union) -> mutable (union)
+    // this is invalid because it _could be_ readonly -> mutable
+    {
+      filename: "file.ts",
+      code: `
+        type MutableA = { a: string };
+        type ReadonlyA = { readonly a: string };
+        const mutate = (mixed: MutableA | undefined | null): void => {
+          return;
+        };
+        const mixedA: ReadonlyA | undefined | null = { a: "readonly?" };
+        mutate(mixedA);
+      `,
+      errors: [
+        {
+          messageId: "errorStringCallExpressionReadonlyToMutable",
+          type: AST_NODE_TYPES.Identifier,
+        },
+      ],
+    },
+    // callee has multiple type signatures (readonly -> mutable)
+    {
+      filename: "file.ts",
+      code: `
+        type MutableA = { a: string };
+        type ReadonlyA = { readonly a: string };
+
         export function func(a: MutableA): MutableA;
         export function func(a: number): number;
         export function func(a: any): any {
           return a;
         }
-        
+
         const readonlyA: ReadonlyA = { a: "" };
         func(readonlyA);
       `,
@@ -276,7 +347,7 @@ ruleTester.run("no-unsafe-assignment", rule, {
           mut.a.b = "whoops";
         };
         const readonlyA: ReadonlyA = { a: { b: "readonly?" } };
-        mutate(readonlyA);      
+        mutate(readonlyA);
       `,
       errors: [
         {
@@ -354,7 +425,7 @@ ruleTester.run("no-unsafe-assignment", rule, {
       code: `
         type MutableA = { readonly a: ReadonlyArray<{ b: string }> };
         type ReadonlyA = { readonly a: ReadonlyArray<{ readonly b: string }> };
-        
+
         const readonlyA: ReadonlyA = { a: [] };
         const mutableA: MutableA = readonlyA;
       `,
