@@ -246,6 +246,18 @@ ruleTester.run("no-unsafe-assignment", rule, {
         func(foo);
       `,
     },
+    // Recursive type (linting must terminate)
+    {
+      filename: "file.ts",
+      code: `
+        type Foo = ReadonlyArray<Foo>;
+        const func = (foo: Foo): void => {
+          return;
+        };
+        const foo: Foo = [[]];
+        func(foo);
+      `,
+    },
     /**
      * Assignment expressions
      */

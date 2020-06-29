@@ -47,6 +47,21 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
       }> = []
       // eslint-disable-next-line sonarjs/cognitive-complexity
     ): boolean => {
+      // eslint-disable-next-line functional/no-conditional-statement
+      if (
+        seenTypes.some(
+          (t) =>
+            t.destinationType === rawDestinationType &&
+            t.sourceType === rawSourceType
+        )
+      ) {
+        return false;
+      }
+
+      const nextSeenTypes = seenTypes.concat([
+        { destinationType: rawDestinationType, sourceType: rawSourceType },
+      ]);
+
       // TODO if the destination is a union containing _all_ mutable types, we're assigning to mutable.
       // TODO if the destination contains a mix of mutable and readonly types, we don't know if we're assigning
       // to mutable unless we can narrow down which destination (parameter) types apply to the given source (argument) types.
@@ -133,31 +148,19 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
         const isUnsafeArrayGenericType =
           destinationNumberIndexType !== undefined &&
           sourceNumberIndexType !== undefined &&
-          // Try to avoid infinite recursion...
-          seenTypes.every(
-            (t) =>
-              t.destinationType !== destinationNumberIndexType &&
-              t.sourceType !== sourceNumberIndexType
-          ) &&
           isUnsafeAssignment(
             destinationNumberIndexType,
             sourceNumberIndexType,
-            seenTypes.concat([{ destinationType, sourceType }])
+            nextSeenTypes
           );
 
         const isUnsafeAssignmentRecursively =
           destinationPropertyType !== undefined &&
           sourcePropertyType !== undefined &&
-          // Try to avoid infinite recursion...
-          seenTypes.every(
-            (t) =>
-              t.destinationType !== destinationPropertyType &&
-              t.sourceType !== sourcePropertyType
-          ) &&
           isUnsafeAssignment(
             destinationPropertyType,
             sourcePropertyType,
-            seenTypes.concat([{ destinationType, sourceType }])
+            nextSeenTypes
           );
 
         const assigningReadonlyToMutable =
