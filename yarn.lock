@@ -1570,10 +1570,10 @@ eslint-plugin-sonarjs@^0.5.0:
   resolved "https://registry.yarnpkg.com/eslint-plugin-sonarjs/-/eslint-plugin-sonarjs-0.5.0.tgz#ce17b2daba65a874c2862213a9e38e8986ad7d7d"
   integrity sha512-XW5MnzlRjhXpIdbULC/qAdJYHWw3rRLws/DyawdlPU/IdVr9AmRK1r2LaCvabwKOAW2XYYSo3kDX58E4MrB7PQ==
 
-eslint-plugin-total-functions@^1.27.0:
-  version "1.27.0"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-total-functions/-/eslint-plugin-total-functions-1.27.0.tgz#695e0da742d98d91423b8a1d157a3427d29f540e"
-  integrity sha512-9GscuBB3tmdXJymiMwCTnLrOEzQPWkHKU4aIwBsjqcvbN467TtyF/bfdbuJpzniUV0p+FyWsSB2fv9HKf/JUwQ==
+eslint-plugin-total-functions@^1.31.0:
+  version "1.31.0"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-total-functions/-/eslint-plugin-total-functions-1.31.0.tgz#56da87cee2ba003c8b224247ed20ca16abb79d05"
+  integrity sha512-4zWwI/hyl5hvNiys5jr6y36SUtNSnn/EmKRr2sbkNoVSKBUBv3Jh9XCErlE5x9dWRm2rNuJ5E3RNZm0GMAiQGQ==
   dependencies:
     "@typescript-eslint/eslint-plugin" "^3.4.0"
     "@typescript-eslint/experimental-utils" "^3.4.0"
@@ -4391,23 +4391,23 @@ type-check@~0.3.2:
   dependencies:
     prelude-ls "~1.1.2"
 
-type-coverage-core@^2.8.2:
-  version "2.8.2"
-  resolved "https://registry.yarnpkg.com/type-coverage-core/-/type-coverage-core-2.8.2.tgz#447c15a8804d41b01365d405ce1cde7af5844349"
-  integrity sha512-Qv41QhEVTdxHXxojm0ZPUDk7fZ8ZrC9Ibg2vrCAVT+qy9AX2MQDg17r+X1u5fguZ9cPzSjWkX3EgJpTWvvDnWg==
+type-coverage-core@^2.8.3:
+  version "2.8.3"
+  resolved "https://registry.yarnpkg.com/type-coverage-core/-/type-coverage-core-2.8.3.tgz#c57eb0b99c96879ddc3e328fddc991ba91b8ebe4"
+  integrity sha512-Go4QSExs0kGcW9yxvIAv4XSAuIC89cAbdb9Qqj/XdqcYoT2X3fB6x+2jwYwE/opbgrAHijh23TT/C6w9VEj6rw==
   dependencies:
     minimatch "3"
     ts-lib-utils "^2.7.2"
     tslib "1 || 2"
     tsutils "3"
 
-type-coverage@^2.8.2:
-  version "2.8.2"
-  resolved "https://registry.yarnpkg.com/type-coverage/-/type-coverage-2.8.2.tgz#bec082acef87e6245834889928bcee9075bfdaad"
-  integrity sha512-MZMR49i0+uDqZOpzPFK41yTjVoH3bigjgK6HnjuTFfnfyYuOgNsDP9rXQK0y2zwQ7VfeaU5Qhecq0XquUGo8lA==
+type-coverage@^2.8.3:
+  version "2.8.3"
+  resolved "https://registry.yarnpkg.com/type-coverage/-/type-coverage-2.8.3.tgz#05b85a954a07c353dc9d2bd180c6fd1e64dae12d"
+  integrity sha512-HXls1Wix1n6HEe/rX+DjE5ENLKtZnveLp4miYIB1ijJbYf9WyXs77c4w9OjOhw3cPgczzUVjnfucvdy++kEDPA==
   dependencies:
     minimist "1"
-    type-coverage-core "^2.8.2"
+    type-coverage-core "^2.8.3"
 
 type-detect@4.0.8:
   version "4.0.8"
