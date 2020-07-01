@@ -5,7 +5,7 @@ import {
 } from "@typescript-eslint/experimental-utils";
 import { isObjectType, isPropertyReadonlyInType } from "tsutils";
 import { get } from "total-functions";
-import { Type, SyntaxKind } from "typescript";
+import { Type, SyntaxKind, Symbol } from "typescript";
 
 type MessageId =
   | "errorStringCallExpressionReadonlyToMutable"
@@ -38,30 +38,16 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
     const parserServices = ESLintUtils.getParserServices(context);
     const checker = parserServices.program.getTypeChecker();
 
-    const isUnsafeAssignment = (
+    /**
+     * Throws away non-object types (string, number, boolean, etc) because we don't check those for readonly -> mutable assignment.
+     */
+    const filterTypes = (
       rawDestinationType: Type,
-      rawSourceType: Type,
-      seenTypes: ReadonlyArray<{
-        readonly destinationType: Type;
-        readonly sourceType: Type;
-      }> = []
-      // eslint-disable-next-line sonarjs/cognitive-complexity
-    ): boolean => {
-      // eslint-disable-next-line functional/no-conditional-statement
-      if (
-        seenTypes.some(
-          (t) =>
-            t.destinationType === rawDestinationType &&
-            t.sourceType === rawSourceType
-        )
-      ) {
-        return false;
-      }
-
-      const nextSeenTypes = seenTypes.concat([
-        { destinationType: rawDestinationType, sourceType: rawSourceType },
-      ]);
-
+      rawSourceType: Type
+    ): {
+      readonly destinationType: Type | undefined;
+      readonly sourceType: Type | undefined;
+    } => {
       // TODO if the destination is a union containing _all_ mutable types, we're assigning to mutable.
       // TODO if the destination contains a mix of mutable and readonly types, we don't know if we're assigning
       // to mutable unless we can narrow down which destination (parameter) types apply to the given source (argument) types.
@@ -86,91 +72,196 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
           ? get(filteredSourceTypes, 0)
           : undefined;
 
-      // eslint-disable-next-line functional/no-conditional-statement
-      if (destinationType === undefined || sourceType === undefined) {
-        return false;
-      }
+      return {
+        destinationType,
+        sourceType,
+      };
+    };
 
-      // TODO this needs to check arrays too (the array itself being readonly AND its generic type being readonly)
-      // TODO how to handle tuples?
+    const isUnsafeStringIndexAssignment = (
+      destinationType: Type,
+      sourceType: Type,
+      seenTypes: ReadonlyArray<{
+        readonly destinationType: Type;
+        readonly sourceType: Type;
+      }>
+    ): boolean => {
+      const destinationStringIndexType = destinationType.getStringIndexType();
+      const sourceStringIndexType = sourceType.getStringIndexType();
+
+      return (
+        destinationStringIndexType !== undefined &&
+        sourceStringIndexType !== undefined &&
+        isUnsafeAssignment(
+          destinationStringIndexType,
+          sourceStringIndexType,
+          seenTypes
+        )
+      );
+    };
+
+    const isUnsafeNumberIndexAssignment = (
+      destinationType: Type,
+      sourceType: Type,
+      seenTypes: ReadonlyArray<{
+        readonly destinationType: Type;
+        readonly sourceType: Type;
+      }>
+    ): boolean => {
+      const destinationNumberIndexType = destinationType.getNumberIndexType();
+      const sourceNumberIndexType = sourceType.getNumberIndexType();
+
+      return (
+        destinationNumberIndexType !== undefined &&
+        sourceNumberIndexType !== undefined &&
+        isUnsafeAssignment(
+          destinationNumberIndexType,
+          sourceNumberIndexType,
+          seenTypes
+        )
+      );
+    };
+
+    const isUnsafePropertyAssignmentRec = (
+      // eslint-disable-next-line @typescript-eslint/ban-types
+      destinationProperty: Symbol,
+      // eslint-disable-next-line @typescript-eslint/ban-types
+      sourceProperty: Symbol,
+      seenTypes: ReadonlyArray<{
+        readonly destinationType: Type;
+        readonly sourceType: Type;
+      }>
+    ): boolean => {
+      const destinationPropertyDeclarations =
+        destinationProperty.getDeclarations() || [];
+      // TODO: How to choose declaration when there are multiple? `checker.getResolvedSignature()`?
+      const destinationPropertyDeclaration =
+        destinationPropertyDeclarations.length > 1
+          ? undefined
+          : get(destinationPropertyDeclarations, 0);
+      const destinationPropertyType =
+        destinationPropertyDeclaration !== undefined
+          ? checker.getTypeAtLocation(destinationPropertyDeclaration)
+          : undefined;
+
+      const sourcePropertyDeclarations = sourceProperty.getDeclarations() || [];
+      // TODO: How to choose declaration when there are multiple? `checker.getResolvedSignature()`?
+      const sourcePropertyDeclaration =
+        sourcePropertyDeclarations.length > 1
+          ? undefined
+          : get(sourcePropertyDeclarations, 0);
+      const sourcePropertyType =
+        sourcePropertyDeclaration !== undefined
+          ? checker.getTypeAtLocation(sourcePropertyDeclaration)
+          : undefined;
+
+      return (
+        destinationPropertyType !== undefined &&
+        sourcePropertyType !== undefined &&
+        isUnsafeAssignment(
+          destinationPropertyType,
+          sourcePropertyType,
+          seenTypes
+        )
+      );
+    };
+
+    const isUnsafePropertyAssignment = (
+      destinationType: Type,
+      sourceType: Type,
+      seenTypes: ReadonlyArray<{
+        readonly destinationType: Type;
+        readonly sourceType: Type;
+      }>
+    ): boolean => {
       return destinationType.getProperties().some((destinationProperty) => {
+        const sourceProperty = sourceType.getProperty(destinationProperty.name);
+
+        // eslint-disable-next-line functional/no-conditional-statement
+        if (sourceProperty === undefined) {
+          return false;
+        }
+
         const destinationPropIsReadonly = isPropertyReadonlyInType(
           destinationType,
           destinationProperty.getEscapedName(),
           checker
         );
 
-        const sourceProperty = sourceType.getProperty(destinationProperty.name);
+        const sourcePropIsReadonly = isPropertyReadonlyInType(
+          sourceType,
+          sourceProperty.getEscapedName(),
+          checker
+        );
 
-        const sourcePropIsReadonly =
-          sourceProperty !== undefined &&
-          isPropertyReadonlyInType(
-            sourceType,
-            sourceProperty.getEscapedName(),
-            checker
-          );
+        // eslint-disable-next-line functional/no-conditional-statement
+        if (sourcePropIsReadonly && !destinationPropIsReadonly) {
+          return true;
+        }
 
-        const destinationPropertyDeclarations =
-          destinationProperty.getDeclarations() || [];
-        // TODO: How to choose declaration when there are multiple? `checker.getResolvedSignature()`?
-        const destinationPropertyDeclaration =
-          destinationPropertyDeclarations.length > 1
-            ? undefined
-            : get(destinationPropertyDeclarations, 0);
-        const destinationPropertyType =
-          destinationPropertyDeclaration !== undefined
-            ? checker.getTypeAtLocation(destinationPropertyDeclaration)
-            : undefined;
-
-        const sourcePropertyDeclarations =
-          sourceProperty === undefined
-            ? []
-            : sourceProperty.getDeclarations() || [];
-        // TODO: How to choose declaration when there are multiple? `checker.getResolvedSignature()`?
-        const sourcePropertyDeclaration =
-          sourcePropertyDeclarations.length > 1
-            ? undefined
-            : get(sourcePropertyDeclarations, 0);
-        const sourcePropertyType =
-          sourcePropertyDeclaration !== undefined
-            ? checker.getTypeAtLocation(sourcePropertyDeclaration)
-            : undefined;
-
-        const destinationNumberIndexType =
-          destinationPropertyType !== undefined
-            ? destinationPropertyType.getNumberIndexType()
-            : undefined;
-        const sourceNumberIndexType =
-          sourcePropertyType !== undefined
-            ? sourcePropertyType.getNumberIndexType()
-            : undefined;
-
-        const isUnsafeArrayGenericType =
-          destinationNumberIndexType !== undefined &&
-          sourceNumberIndexType !== undefined &&
-          isUnsafeAssignment(
-            destinationNumberIndexType,
-            sourceNumberIndexType,
-            nextSeenTypes
-          );
-
-        const isUnsafeAssignmentRecursively =
-          destinationPropertyType !== undefined &&
-          sourcePropertyType !== undefined &&
-          isUnsafeAssignment(
-            destinationPropertyType,
-            sourcePropertyType,
-            nextSeenTypes
-          );
-
-        const assigningReadonlyToMutable =
-          sourcePropIsReadonly && !destinationPropIsReadonly;
-        return (
-          assigningReadonlyToMutable ||
-          isUnsafeArrayGenericType ||
-          isUnsafeAssignmentRecursively
+        return isUnsafePropertyAssignmentRec(
+          destinationProperty,
+          sourceProperty,
+          seenTypes
         );
       });
+    };
+
+    const isUnsafeAssignment = (
+      rawDestinationType: Type,
+      rawSourceType: Type,
+      seenTypes: ReadonlyArray<{
+        readonly destinationType: Type;
+        readonly sourceType: Type;
+      }> = []
+    ): boolean => {
+      // TODO if rawSourceType is entirely readonly (including all member types if it's a union)
+      // and rawDestinationType is entirely mutable (including all member types if it's a union)
+      // (where "entirely" means all object properties, string index types, number index types and recursively)
+      // then we can safely conclude this must be unsafe, report the error and return early.
+      // this would catch some cases that we currently miss because they are a union type with > 1 object type member
+      // (which currently gets filtered out inside `filterTypes`).
+
+      const nextSeenTypes = seenTypes.concat([
+        { destinationType: rawDestinationType, sourceType: rawSourceType },
+      ]);
+
+      const { destinationType, sourceType } = filterTypes(
+        rawDestinationType,
+        rawSourceType
+      );
+
+      // This is an unsafe assignment if...
+      return (
+        // we're not in an infinitely recursive type,
+        seenTypes.every(
+          (t) =>
+            t.destinationType !== rawDestinationType &&
+            t.sourceType !== rawSourceType
+        ) &&
+        // and we statically know both the destination and the source type,
+        destinationType !== undefined &&
+        sourceType !== undefined &&
+        // and we're either:
+        // assigning from a type with readonly string index type to one with a mutable string index type, or
+        (isUnsafeStringIndexAssignment(
+          destinationType,
+          sourceType,
+          nextSeenTypes
+        ) ||
+          // assigning from a type with readonly number index type to one with a mutable number index type, or
+          isUnsafeNumberIndexAssignment(
+            destinationType,
+            sourceType,
+            nextSeenTypes
+          ) ||
+          // assigning from a type with one or more readonly properties to one with one or more mutable properties with the same name(s).
+          isUnsafePropertyAssignment(
+            destinationType,
+            sourceType,
+            nextSeenTypes
+          ))
+      );
     };
 
     return {
@@ -194,10 +285,10 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
 
           // eslint-disable-next-line functional/no-conditional-statement
           if (
-            declaration.init !== null &&
             rightType !== undefined &&
             // object expressions are allowed because we won't retain a reference to the object to get out of sync.
             // TODO but what about properties in the object literal that are references to values we _do_ retain a reference to?
+            declaration.init !== null &&
             declaration.init.type !== AST_NODE_TYPES.ObjectExpression &&
             isUnsafeAssignment(leftType, rightType)
           ) {
