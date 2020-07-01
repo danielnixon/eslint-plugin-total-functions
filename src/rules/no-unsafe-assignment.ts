@@ -5,7 +5,7 @@ import {
 } from "@typescript-eslint/experimental-utils";
 import { isObjectType, isPropertyReadonlyInType } from "tsutils";
 import { get } from "total-functions";
-import { Type, SyntaxKind, Symbol } from "typescript";
+import { Type, SyntaxKind, Symbol, IndexKind } from "typescript";
 
 type MessageId =
   | "errorStringCallExpressionReadonlyToMutable"
@@ -86,17 +86,37 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
         readonly sourceType: Type;
       }>
     ): boolean => {
+      const destinationIndexInfo = checker.getIndexInfoOfType(
+        destinationType,
+        IndexKind.String
+      );
+      const destinationTypeHasReadonlyIndexSignature =
+        destinationIndexInfo !== undefined
+          ? destinationIndexInfo.isReadonly
+          : false;
+      const sourceIndexInfo = checker.getIndexInfoOfType(
+        sourceType,
+        IndexKind.String
+      );
+      const sourceTypeHasReadonlyIndexSignature =
+        sourceIndexInfo !== undefined ? sourceIndexInfo.isReadonly : false;
+
       const destinationStringIndexType = destinationType.getStringIndexType();
       const sourceStringIndexType = sourceType.getStringIndexType();
 
+      // This is unsafe if...
       return (
-        destinationStringIndexType !== undefined &&
-        sourceStringIndexType !== undefined &&
-        isUnsafeAssignment(
-          destinationStringIndexType,
-          sourceStringIndexType,
-          seenTypes
-        )
+        // we're assigning from a readonly index signature to a mutable one, or
+        (sourceTypeHasReadonlyIndexSignature &&
+          !destinationTypeHasReadonlyIndexSignature) ||
+        // we're assigning from a readonly index type to a mutable one.
+        (destinationStringIndexType !== undefined &&
+          sourceStringIndexType !== undefined &&
+          isUnsafeAssignment(
+            destinationStringIndexType,
+            sourceStringIndexType,
+            seenTypes
+          ))
       );
     };
 
@@ -108,17 +128,37 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
         readonly sourceType: Type;
       }>
     ): boolean => {
+      const destinationIndexInfo = checker.getIndexInfoOfType(
+        destinationType,
+        IndexKind.Number
+      );
+      const destinationTypeHasReadonlyIndexSignature =
+        destinationIndexInfo !== undefined
+          ? destinationIndexInfo.isReadonly
+          : false;
+      const sourceIndexInfo = checker.getIndexInfoOfType(
+        sourceType,
+        IndexKind.Number
+      );
+      const sourceTypeHasReadonlyIndexSignature =
+        sourceIndexInfo !== undefined ? sourceIndexInfo.isReadonly : false;
+
       const destinationNumberIndexType = destinationType.getNumberIndexType();
       const sourceNumberIndexType = sourceType.getNumberIndexType();
 
+      // This is unsafe if...
       return (
-        destinationNumberIndexType !== undefined &&
-        sourceNumberIndexType !== undefined &&
-        isUnsafeAssignment(
-          destinationNumberIndexType,
-          sourceNumberIndexType,
-          seenTypes
-        )
+        // we're assigning from a readonly index signature to a mutable one, or
+        (sourceTypeHasReadonlyIndexSignature &&
+          !destinationTypeHasReadonlyIndexSignature) ||
+        // we're assigning from a readonly index type to a mutable one.
+        (destinationNumberIndexType !== undefined &&
+          sourceNumberIndexType !== undefined &&
+          isUnsafeAssignment(
+            destinationNumberIndexType,
+            sourceNumberIndexType,
+            seenTypes
+          ))
       );
     };
 

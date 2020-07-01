@@ -262,21 +262,6 @@ ruleTester.run("no-unsafe-assignment", rule, {
      * Assignment expressions
      */
     // TODO
-    // readonly (index signature) -> mutable (index signature) (recursive types)
-    // TODO this should be invalid
-    {
-      filename: "file.ts",
-      code: `
-        type MutableA = {
-          [P in string]: MutableA;
-        };
-        type ReadonlyA = {
-          readonly [P in string]: ReadonlyA;
-        };
-        const readonlyA: ReadonlyA = {};
-        const mutableA: MutableA = readonlyA;
-      `,
-    },
   ],
   invalid: [
     /**
@@ -452,6 +437,26 @@ ruleTester.run("no-unsafe-assignment", rule, {
       code: `
         type MutableA = Record<string, { a: string }>;
         type ReadonlyA = Record<string, { readonly a: string }>;
+        const readonlyA: ReadonlyA = {};
+        const mutableA: MutableA = readonlyA;
+      `,
+      errors: [
+        {
+          messageId: "errorStringVariableDeclarationReadonlyToMutable",
+          type: AST_NODE_TYPES.VariableDeclaration,
+        },
+      ],
+    },
+    // readonly (index signature) -> mutable (index signature) (recursive types)
+    {
+      filename: "file.ts",
+      code: `
+        type MutableA = {
+          [P in string]: MutableA;
+        };
+        type ReadonlyA = {
+          readonly [P in string]: ReadonlyA;
+        };
         const readonlyA: ReadonlyA = {};
         const mutableA: MutableA = readonlyA;
       `,
