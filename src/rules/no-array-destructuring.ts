@@ -3,7 +3,7 @@ import {
   ESLintUtils,
   AST_NODE_TYPES,
 } from "@typescript-eslint/experimental-utils";
-import { isTupleTypeReference } from "tsutils";
+import { isTupleTypeReference, unionTypeParts } from "tsutils";
 import ts from "typescript";
 
 /**
@@ -46,11 +46,7 @@ const noArrayDestructuring: RuleModule<"errorStringGeneric", readonly []> = {
 
         const numberIndexType = type.getNumberIndexType();
         const typeParts =
-          numberIndexType !== undefined
-            ? numberIndexType.isUnion()
-              ? numberIndexType.types
-              : [numberIndexType]
-            : [];
+          numberIndexType !== undefined ? unionTypeParts(numberIndexType) : [];
 
         // eslint-disable-next-line functional/no-conditional-statement
         if (

@@ -4,7 +4,7 @@ import {
   AST_NODE_TYPES,
   TSESTree,
 } from "@typescript-eslint/experimental-utils";
-import { isTupleTypeReference } from "tsutils";
+import { isTupleTypeReference, unionTypeParts } from "tsutils";
 import ts from "typescript";
 
 /**
@@ -127,15 +127,14 @@ const noArraySubscript: RuleModule<"errorStringGeneric", readonly []> = {
 
       const numberIndexType = type.getNumberIndexType();
       // eslint-disable-next-line functional/no-conditional-statement
-      if (numberIndexType !== undefined) {
-        const typeParts = numberIndexType.isUnion()
-          ? numberIndexType.types
-          : [numberIndexType];
-        // eslint-disable-next-line functional/no-conditional-statement
-        if (typeParts.some((t) => t.flags & ts.TypeFlags.Undefined)) {
-          // Allow subscript access if undefined is already in the array type.
-          return;
-        }
+      if (
+        numberIndexType !== undefined &&
+        unionTypeParts(numberIndexType).some(
+          (t) => t.flags & ts.TypeFlags.Undefined
+        )
+      ) {
+        // Allow subscript access if undefined is already in the array type.
+        return;
       }
 
       // eslint-disable-next-line functional/no-conditional-statement

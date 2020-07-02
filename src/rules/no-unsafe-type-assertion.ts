@@ -3,7 +3,7 @@ import {
   AST_NODE_TYPES,
   ESLintUtils,
 } from "@typescript-eslint/experimental-utils";
-import { isObjectType } from "tsutils";
+import { isObjectType, unionTypeParts } from "tsutils";
 import ts from "typescript";
 
 /**
@@ -94,12 +94,9 @@ const noUnsafeTypeAssertion: RuleModule<
               p,
               destinationNode
             );
-            const destinationPropertyAllowsUndefined =
-              (propertyType.isUnion() &&
-                propertyType.types.some(
-                  (t) => t.flags & ts.TypeFlags.Undefined
-                )) ||
-              propertyType.flags & ts.TypeFlags.Undefined;
+            const destinationPropertyAllowsUndefined = unionTypeParts(
+              propertyType
+            ).some((t) => t.flags & ts.TypeFlags.Undefined);
 
             const destinationPropertyIsOptional =
               p.flags & ts.SymbolFlags.Optional;
@@ -113,11 +110,9 @@ const noUnsafeTypeAssertion: RuleModule<
 
             const sourcePropertyIsUndefined =
               sourcePropertyType === undefined ||
-              (sourcePropertyType.isUnion() &&
-                sourcePropertyType.types.some(
-                  (t) => t.flags & ts.TypeFlags.Undefined
-                )) ||
-              sourcePropertyType.flags & ts.TypeFlags.Undefined;
+              unionTypeParts(sourcePropertyType).some(
+                (t) => t.flags & ts.TypeFlags.Undefined
+              );
 
             return (
               destinationPropertyAllowsUndefined ||
