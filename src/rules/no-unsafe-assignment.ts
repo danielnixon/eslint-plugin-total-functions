@@ -105,8 +105,8 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
       const sourceStringIndexType = sourceType.getStringIndexType();
 
       // This is unsafe if...
-      const isUnsafe =
-        // eslint-disable-next-line sonarjs/prefer-immediate-return
+      return (
+        // we're assigning from one object to another, and
         (isObjectType(destinationType) &&
           isObjectType(sourceType) &&
           // we're assigning from a readonly index signature to a mutable one, or
@@ -119,9 +119,8 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
             destinationStringIndexType,
             sourceStringIndexType,
             seenTypes
-          ));
-
-      return isUnsafe;
+          ))
+      );
     };
 
     const isUnsafeNumberIndexAssignment = (
@@ -373,7 +372,7 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
       // // eslint-disable-next-line functional/no-return-void
       // ArrowFunctionExpression: (node): void => {
       // },
-      // eslint-disable-next-line functional/no-return-void, sonarjs/cognitive-complexity
+      // eslint-disable-next-line functional/no-return-void
       CallExpression: (node): void => {
         const callExpressionNode = parserServices.esTreeNodeToTSNodeMap.get(
           node
@@ -411,18 +410,13 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
 
           const paramType = isRestParam ? numberIndexType : rawParamType;
 
-          const argumentTsNode =
-            argument !== undefined
-              ? parserServices.esTreeNodeToTSNodeMap.get(argument)
-              : undefined;
-          const argumentType =
-            argumentTsNode !== undefined
-              ? checker.getTypeAtLocation(argumentTsNode)
-              : undefined;
+          const argumentTsNode = parserServices.esTreeNodeToTSNodeMap.get(
+            argument
+          );
+          const argumentType = checker.getTypeAtLocation(argumentTsNode);
 
           // eslint-disable-next-line functional/no-conditional-statement
           if (
-            argument !== undefined &&
             argumentType !== undefined &&
             // object expressions are allowed because we won't retain a reference to the object to get out of sync.
             // TODO but what about properties in the object literal that are references to values we _do_ retain a reference to?

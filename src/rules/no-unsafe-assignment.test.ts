@@ -267,7 +267,6 @@ ruleTester.run("no-unsafe-assignment", rule, {
       `,
     },
     // readonly array of readonly object -> readonly array of readonly object
-    // TODO this should be valid
     {
       filename: "file.ts",
       code: `
