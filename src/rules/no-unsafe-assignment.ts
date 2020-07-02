@@ -185,9 +185,6 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
       return (
         destinationPropertyType !== undefined &&
         sourcePropertyType !== undefined &&
-        // TODO isUnsafeAssignment calls filterTypes, so this should already be taken care of.
-        isObjectType(destinationPropertyType) &&
-        isObjectType(sourcePropertyType) &&
         isUnsafeAssignment(
           destinationPropertyType,
           sourcePropertyType,
@@ -204,47 +201,41 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
         readonly sourceType: Type;
       }>
     ): boolean => {
-      return (
-        isObjectType(destinationType) &&
-        isObjectType(sourceType) &&
-        destinationType.getProperties().some((destinationProperty) => {
-          const sourceProperty = sourceType.getProperty(
-            destinationProperty.name
-          );
+      return destinationType.getProperties().some((destinationProperty) => {
+        const sourceProperty = sourceType.getProperty(destinationProperty.name);
 
-          // eslint-disable-next-line functional/no-conditional-statement
-          if (sourceProperty === undefined) {
-            return false;
-          }
+        // eslint-disable-next-line functional/no-conditional-statement
+        if (sourceProperty === undefined) {
+          return false;
+        }
 
-          const destinationPropIsReadonly = isPropertyReadonlyInType(
-            destinationType,
-            destinationProperty.getEscapedName(),
-            checker
-          );
+        const destinationPropIsReadonly = isPropertyReadonlyInType(
+          destinationType,
+          destinationProperty.getEscapedName(),
+          checker
+        );
 
-          const sourcePropIsReadonly = isPropertyReadonlyInType(
-            sourceType,
-            sourceProperty.getEscapedName(),
-            checker
-          );
+        const sourcePropIsReadonly = isPropertyReadonlyInType(
+          sourceType,
+          sourceProperty.getEscapedName(),
+          checker
+        );
 
-          // eslint-disable-next-line functional/no-conditional-statement
-          if (sourcePropIsReadonly && !destinationPropIsReadonly) {
-            return true;
-          }
+        // eslint-disable-next-line functional/no-conditional-statement
+        if (sourcePropIsReadonly && !destinationPropIsReadonly) {
+          return true;
+        }
 
-          const nextSeenTypes = seenTypes.concat([
-            { destinationType, sourceType },
-          ]);
+        const nextSeenTypes = seenTypes.concat([
+          { destinationType, sourceType },
+        ]);
 
-          return isUnsafePropertyAssignmentRec(
-            destinationProperty,
-            sourceProperty,
-            nextSeenTypes
-          );
-        })
-      );
+        return isUnsafePropertyAssignmentRec(
+          destinationProperty,
+          sourceProperty,
+          nextSeenTypes
+        );
+      });
     };
 
     const isUnsafeAssignment = (
@@ -283,6 +274,8 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
         // and we statically know both the destination and the source type,
         destinationType !== undefined &&
         sourceType !== undefined &&
+        // and the types we're assigning from and to are different,
+        destinationType !== sourceType &&
         // and we're either:
         // assigning from a type with readonly string index type to one with a mutable string index type, or
         (isUnsafeStringIndexAssignment(
@@ -310,6 +303,15 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
       VariableDeclaration: (node): void => {
         // eslint-disable-next-line functional/no-expression-statement
         node.declarations.forEach((declaration) => {
+          // eslint-disable-next-line functional/no-conditional-statement
+          if (
+            declaration.id.type === AST_NODE_TYPES.Identifier &&
+            declaration.id.typeAnnotation === undefined
+          ) {
+            // If there is no type annotation then there's no risk of assigning mutable to readonly.
+            return;
+          }
+
           const leftTsNode = parserServices.esTreeNodeToTSNodeMap.get(
             declaration.id
           );
@@ -383,7 +385,7 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
 
         // eslint-disable-next-line functional/no-expression-statement
         node.arguments.forEach((argument, i) => {
-          // This is the argument that corresponds to the current parameter.
+          // This is the parameter that corresponds to the current argument.
           const parameter = get(parameters, i);
 
           // eslint-disable-next-line functional/no-conditional-statement
