@@ -266,6 +266,17 @@ ruleTester.run("no-unsafe-assignment", rule, {
         const foo = document.createElement("div");
       `,
     },
+    // readonly array of readonly object -> readonly array of readonly object
+    // TODO this should be valid
+    {
+      filename: "file.ts",
+      code: `
+        type Obj = { readonly foo: string };
+        const foo = (a: ReadonlyArray<Obj>): number => a.length;
+        const arr: ReadonlyArray<Obj> = [];
+        foo(arr);
+      `,
+    },
     /**
      * Assignment expressions
      */

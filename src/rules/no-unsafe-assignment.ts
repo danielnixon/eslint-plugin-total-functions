@@ -105,7 +105,8 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
       const sourceStringIndexType = sourceType.getStringIndexType();
 
       // This is unsafe if...
-      return (
+      const isUnsafe =
+        // eslint-disable-next-line sonarjs/prefer-immediate-return
         (isObjectType(destinationType) &&
           isObjectType(sourceType) &&
           // we're assigning from a readonly index signature to a mutable one, or
@@ -118,8 +119,9 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
             destinationStringIndexType,
             sourceStringIndexType,
             seenTypes
-          ))
-      );
+          ));
+
+      return isUnsafe;
     };
 
     const isUnsafeNumberIndexAssignment = (
@@ -130,39 +132,21 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
         readonly sourceType: Type;
       }>
     ): boolean => {
-      const destinationIndexInfo = checker.getIndexInfoOfType(
-        destinationType,
-        IndexKind.Number
-      );
-      const destinationTypeHasReadonlyIndexSignature =
-        destinationIndexInfo !== undefined
-          ? destinationIndexInfo.isReadonly
-          : false;
-      const sourceIndexInfo = checker.getIndexInfoOfType(
-        sourceType,
-        IndexKind.Number
-      );
-      const sourceTypeHasReadonlyIndexSignature =
-        sourceIndexInfo !== undefined ? sourceIndexInfo.isReadonly : false;
-
       const destinationNumberIndexType = destinationType.getNumberIndexType();
       const sourceNumberIndexType = sourceType.getNumberIndexType();
 
       // This is unsafe if...
       return (
-        (isObjectType(destinationType) &&
-          isObjectType(sourceType) &&
-          // we're assigning from a readonly index signature to a mutable one, or
-          sourceTypeHasReadonlyIndexSignature &&
-          !destinationTypeHasReadonlyIndexSignature) ||
+        isObjectType(destinationType) &&
+        isObjectType(sourceType) &&
         // we're assigning from a readonly index type to a mutable one.
-        (destinationNumberIndexType !== undefined &&
-          sourceNumberIndexType !== undefined &&
-          isUnsafeAssignment(
-            destinationNumberIndexType,
-            sourceNumberIndexType,
-            seenTypes
-          ))
+        destinationNumberIndexType !== undefined &&
+        sourceNumberIndexType !== undefined &&
+        isUnsafeAssignment(
+          destinationNumberIndexType,
+          sourceNumberIndexType,
+          seenTypes
+        )
       );
     };
 
