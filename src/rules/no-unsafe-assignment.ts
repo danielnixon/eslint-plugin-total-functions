@@ -106,10 +106,10 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
 
       // This is unsafe if...
       return (
-        isObjectType(destinationType) &&
-        isObjectType(sourceType) &&
-        // we're assigning from a readonly index signature to a mutable one, or
-        (sourceTypeHasReadonlyIndexSignature &&
+        (isObjectType(destinationType) &&
+          isObjectType(sourceType) &&
+          // we're assigning from a readonly index signature to a mutable one, or
+          sourceTypeHasReadonlyIndexSignature &&
           !destinationTypeHasReadonlyIndexSignature) ||
         // we're assigning from a readonly index type to a mutable one.
         (destinationStringIndexType !== undefined &&
@@ -150,10 +150,10 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
 
       // This is unsafe if...
       return (
-        isObjectType(destinationType) &&
-        isObjectType(sourceType) &&
-        // we're assigning from a readonly index signature to a mutable one, or
-        (sourceTypeHasReadonlyIndexSignature &&
+        (isObjectType(destinationType) &&
+          isObjectType(sourceType) &&
+          // we're assigning from a readonly index signature to a mutable one, or
+          sourceTypeHasReadonlyIndexSignature &&
           !destinationTypeHasReadonlyIndexSignature) ||
         // we're assigning from a readonly index type to a mutable one.
         (destinationNumberIndexType !== undefined &&
@@ -221,39 +221,47 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
         readonly sourceType: Type;
       }>
     ): boolean => {
-      return isObjectType(destinationType) && isObjectType(sourceType) && destinationType.getProperties().some((destinationProperty) => {
-        const sourceProperty = sourceType.getProperty(destinationProperty.name);
+      return (
+        isObjectType(destinationType) &&
+        isObjectType(sourceType) &&
+        destinationType.getProperties().some((destinationProperty) => {
+          const sourceProperty = sourceType.getProperty(
+            destinationProperty.name
+          );
 
-        // eslint-disable-next-line functional/no-conditional-statement
-        if (sourceProperty === undefined) {
-          return false;
-        }
+          // eslint-disable-next-line functional/no-conditional-statement
+          if (sourceProperty === undefined) {
+            return false;
+          }
 
-        const destinationPropIsReadonly = isPropertyReadonlyInType(
-          destinationType,
-          destinationProperty.getEscapedName(),
-          checker
-        );
+          const destinationPropIsReadonly = isPropertyReadonlyInType(
+            destinationType,
+            destinationProperty.getEscapedName(),
+            checker
+          );
 
-        const sourcePropIsReadonly = isPropertyReadonlyInType(
-          sourceType,
-          sourceProperty.getEscapedName(),
-          checker
-        );
+          const sourcePropIsReadonly = isPropertyReadonlyInType(
+            sourceType,
+            sourceProperty.getEscapedName(),
+            checker
+          );
 
-        // eslint-disable-next-line functional/no-conditional-statement
-        if (sourcePropIsReadonly && !destinationPropIsReadonly) {
-          return true;
-        }
+          // eslint-disable-next-line functional/no-conditional-statement
+          if (sourcePropIsReadonly && !destinationPropIsReadonly) {
+            return true;
+          }
 
-        const nextSeenTypes = seenTypes.concat([{destinationType, sourceType}]);
+          const nextSeenTypes = seenTypes.concat([
+            { destinationType, sourceType },
+          ]);
 
-        return isUnsafePropertyAssignmentRec(
-          destinationProperty,
-          sourceProperty,
-          nextSeenTypes
-        );
-      });
+          return isUnsafePropertyAssignmentRec(
+            destinationProperty,
+            sourceProperty,
+            nextSeenTypes
+          );
+        })
+      );
     };
 
     const isUnsafeAssignment = (
@@ -276,17 +284,18 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
         rawSourceType
       );
 
-      const nextSeenTypes = seenTypes.concat(destinationType !== undefined && sourceType !== undefined ? [
-        { destinationType, sourceType },
-      ] : []);
+      const nextSeenTypes = seenTypes.concat(
+        destinationType !== undefined && sourceType !== undefined
+          ? [{ destinationType, sourceType }]
+          : []
+      );
 
       // This is an unsafe assignment if...
       return (
         // we're not in an infinitely recursive type,
         seenTypes.every(
           (t) =>
-            t.destinationType !== destinationType &&
-            t.sourceType !== sourceType
+            t.destinationType !== destinationType && t.sourceType !== sourceType
         ) &&
         // and we statically know both the destination and the source type,
         destinationType !== undefined &&
