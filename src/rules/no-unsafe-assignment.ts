@@ -106,6 +106,8 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
 
       // This is unsafe if...
       return (
+        isObjectType(destinationType) &&
+        isObjectType(sourceType) &&
         // we're assigning from a readonly index signature to a mutable one, or
         (sourceTypeHasReadonlyIndexSignature &&
           !destinationTypeHasReadonlyIndexSignature) ||
@@ -148,6 +150,8 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
 
       // This is unsafe if...
       return (
+        isObjectType(destinationType) &&
+        isObjectType(sourceType) &&
         // we're assigning from a readonly index signature to a mutable one, or
         (sourceTypeHasReadonlyIndexSignature &&
           !destinationTypeHasReadonlyIndexSignature) ||
@@ -198,6 +202,9 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
       return (
         destinationPropertyType !== undefined &&
         sourcePropertyType !== undefined &&
+        // TODO isUnsafeAssignment calls filterTypes, so this should already be taken care of.
+        isObjectType(destinationPropertyType) &&
+        isObjectType(sourcePropertyType) &&
         isUnsafeAssignment(
           destinationPropertyType,
           sourcePropertyType,
@@ -214,7 +221,7 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
         readonly sourceType: Type;
       }>
     ): boolean => {
-      return destinationType.getProperties().some((destinationProperty) => {
+      return isObjectType(destinationType) && isObjectType(sourceType) && destinationType.getProperties().some((destinationProperty) => {
         const sourceProperty = sourceType.getProperty(destinationProperty.name);
 
         // eslint-disable-next-line functional/no-conditional-statement
@@ -239,10 +246,12 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
           return true;
         }
 
+        const nextSeenTypes = seenTypes.concat([{destinationType, sourceType}]);
+
         return isUnsafePropertyAssignmentRec(
           destinationProperty,
           sourceProperty,
-          seenTypes
+          nextSeenTypes
         );
       });
     };
@@ -262,22 +271,22 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
       // this would catch some cases that we currently miss because they are a union type with > 1 object type member
       // (which currently gets filtered out inside `filterTypes`).
 
-      const nextSeenTypes = seenTypes.concat([
-        { destinationType: rawDestinationType, sourceType: rawSourceType },
-      ]);
-
       const { destinationType, sourceType } = filterTypes(
         rawDestinationType,
         rawSourceType
       );
+
+      const nextSeenTypes = seenTypes.concat(destinationType !== undefined && sourceType !== undefined ? [
+        { destinationType, sourceType },
+      ] : []);
 
       // This is an unsafe assignment if...
       return (
         // we're not in an infinitely recursive type,
         seenTypes.every(
           (t) =>
-            t.destinationType !== rawDestinationType &&
-            t.sourceType !== rawSourceType
+            t.destinationType !== destinationType &&
+            t.sourceType !== sourceType
         ) &&
         // and we statically know both the destination and the source type,
         destinationType !== undefined &&

@@ -258,6 +258,14 @@ ruleTester.run("no-unsafe-assignment", rule, {
         func(foo);
       `,
     },
+    // why does this hang?
+    // TODO fix
+    {
+      filename: "file.ts",
+      code: `
+        const foo = document.createElement("div");
+      `,
+    },
     /**
      * Assignment expressions
      */

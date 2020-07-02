@@ -1,4 +1,7 @@
 {
   "extends": "./tsconfig.json",
-  "files": ["file.ts"]
+  "files": ["file.ts"],
+  "compilerOptions": {
+    "lib": ["esnext", "DOM"]
+  }
 }
