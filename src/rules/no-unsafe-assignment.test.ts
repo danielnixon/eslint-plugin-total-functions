@@ -93,15 +93,55 @@ ruleTester.run("no-unsafe-assignment", rule, {
         foo({ a: "" });
       `,
     },
-    // object literal -> readonly (no reference to object retained)
+    // object literal -> mutable (mutable reference to property retained)
     {
       filename: "file.ts",
       code: `
-        type ReadonlyA = { readonly a: string };
+        type MutableB = { b: string };
+        type MutableA = { readonly a: MutableB };
+        const func = (param: MutableA): void => {
+          return undefined;
+        };
+        const b: MutableB = { b: "" };
+        func({ a: b });
+      `,
+    },
+    // object literal -> readonly (mutable reference to property retained)
+    {
+      filename: "file.ts",
+      code: `
+        type MutableB = { b: string };
+        type ReadonlyA = { readonly a: { readonly b: string } };
         const func = (param: ReadonlyA): void => {
           return undefined;
         };
-        func({ a: "" });
+        const b: MutableB = { b: "" };
+        func({ a: b });
+      `,
+    },
+    // object literal -> readonly (readonly reference to property retained)
+    {
+      filename: "file.ts",
+      code: `
+        type ReadonlyB = { readonly b: string };
+        type ReadonlyA = { readonly a: ReadonlyB };
+        const func = (param: ReadonlyA): void => {
+          return undefined;
+        };
+        const b: ReadonlyB = { b: "" };
+        func({ a: b });
+      `,
+    },
+    // object literal -> readonly (no reference to object or its property retained)
+    {
+      filename: "file.ts",
+      code: `
+        type ReadonlyB = { readonly b: string };
+        type ReadonlyA = { readonly a: ReadonlyB };
+        const func = (param: ReadonlyA): void => {
+          return undefined;
+        };
+        func({ a: { b: "" } });
       `,
     },
     // mutable (union) -> mutable
@@ -128,8 +168,8 @@ ruleTester.run("no-unsafe-assignment", rule, {
         foo(mut);
       `,
     },
-    // mutable -> mutable (type changes)
-    // todo this should be invalid
+    // mutable -> mutable (type changes) (caveat mutator)
+    // TODO this is unsafe but you're already using a mutable type so it's not a priority for this rule to flag
     {
       filename: "file.ts",
       code: `
@@ -142,8 +182,9 @@ ruleTester.run("no-unsafe-assignment", rule, {
         foo(mut);
       `,
     },
-    // mutable -> readonly
-    // todo this should be invalid
+    // mutable -> readonly (caveat mutator)
+    // TODO this could be unsafe (depending on what `func` does with `param` and what assumptions it makes about its readonlyness)
+    // but you're already using a mutable type so it's not a priority for this rule to flag
     {
       filename: "file.ts",
       code: `
@@ -296,6 +337,56 @@ ruleTester.run("no-unsafe-assignment", rule, {
      * Assignment expressions
      */
     // TODO
+    /**
+     * Arrow functions
+     */
+    // Arrow function (compact form) (readonly -> readonly)
+    {
+      filename: "file.ts",
+      code: `
+        type ReadonlyA = { readonly a: string };
+        const ro: ReadonlyA = { a: "" };
+        const func = (): ReadonlyA => ro;
+      `,
+    },
+    // Arrow function (compact form) (object literal -> readonly)
+    {
+      filename: "file.ts",
+      code: `
+        type ReadonlyA = { readonly a: string };
+        const func = (): ReadonlyA => { a: "" };
+      `,
+    },
+    // Arrow function (compact form) (object literal -> mutable)
+    {
+      filename: "file.ts",
+      code: `
+        type MutableA = { a: string };
+        const func = (): MutableA => { a: "" };
+      `,
+    },
+    // Arrow function (compact form) (mutable -> mutable)
+    {
+      filename: "file.ts",
+      code: `
+        type MutableA = { a: string };
+        const ro: MutableA = { a: "" };
+        const func = (): MutableA => ro;
+      `,
+    },
+    // Arrow function (block form) (readonly -> mutable)
+    // TODO this should be invalid
+    {
+      filename: "file.ts",
+      code: `
+        type MutableA = { a: string };
+        type ReadonlyA = { readonly a: string };
+        const ro: ReadonlyA = { a: "" };
+        const func = (): MutableA => {
+          return ro;
+        };
+      `,
+    },
   ],
   invalid: [
     /**
@@ -399,6 +490,27 @@ ruleTester.run("no-unsafe-assignment", rule, {
         {
           messageId: "errorStringCallExpressionReadonlyToMutable",
           type: AST_NODE_TYPES.Identifier,
+        },
+      ],
+    },
+    // object literal -> mutable (readonly reference to property retained)
+    // this can lead to surprising mutation in the readonly reference that is retained
+    {
+      filename: "file.ts",
+      code: `
+        type MutableB = { b: string };
+        type ReadonlyB = { readonly b: string };
+        type MutableA = { readonly a: MutableB };
+        const func = (param: MutableA): void => {
+          return undefined;
+        };
+        const b: ReadonlyB = { b: "" };
+        func({ a: b });
+      `,
+      errors: [
+        {
+          messageId: "errorStringCallExpressionReadonlyToMutable",
+          type: AST_NODE_TYPES.ObjectExpression,
         },
       ],
     },
@@ -515,6 +627,25 @@ ruleTester.run("no-unsafe-assignment", rule, {
         {
           messageId: "errorStringVariableDeclarationReadonlyToMutable",
           type: AST_NODE_TYPES.VariableDeclaration,
+        },
+      ],
+    },
+    /**
+     * Arrow functions
+     */
+    // Arrow function (compact form) (readonly -> mutable)
+    {
+      filename: "file.ts",
+      code: `
+        type MutableA = { a: string };
+        type ReadonlyA = { readonly a: string };
+        const ro: ReadonlyA = { a: "" };
+        const func = (): MutableA => ro;
+      `,
+      errors: [
+        {
+          messageId: "errorStringArrowFunctionExpressionReadonlyToMutable",
+          type: AST_NODE_TYPES.Identifier,
         },
       ],
     },

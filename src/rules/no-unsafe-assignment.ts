@@ -14,7 +14,8 @@ import { Type, SyntaxKind, Symbol, IndexKind } from "typescript";
 type MessageId =
   | "errorStringCallExpressionReadonlyToMutable"
   | "errorStringAssignmentExpressionReadonlyToMutable"
-  | "errorStringVariableDeclarationReadonlyToMutable";
+  | "errorStringVariableDeclarationReadonlyToMutable"
+  | "errorStringArrowFunctionExpressionReadonlyToMutable";
 
 /**
  * An ESLint rule to ban unsafe assignment and declarations.
@@ -35,6 +36,8 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
         "Assigning a readonly type to a mutable type can lead to unexpected mutation in the readonly value.",
       errorStringVariableDeclarationReadonlyToMutable:
         "Using a readonly type to initialize a mutable type can lead to unexpected mutation in the readonly value.",
+      errorStringArrowFunctionExpressionReadonlyToMutable:
+        "Returning a readonly type from a function that returns a mutable type can lead to unexpected mutation in the readonly value.",
     },
     schema: [],
   },
@@ -329,10 +332,6 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
           // eslint-disable-next-line functional/no-conditional-statement
           if (
             rightType !== undefined &&
-            // object expressions are allowed because we won't retain a reference to the object to get out of sync.
-            // TODO but what about properties in the object literal that are references to values we _do_ retain a reference to?
-            declaration.init !== null &&
-            declaration.init.type !== AST_NODE_TYPES.ObjectExpression &&
             isUnsafeAssignment(leftType, rightType)
           ) {
             // eslint-disable-next-line functional/no-expression-statement
@@ -354,12 +353,7 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
         const rightType = checker.getTypeAtLocation(rightTsNode);
 
         // eslint-disable-next-line functional/no-conditional-statement
-        if (
-          // object expressions are allowed because we won't retain a reference to the object to get out of sync.
-          // TODO but what about properties in the object literal that are references to values we _do_ retain a reference to?
-          node.right.type !== AST_NODE_TYPES.ObjectExpression &&
-          isUnsafeAssignment(leftType, rightType)
-        ) {
+        if (isUnsafeAssignment(leftType, rightType)) {
           // eslint-disable-next-line functional/no-expression-statement
           context.report({
             node: node,
@@ -371,9 +365,31 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
       // eslint-disable-next-line functional/no-return-void
       // ReturnStatement: (node): void => {
       // },
-      // // eslint-disable-next-line functional/no-return-void
-      // ArrowFunctionExpression: (node): void => {
-      // },
+      // eslint-disable-next-line functional/no-return-void
+      ArrowFunctionExpression: (node): void => {
+        // eslint-disable-next-line functional/no-conditional-statement
+        if (node.returnType === undefined) {
+          return;
+        }
+
+        const destinationType = checker.getTypeAtLocation(
+          parserServices.esTreeNodeToTSNodeMap.get(
+            node.returnType.typeAnnotation
+          )
+        );
+        const sourceType = checker.getTypeAtLocation(
+          parserServices.esTreeNodeToTSNodeMap.get(node.body)
+        );
+
+        // eslint-disable-next-line functional/no-conditional-statement
+        if (isUnsafeAssignment(destinationType, sourceType)) {
+          // eslint-disable-next-line functional/no-expression-statement
+          context.report({
+            node: node.body,
+            messageId: "errorStringArrowFunctionExpressionReadonlyToMutable",
+          });
+        }
+      },
       // eslint-disable-next-line functional/no-return-void
       CallExpression: (node): void => {
         const callExpressionNode = parserServices.esTreeNodeToTSNodeMap.get(
@@ -420,9 +436,6 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
           // eslint-disable-next-line functional/no-conditional-statement
           if (
             argumentType !== undefined &&
-            // object expressions are allowed because we won't retain a reference to the object to get out of sync.
-            // TODO but what about properties in the object literal that are references to values we _do_ retain a reference to?
-            argument.type !== AST_NODE_TYPES.ObjectExpression &&
             paramType !== undefined &&
             isUnsafeAssignment(paramType, argumentType)
           ) {
