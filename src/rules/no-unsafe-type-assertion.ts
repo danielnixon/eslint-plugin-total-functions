@@ -3,8 +3,9 @@ import {
   AST_NODE_TYPES,
   ESLintUtils,
 } from "@typescript-eslint/experimental-utils";
-import { isObjectType, unionTypeParts } from "tsutils";
+import { unionTypeParts } from "tsutils";
 import ts from "typescript";
+import { filterTypes } from "./common";
 
 /**
  * An ESLint rule to ban unsafe type assertions.
@@ -68,11 +69,16 @@ const noUnsafeTypeAssertion: RuleModule<
 
         // The right hand side of the "as".
         const destinationNode = parserServices.esTreeNodeToTSNodeMap.get(node);
-        const destinationType = checker.getTypeAtLocation(destinationNode);
+        const rawDestinationType = checker.getTypeAtLocation(destinationNode);
 
         // The left hand side of the "as".
         const sourceNode = destinationNode.expression;
-        const sourceType = checker.getTypeAtLocation(sourceNode);
+        const rawSourceType = checker.getTypeAtLocation(sourceNode);
+
+        const { destinationType, sourceType } = filterTypes(
+          rawDestinationType,
+          rawSourceType
+        );
 
         // eslint-disable-next-line functional/no-conditional-statement
         if (sourceType === destinationType) {
@@ -81,9 +87,7 @@ const noUnsafeTypeAssertion: RuleModule<
         }
 
         // eslint-disable-next-line functional/no-conditional-statement
-        if (!isObjectType(destinationType) || !isObjectType(sourceType)) {
-          // Don't flag when either side of the type assertion is not an object.
-          // TODO: confirm there are no non-object type assertions that are unsafe.
+        if (destinationType === undefined || sourceType === undefined) {
           return;
         }
 

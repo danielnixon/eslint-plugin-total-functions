@@ -98,6 +98,17 @@ ruleTester.run("no-unsafe-type-assertion", rule, {
       filename: "file.ts",
       code: "const foo = 42 as number;",
     },
+    // as incompatible type (nested)
+    // TODO this should be invalid
+    {
+      filename: "file.ts",
+      code: `
+        type Foo = { readonly foo: { readonly a: string } };
+        type Bar = { readonly foo: { readonly a: string | undefined } };
+        const bar: Bar = { foo: { a: undefined } };
+        const foobar = bar as Foo;
+      `,
+    },
   ],
   invalid: [
     // deprecated type assertion style
@@ -161,6 +172,22 @@ ruleTester.run("no-unsafe-type-assertion", rule, {
       filename: "file.ts",
       code:
         "type Foo = { readonly foo: string }; type Bar = { readonly foo: string | undefined }; const bar: Bar = { foo: undefined }; const foobar = bar as Foo;",
+      errors: [
+        {
+          messageId: "errorStringGeneric",
+          type: AST_NODE_TYPES.TSAsExpression,
+        },
+      ],
+    },
+    // as incompatible type (union)
+    {
+      filename: "file.ts",
+      code: `
+        type Foo = { readonly foo: string };
+        type Bar = { readonly foo: string | undefined };
+        const bar: Bar = { foo: undefined };
+        const foobar = bar as Foo | number;
+      `,
       errors: [
         {
           messageId: "errorStringGeneric",
