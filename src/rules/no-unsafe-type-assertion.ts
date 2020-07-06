@@ -120,7 +120,7 @@ const noUnsafeTypeAssertion: RuleModule<
           messageId: "errorStringPreferAs",
         });
       },
-      // eslint-disable-next-line functional/no-return-void, sonarjs/cognitive-complexity
+      // eslint-disable-next-line functional/no-return-void
       TSAsExpression: (node): void => {
         // eslint-disable-next-line functional/no-conditional-statement
         if (node.typeAnnotation.type === AST_NODE_TYPES.TSAnyKeyword) {

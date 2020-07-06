@@ -387,6 +387,65 @@ ruleTester.run("no-unsafe-assignment", rule, {
         };
       `,
     },
+    /**
+     * type assertions
+     */
+    // readonly -> readonly
+    {
+      filename: "file.ts",
+      code: `
+        type ReadonlyA = { readonly a: string };
+        const ro: ReadonlyA = { a: "" };
+        const mut = ro as ReadonlyA;
+      `,
+    },
+    // mutable -> mutable
+    {
+      filename: "file.ts",
+      code: `
+        type MutableA = { a: string };
+        const ro: MutableA = { a: "" };
+        const mut = ro as MutableA;
+      `,
+    },
+    // mutable -> readonly
+    {
+      filename: "file.ts",
+      code: `
+        type MutableA = { a: string };
+        type ReadonlyA = { readonly a: string };
+        const ro: MutableA = { a: "" };
+        const mut = ro as ReadonlyA;
+      `,
+    },
+    // readonly -> readonly
+    {
+      filename: "file.ts",
+      code: `
+        type ReadonlyA = { readonly a: string };
+        const ro: ReadonlyA = { a: "" };
+        const mut = <ReadonlyA>ro;
+      `,
+    },
+    // mutable -> mutable
+    {
+      filename: "file.ts",
+      code: `
+        type MutableA = { a: string };
+        const ro: MutableA = { a: "" };
+        const mut = <MutableA>ro;
+      `,
+    },
+    // mutable -> readonly
+    {
+      filename: "file.ts",
+      code: `
+        type MutableA = { a: string };
+        type ReadonlyA = { readonly a: string };
+        const ro: MutableA = { a: "" };
+        const mut = <ReadonlyA>ro;
+      `,
+    },
   ],
   invalid: [
     /**
@@ -646,6 +705,41 @@ ruleTester.run("no-unsafe-assignment", rule, {
         {
           messageId: "errorStringArrowFunctionExpressionReadonlyToMutable",
           type: AST_NODE_TYPES.Identifier,
+        },
+      ],
+    },
+    /**
+     * type assertions
+     */
+    // readonly -> mutable
+    {
+      filename: "file.ts",
+      code: `
+        type MutableA = { a: string };
+        type ReadonlyA = { readonly a: string };
+        const ro: ReadonlyA = { a: "" };
+        const mut = ro as MutableA;
+      `,
+      errors: [
+        {
+          messageId: "errorStringTSAsExpressionReadonlyToMutable",
+          type: AST_NODE_TYPES.TSAsExpression,
+        },
+      ],
+    },
+    // readonly -> mutable
+    {
+      filename: "file.ts",
+      code: `
+        type MutableA = { a: string };
+        type ReadonlyA = { readonly a: string };
+        const ro: ReadonlyA = { a: "" };
+        const mut = <MutableA>ro;
+      `,
+      errors: [
+        {
+          messageId: "errorStringTSTypeAssertionReadonlyToMutable",
+          type: AST_NODE_TYPES.TSTypeAssertion,
         },
       ],
     },

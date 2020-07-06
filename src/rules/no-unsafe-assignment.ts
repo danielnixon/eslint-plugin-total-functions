@@ -12,7 +12,9 @@ type MessageId =
   | "errorStringCallExpressionReadonlyToMutable"
   | "errorStringAssignmentExpressionReadonlyToMutable"
   | "errorStringVariableDeclarationReadonlyToMutable"
-  | "errorStringArrowFunctionExpressionReadonlyToMutable";
+  | "errorStringArrowFunctionExpressionReadonlyToMutable"
+  | "errorStringTSAsExpressionReadonlyToMutable"
+  | "errorStringTSTypeAssertionReadonlyToMutable";
 
 /**
  * An ESLint rule to ban unsafe assignment and declarations.
@@ -35,6 +37,10 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
         "Using a readonly type to initialize a mutable type can lead to unexpected mutation in the readonly value.",
       errorStringArrowFunctionExpressionReadonlyToMutable:
         "Returning a readonly type from a function that returns a mutable type can lead to unexpected mutation in the readonly value.",
+      errorStringTSAsExpressionReadonlyToMutable:
+        "Asserting a readonly type to a mutable type can lead to unexpected mutation in the readonly value.",
+      errorStringTSTypeAssertionReadonlyToMutable:
+        "Asserting a readonly type to a mutable type can lead to unexpected mutation in the readonly value.",
     },
     schema: [],
   },
@@ -246,6 +252,38 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
     };
 
     return {
+      // eslint-disable-next-line functional/no-return-void
+      TSTypeAssertion: (node): void => {
+        const destinationNode = parserServices.esTreeNodeToTSNodeMap.get(node);
+        const destinationType = checker.getTypeAtLocation(destinationNode);
+        const sourceNode = destinationNode.expression;
+        const sourceType = checker.getTypeAtLocation(sourceNode);
+
+        // eslint-disable-next-line functional/no-conditional-statement
+        if (isUnsafeAssignment(destinationType, sourceType)) {
+          // eslint-disable-next-line functional/no-expression-statement
+          context.report({
+            node: node,
+            messageId: "errorStringTSTypeAssertionReadonlyToMutable",
+          });
+        }
+      },
+      // eslint-disable-next-line functional/no-return-void
+      TSAsExpression: (node): void => {
+        const destinationNode = parserServices.esTreeNodeToTSNodeMap.get(node);
+        const destinationType = checker.getTypeAtLocation(destinationNode);
+        const sourceNode = destinationNode.expression;
+        const sourceType = checker.getTypeAtLocation(sourceNode);
+
+        // eslint-disable-next-line functional/no-conditional-statement
+        if (isUnsafeAssignment(destinationType, sourceType)) {
+          // eslint-disable-next-line functional/no-expression-statement
+          context.report({
+            node: node,
+            messageId: "errorStringTSAsExpressionReadonlyToMutable",
+          });
+        }
+      },
       // eslint-disable-next-line functional/no-return-void
       VariableDeclaration: (node): void => {
         // eslint-disable-next-line functional/no-expression-statement
