@@ -347,6 +347,7 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
       // eslint-disable-next-line functional/no-return-void
       // ReturnStatement: (node): void => {
       // },
+      // TODO: YieldExpression?
       // eslint-disable-next-line functional/no-return-void
       ArrowFunctionExpression: (node): void => {
         // eslint-disable-next-line functional/no-conditional-statement
