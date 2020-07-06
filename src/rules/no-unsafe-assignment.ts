@@ -6,7 +6,7 @@ import {
 import { isObjectType, isPropertyReadonlyInType } from "tsutils";
 import { get } from "total-functions";
 import { Type, SyntaxKind, Symbol, IndexKind } from "typescript";
-import { filterTypes } from "./common";
+import { filterTypes, symbolToType } from "./common";
 
 type MessageId =
   | "errorStringCallExpressionReadonlyToMutable"
@@ -123,28 +123,11 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
         readonly sourceType: Type;
       }>
     ): boolean => {
-      const destinationPropertyDeclarations =
-        destinationProperty.getDeclarations() || [];
-      // TODO: How to choose declaration when there are multiple? `checker.getResolvedSignature()`?
-      const destinationPropertyDeclaration =
-        destinationPropertyDeclarations.length > 1
-          ? undefined
-          : get(destinationPropertyDeclarations, 0);
-      const destinationPropertyType =
-        destinationPropertyDeclaration !== undefined
-          ? checker.getTypeAtLocation(destinationPropertyDeclaration)
-          : undefined;
-
-      const sourcePropertyDeclarations = sourceProperty.getDeclarations() || [];
-      // TODO: How to choose declaration when there are multiple? `checker.getResolvedSignature()`?
-      const sourcePropertyDeclaration =
-        sourcePropertyDeclarations.length > 1
-          ? undefined
-          : get(sourcePropertyDeclarations, 0);
-      const sourcePropertyType =
-        sourcePropertyDeclaration !== undefined
-          ? checker.getTypeAtLocation(sourcePropertyDeclaration)
-          : undefined;
+      const destinationPropertyType = symbolToType(
+        destinationProperty,
+        checker
+      );
+      const sourcePropertyType = symbolToType(sourceProperty, checker);
 
       return (
         destinationPropertyType !== undefined &&

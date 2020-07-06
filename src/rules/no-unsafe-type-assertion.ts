@@ -5,7 +5,7 @@ import {
 } from "@typescript-eslint/experimental-utils";
 import { unionTypeParts } from "tsutils";
 import ts from "typescript";
-import { filterTypes } from "./common";
+import { filterTypes, symbolToType } from "./common";
 
 /**
  * An ESLint rule to ban unsafe type assertions.
@@ -31,6 +31,83 @@ const noUnsafeTypeAssertion: RuleModule<
   create: (context) => {
     const parserServices = ESLintUtils.getParserServices(context);
     const checker = parserServices.program.getTypeChecker();
+
+    const isUnsafe = (
+      rawDestinationType: ts.Type,
+      rawSourceType: ts.Type,
+      seenTypes: ReadonlyArray<{
+        readonly destinationType: ts.Type;
+        readonly sourceType: ts.Type;
+      }> = []
+    ): boolean => {
+      const { destinationType, sourceType } = filterTypes(
+        rawDestinationType,
+        rawSourceType
+      );
+
+      // eslint-disable-next-line functional/no-conditional-statement
+      if (destinationType === undefined || sourceType === undefined) {
+        return false;
+      }
+
+      return destinationType.getProperties().every((destinationProperty) => {
+        const destinationPropertyType = symbolToType(
+          destinationProperty,
+          checker
+        );
+        const sourceProperty = sourceType.getProperty(destinationProperty.name);
+        const sourcePropertyType =
+          sourceProperty !== undefined
+            ? symbolToType(sourceProperty, checker)
+            : undefined;
+
+        const destinationPropertyIsOptional =
+          destinationProperty.flags & ts.SymbolFlags.Optional;
+
+        const destinationTypeParts =
+          destinationPropertyType !== undefined
+            ? unionTypeParts(destinationPropertyType)
+            : [];
+        const destinationPropertyAllowsUndefined = destinationTypeParts.some(
+          (t) => t.flags & ts.TypeFlags.Undefined
+        );
+
+        const sourcePropertyIsUndefined =
+          sourcePropertyType === undefined ||
+          unionTypeParts(sourcePropertyType).some(
+            (t) => t.flags & ts.TypeFlags.Undefined
+          );
+
+        const nextSeenTypes = seenTypes.concat([
+          { destinationType, sourceType },
+        ]);
+
+        const isUnsafePropertyAssignment =
+          sourcePropertyIsUndefined &&
+          !destinationPropertyAllowsUndefined &&
+          !destinationPropertyIsOptional;
+
+        // This is an unsafe assignment if...
+        return (
+          // we're not in an infinitely recursive type,
+          seenTypes.every(
+            (t) =>
+              t.destinationType !== destinationType &&
+              t.sourceType !== sourceType
+          ) &&
+          // and this is an unsafe property assignment, or
+          (isUnsafePropertyAssignment ||
+            // this is unsafe recursively
+            (destinationPropertyType !== undefined &&
+              sourcePropertyType !== undefined &&
+              isUnsafe(
+                destinationPropertyType,
+                sourcePropertyType,
+                nextSeenTypes
+              )))
+        );
+      });
+    };
 
     return {
       // eslint-disable-next-line functional/no-return-void
@@ -75,71 +152,14 @@ const noUnsafeTypeAssertion: RuleModule<
         const sourceNode = destinationNode.expression;
         const rawSourceType = checker.getTypeAtLocation(sourceNode);
 
-        const { destinationType, sourceType } = filterTypes(
-          rawDestinationType,
-          rawSourceType
-        );
-
         // eslint-disable-next-line functional/no-conditional-statement
-        if (sourceType === destinationType) {
-          // Don't flag when type assertion isn't actually changing the type.
-          return;
+        if (isUnsafe(rawDestinationType, rawSourceType)) {
+          // eslint-disable-next-line functional/no-expression-statement
+          context.report({
+            node: node,
+            messageId: "errorStringGeneric",
+          });
         }
-
-        // eslint-disable-next-line functional/no-conditional-statement
-        if (destinationType === undefined || sourceType === undefined) {
-          return;
-        }
-
-        // eslint-disable-next-line functional/no-conditional-statement
-        if (
-          destinationType.getProperties().every((p) => {
-            const propertyType = checker.getTypeOfSymbolAtLocation(
-              p,
-              destinationNode
-            );
-            const destinationPropertyAllowsUndefined = unionTypeParts(
-              propertyType
-            ).some((t) => t.flags & ts.TypeFlags.Undefined);
-
-            const destinationPropertyIsOptional =
-              p.flags & ts.SymbolFlags.Optional;
-
-            const sourceProperty = sourceType.getProperty(p.name);
-
-            const sourcePropertyType =
-              sourceProperty === undefined
-                ? undefined
-                : checker.getTypeOfSymbolAtLocation(sourceProperty, sourceNode);
-
-            const sourcePropertyIsUndefined =
-              sourcePropertyType === undefined ||
-              unionTypeParts(sourcePropertyType).some(
-                (t) => t.flags & ts.TypeFlags.Undefined
-              );
-
-            return (
-              destinationPropertyAllowsUndefined ||
-              destinationPropertyIsOptional ||
-              !sourcePropertyIsUndefined
-            );
-          })
-        ) {
-          // If this is an object type with a type assertion to another object type,
-          // don't flag it as an error if the properties "line up".
-          // We don't need to check property types because the compiler will consider
-          // that an error, e.g.:
-          //
-          // type Foo = { readonly foo: string };
-          // const foo = { foo: 1 } as Foo; // this won't compile
-          return;
-        }
-
-        // eslint-disable-next-line functional/no-expression-statement
-        context.report({
-          node: node,
-          messageId: "errorStringGeneric",
-        });
       },
     };
   },

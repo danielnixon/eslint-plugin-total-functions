@@ -1,6 +1,6 @@
 import { isObjectType, unionTypeParts } from "tsutils";
 import { get } from "total-functions";
-import { Type } from "typescript";
+import { Type, TypeChecker, Symbol } from "typescript";
 
 /**
  * Throws away non-object types (string, number, boolean, etc) because we don't check those for readonly -> mutable assignment.
@@ -35,4 +35,18 @@ export const filterTypes = (
     destinationType,
     sourceType,
   };
+};
+
+export const symbolToType = (
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  s: Symbol,
+  checker: TypeChecker
+): Type | undefined => {
+  const declarations = s.getDeclarations() || [];
+  // TODO: How to choose declaration when there are multiple?
+  const declaration =
+    declarations.length > 1 ? undefined : get(declarations, 0);
+  return declaration !== undefined
+    ? checker.getTypeAtLocation(declaration)
+    : undefined;
 };
