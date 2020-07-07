@@ -107,6 +107,16 @@ ruleTester.run("no-unsafe-type-assertion", rule, {
         const bar = foo as Foo | undefined;
       `,
     },
+    // recursive type (linting must terminate)
+    {
+      filename: "file.ts",
+      code: `
+        type Foo = { readonly a: Foo } | undefined;
+        type Bar = { readonly a: Bar } | undefined;
+        const foo: Foo = { a: undefined };
+        const bar = foo as Bar;
+      `,
+    },
   ],
   invalid: [
     // deprecated type assertion style
