@@ -50,7 +50,7 @@ const noUnsafeTypeAssertion: RuleModule<
         return false;
       }
 
-      return destinationType.getProperties().every((destinationProperty) => {
+      return destinationType.getProperties().some((destinationProperty) => {
         const destinationPropertyType = symbolToType(
           destinationProperty,
           checker

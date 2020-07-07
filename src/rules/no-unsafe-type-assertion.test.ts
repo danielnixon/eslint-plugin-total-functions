@@ -142,7 +142,7 @@ ruleTester.run("no-unsafe-type-assertion", rule, {
         },
       ],
     },
-    // as incompatible type (value as type name)
+    // as incompatible type (value as type literal)
     {
       filename: "file.ts",
       code: "const foo = {}; const bar = foo as { readonly foo: string };",
@@ -153,11 +153,23 @@ ruleTester.run("no-unsafe-type-assertion", rule, {
         },
       ],
     },
-    // as incompatible type (value as type literal)
+    // as incompatible type (value as type name)
     {
       filename: "file.ts",
       code:
         "type Foo = { readonly foo: string }; const foo = {}; const bar = foo as Foo;",
+      errors: [
+        {
+          messageId: "errorStringGeneric",
+          type: AST_NODE_TYPES.TSAsExpression,
+        },
+      ],
+    },
+    // as incompatible type (multiple properties, some valid + some invalid)
+    {
+      filename: "file.ts",
+      code:
+        "type Foo = { readonly foo: string, readonly bar: string }; const foo = { foo: '' }; const bar = foo as Foo;",
       errors: [
         {
           messageId: "errorStringGeneric",
