@@ -404,6 +404,7 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
           // For now we just conclude that this is a rest param if it's a rest param in _all_ declarations.
           const isRestParam =
             rawParamType.symbol !== undefined &&
+            rawParamType.symbol.declarations !== undefined &&
             rawParamType.symbol.declarations.every(
               (d) => d.kind & SyntaxKind.RestType
             ) &&

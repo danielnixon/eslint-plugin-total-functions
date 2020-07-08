@@ -446,6 +446,16 @@ ruleTester.run("no-unsafe-assignment", rule, {
         const mut = <ReadonlyA>ro;
       `,
     },
+    // Symbol.declarations claims to be of type Declaration[] but it's really Declaration[] | undefined
+    // This test exercises the case where it is undefined to ensure we handle it appropriately.
+    // TODO: what else in the typescript lib lies about its type?
+    // TODO: use patch-package to fix this type, forcing us to handle it.
+    {
+      filename: "file.ts",
+      code: `
+        Object.keys({}) as ReadonlyArray<string>;
+      `,
+    },
   ],
   invalid: [
     /**
