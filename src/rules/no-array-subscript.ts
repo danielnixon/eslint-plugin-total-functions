@@ -42,27 +42,20 @@ const noArraySubscript: RuleModule<"errorStringGeneric", readonly []> = {
         return;
       }
 
+      const contextualType = checker.getContextualType(
+        parserServices.esTreeNodeToTSNodeMap.get(node)
+      );
+
       // eslint-disable-next-line functional/no-conditional-statement
       if (
-        node.parent !== undefined &&
-        node.parent.type === AST_NODE_TYPES.TSAsExpression
+        contextualType !== undefined &&
+        unionTypeParts(contextualType).some(
+          (t) => t.flags & ts.TypeFlags.Undefined
+        )
       ) {
-        const typeAnnotationNode = parserServices.esTreeNodeToTSNodeMap.get(
-          node.parent.typeAnnotation
-        );
-        const typeAnnotationType = checker.getTypeAtLocation(
-          typeAnnotationNode
-        );
-
-        // eslint-disable-next-line functional/no-conditional-statement
-        if (
-          typeAnnotationType.isUnion() &&
-          typeAnnotationType.types.some((t) => t.flags & ts.TypeFlags.Undefined)
-        ) {
-          // We've annotated the array access with a type annotation that forces
-          // the result to include undefined.
-          return;
-        }
+        // Contextual type includes (or is) undefined.
+        // See https://www.typescriptlang.org/docs/handbook/type-inference.html#contextual-typing
+        return;
       }
 
       // eslint-disable-next-line functional/no-conditional-statement
@@ -78,52 +71,6 @@ const noArraySubscript: RuleModule<"errorStringGeneric", readonly []> = {
 
       const tsNode = parserServices.esTreeNodeToTSNodeMap.get(node.object);
       const type = checker.getTypeAtLocation(tsNode);
-
-      // eslint-disable-next-line functional/no-conditional-statement
-      if (
-        node.parent !== undefined &&
-        node.parent.type === AST_NODE_TYPES.VariableDeclarator &&
-        node.parent.id.typeAnnotation !== undefined
-      ) {
-        const typeAnnotationNode = parserServices.esTreeNodeToTSNodeMap.get(
-          node.parent.id.typeAnnotation.typeAnnotation
-        );
-        const typeAnnotationType = checker.getTypeAtLocation(
-          typeAnnotationNode
-        );
-
-        // eslint-disable-next-line functional/no-conditional-statement
-        if (
-          typeAnnotationType.isUnion() &&
-          typeAnnotationType.types.some((t) => t.flags & ts.TypeFlags.Undefined)
-        ) {
-          // We're using the result of the array access to initialise something
-          // that happens to include undefined, so we can ignore the partiality.
-          return;
-        }
-      }
-
-      // eslint-disable-next-line functional/no-conditional-statement
-      if (
-        node.parent !== undefined &&
-        node.parent.type === AST_NODE_TYPES.AssignmentExpression &&
-        node.parent.right === node
-      ) {
-        const leftNode = parserServices.esTreeNodeToTSNodeMap.get(
-          node.parent.left
-        );
-        const leftType = checker.getTypeAtLocation(leftNode);
-
-        // eslint-disable-next-line functional/no-conditional-statement
-        if (
-          leftType.isUnion() &&
-          leftType.types.some((t) => t.flags & ts.TypeFlags.Undefined)
-        ) {
-          // We're assigning the result of the array access to something that happens
-          // to include undefined, so we can ignore the partiality.
-          return;
-        }
-      }
 
       const numberIndexType = type.getNumberIndexType();
       // eslint-disable-next-line functional/no-conditional-statement
@@ -165,8 +112,6 @@ const noArraySubscript: RuleModule<"errorStringGeneric", readonly []> = {
         // If this access is invalid TypeScript itself will catch it.
         return;
       }
-
-      // TODO: https://github.com/danielnixon/eslint-plugin-total-functions/issues/11
 
       // eslint-disable-next-line functional/no-expression-statement
       context.report({

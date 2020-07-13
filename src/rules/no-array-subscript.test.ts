@@ -113,8 +113,85 @@ ruleTester.run("no-array-subscript", rule, {
       filename: "file.ts",
       code: "const obj = { 100: 'a' }; const foo = obj[200];",
     },
+
+    // Result returned from arrow function expression (the compact form) whose return type includes undefined.
+    // Allowed because the partiality isn't observable.
+    {
+      filename: "file.ts",
+      code:
+        "const last: <A>(array: ReadonlyArray<A>) => A | undefined = (a) => a[a.length - 1];",
+    },
+    // Result returned from arrow function whose return type includes undefined.
+    // Allowed because the partiality isn't observable.
+    {
+      filename: "file.ts",
+      code:
+        "const last: <A>(array: ReadonlyArray<A>) => A | undefined = (a) => { console.log('a'); return a[a.length - 1]; }",
+    },
+    // Result returned from function whose return type includes undefined.
+    // Allowed because the partiality isn't observable.
+    {
+      filename: "file.ts",
+      code:
+        "function last<A>(array: ReadonlyArray<A>): A | undefined { console.log('a'); return array[array.length - 1]; }",
+    },
+    // Result returned from function (alternate syntax) whose return type includes undefined.
+    // Allowed because the partiality isn't observable.
+    {
+      filename: "file.ts",
+      code:
+        "const last = function <A>(array: ReadonlyArray<A>): A | undefined { console.log('a'); return array[array.length - 1]; }",
+    },
+    // Object expression where result of array access is assigned to optional property (type name).
+    // Allowed because the partiality isn't observable.
+    {
+      filename: "file.ts",
+      code:
+        "type Foo = { readonly foo?: number }; const arr = [0]; const foo: Foo = { foo: arr[0] };",
+    },
+    // Object expression where result of array access is assigned to optional property (type literal).
+    // Allowed because the partiality isn't observable.
+    {
+      filename: "file.ts",
+      code:
+        "const arr = [0]; const foo: { readonly foo?: number } = { foo: arr[0] };",
+    },
+    // Object expression where result of array access is assigned to property that includes undefined (type name).
+    // Allowed because the partiality isn't observable.
+    {
+      filename: "file.ts",
+      code:
+        "type Foo = { readonly foo: number | undefined }; const arr = [0]; const foo: Foo = { foo: arr[0] };",
+    },
+    // Object expression where result of array access is assigned to property that includes undefined (type literal).
+    // Allowed because the partiality isn't observable.
+    {
+      filename: "file.ts",
+      code:
+        "const arr = [0]; const foo: { readonly foo: number | undefined } = { foo: arr[0] };",
+    },
+    // Object expression with type assertion that includes undefined for the property being assigned to by the array access.
+    // Allowed because the partiality isn't observable.
+    {
+      filename: "file.ts",
+      code:
+        "const arr = [0]; const foo = { foo: arr[0] } as { readonly foo: number | undefined };",
+    },
   ],
   invalid: [
+    // Partial tuple property access with non-literal (but const) key (within range of tuple portion).
+    // TODO this should be valid?
+    {
+      filename: "file.ts",
+      code:
+        "const arr: readonly [0, 1, 2, ...(readonly number[])] = [0, 1, 2]; const key = 1; const foo = arr[key];",
+      errors: [
+        {
+          messageId: "errorStringGeneric",
+          type: AST_NODE_TYPES.MemberExpression,
+        },
+      ],
+    },
     // Array subscript access.
     {
       filename: "file.ts",
@@ -196,58 +273,6 @@ ruleTester.run("no-array-subscript", rule, {
         },
       ],
     },
-    // Result returned from arrow function expression (the compact form) whose return type includes undefined.
-    // TODO: ideally this could be allowed because the partiality isn't observable.
-    {
-      filename: "file.ts",
-      code:
-        "const last: <A>(array: ReadonlyArray<A>) => A | undefined = (a) => a[a.length - 1];",
-      errors: [
-        {
-          messageId: "errorStringGeneric",
-          type: AST_NODE_TYPES.MemberExpression,
-        },
-      ],
-    },
-    // Result returned from arrow function whose return type includes undefined.
-    // TODO: ideally this could be allowed because the partiality isn't observable.
-    {
-      filename: "file.ts",
-      code:
-        "const last: <A>(array: ReadonlyArray<A>) => A | undefined = (a) => { console.log('a'); return a[a.length - 1]; }",
-      errors: [
-        {
-          messageId: "errorStringGeneric",
-          type: AST_NODE_TYPES.MemberExpression,
-        },
-      ],
-    },
-    // Result returned from function whose return type includes undefined.
-    // TODO: ideally this could be allowed because the partiality isn't observable.
-    {
-      filename: "file.ts",
-      code:
-        "function last<A>(array: ReadonlyArray<A>): A | undefined { console.log('a'); return array[array.length - 1]; }",
-      errors: [
-        {
-          messageId: "errorStringGeneric",
-          type: AST_NODE_TYPES.MemberExpression,
-        },
-      ],
-    },
-    // Result returned from function (alternate syntax) whose return type includes undefined.
-    // TODO: ideally this could be allowed because the partiality isn't observable.
-    {
-      filename: "file.ts",
-      code:
-        "const last = function <A>(array: ReadonlyArray<A>): A | undefined { console.log('a'); return array[array.length - 1]; }",
-      errors: [
-        {
-          messageId: "errorStringGeneric",
-          type: AST_NODE_TYPES.MemberExpression,
-        },
-      ],
-    },
     // Array access within an arrow function but not the return value;
     {
       filename: "file.ts",
@@ -277,84 +302,6 @@ ruleTester.run("no-array-subscript", rule, {
       filename: "file.ts",
       code:
         "const arr: readonly [0, 1, 2, ...(readonly number[])] = [0, 1, 2]; const key = 42; const foo = arr[key];",
-      errors: [
-        {
-          messageId: "errorStringGeneric",
-          type: AST_NODE_TYPES.MemberExpression,
-        },
-      ],
-    },
-    // Partial tuple property access with non-literal (but const) key (within range of tuple portion).
-    // TODO this should be valid.
-    {
-      filename: "file.ts",
-      code:
-        "const arr: readonly [0, 1, 2, ...(readonly number[])] = [0, 1, 2]; const key = 1; const foo = arr[key];",
-      errors: [
-        {
-          messageId: "errorStringGeneric",
-          type: AST_NODE_TYPES.MemberExpression,
-        },
-      ],
-    },
-    // Object expression where result of array access is assigned to optional property (type name).
-    // TODO this should be valid.
-    {
-      filename: "file.ts",
-      code:
-        "type Foo = { readonly foo?: number }; const arr = [0]; const foo: Foo = { foo: arr[0] };",
-      errors: [
-        {
-          messageId: "errorStringGeneric",
-          type: AST_NODE_TYPES.MemberExpression,
-        },
-      ],
-    },
-    // Object expression where result of array access is assigned to optional property (type literal).
-    // TODO this should be valid.
-    {
-      filename: "file.ts",
-      code:
-        "const arr = [0]; const foo: { readonly foo?: number } = { foo: arr[0] };",
-      errors: [
-        {
-          messageId: "errorStringGeneric",
-          type: AST_NODE_TYPES.MemberExpression,
-        },
-      ],
-    },
-    // Object expression where result of array access is assigned to property that includes undefined (type name).
-    // TODO this should be valid.
-    {
-      filename: "file.ts",
-      code:
-        "type Foo = { readonly foo: number | undefined }; const arr = [0]; const foo: Foo = { foo: arr[0] };",
-      errors: [
-        {
-          messageId: "errorStringGeneric",
-          type: AST_NODE_TYPES.MemberExpression,
-        },
-      ],
-    },
-    // Object expression where result of array access is assigned to property that includes undefined (type literal).
-    // TODO this should be valid.
-    {
-      filename: "file.ts",
-      code:
-        "const arr = [0]; const foo: { readonly foo: number | undefined } = { foo: arr[0] };",
-      errors: [
-        {
-          messageId: "errorStringGeneric",
-          type: AST_NODE_TYPES.MemberExpression,
-        },
-      ],
-    },
-    // Object expression with type assertion that includes undefined for the property being assigned to by the array access.
-    // TODO this should be valid.
-    {
-      filename: "file.ts",
-      code:
-        "const arr = [0]; const foo = { foo: arr[0] } as { readonly foo: number | undefined };",
       errors: [
         {
           messageId: "errorStringGeneric",
