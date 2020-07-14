@@ -2,6 +2,9 @@ import { isObjectType, unionTypeParts } from "tsutils";
 import { get } from "total-functions";
 import { Type, TypeChecker, Symbol } from "typescript";
 
+export const single = <A>(as: ReadonlyArray<A>): A | undefined =>
+  as.length === 1 ? get(as, 0) : undefined;
+
 /**
  * Throws away non-object types (string, number, boolean, etc) because we don't check those for readonly -> mutable assignment.
  */
@@ -20,16 +23,12 @@ export const filterTypes = (
   const filteredDestinationTypes = unionTypeParts(
     rawDestinationType
   ).filter((t) => isObjectType(t));
-  const destinationType =
-    filteredDestinationTypes.length === 1
-      ? get(filteredDestinationTypes, 0)
-      : undefined;
+  const destinationType = single(filteredDestinationTypes);
 
   const filteredSourceTypes = unionTypeParts(rawSourceType).filter((t) =>
     isObjectType(t)
   );
-  const sourceType =
-    filteredSourceTypes.length === 1 ? get(filteredSourceTypes, 0) : undefined;
+  const sourceType = single(filteredSourceTypes);
 
   return {
     destinationType,
@@ -44,8 +43,7 @@ export const symbolToType = (
 ): Type | undefined => {
   const declarations = s.getDeclarations() || [];
   // TODO: How to choose declaration when there are multiple?
-  const declaration =
-    declarations.length > 1 ? undefined : get(declarations, 0);
+  const declaration = single(declarations);
   return declaration !== undefined
     ? checker.getTypeAtLocation(declaration)
     : undefined;
