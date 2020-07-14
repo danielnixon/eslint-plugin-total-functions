@@ -3,3 +3,4 @@ dist
 yarn-error.log
 node_modules
 dist/*.test.*
+.stryker-tmp
