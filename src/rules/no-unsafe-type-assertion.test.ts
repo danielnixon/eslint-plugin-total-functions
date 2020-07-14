@@ -117,19 +117,13 @@ ruleTester.run("no-unsafe-type-assertion", rule, {
         const bar = foo as Bar;
       `,
     },
-  ],
-  invalid: [
     // deprecated type assertion style
     {
       filename: "file.ts",
       code: "const foo = <any>'foo';",
-      errors: [
-        {
-          messageId: "errorStringPreferAs",
-          type: AST_NODE_TYPES.TSTypeAssertion,
-        },
-      ],
     },
+  ],
+  invalid: [
     // as incompatible type (object literal as type name)
     {
       filename: "file.ts",

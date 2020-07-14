@@ -1,8 +1,5 @@
 import { RuleModule } from "@typescript-eslint/experimental-utils/dist/ts-eslint";
-import {
-  AST_NODE_TYPES,
-  ESLintUtils,
-} from "@typescript-eslint/experimental-utils";
+import { ESLintUtils, TSESTree } from "@typescript-eslint/experimental-utils";
 import { unionTypeParts } from "tsutils";
 import ts from "typescript";
 import { filterTypes, symbolToType } from "./common";
@@ -109,58 +106,31 @@ const noUnsafeTypeAssertion: RuleModule<
       });
     };
 
-    return {
+    const reportUnsafe = (
+      node: TSESTree.TSTypeAssertion | TSESTree.TSAsExpression
       // eslint-disable-next-line functional/no-return-void
-      TSTypeAssertion: (node): void => {
-        // This is the deprecated style so always error.
+    ): void => {
+      // The right hand side of the "as".
+      const destinationNode = parserServices.esTreeNodeToTSNodeMap.get(node);
+      const rawDestinationType = checker.getTypeAtLocation(destinationNode);
 
+      // The left hand side of the "as".
+      const sourceNode = destinationNode.expression;
+      const rawSourceType = checker.getTypeAtLocation(sourceNode);
+
+      // eslint-disable-next-line functional/no-conditional-statement
+      if (isUnsafe(rawDestinationType, rawSourceType)) {
         // eslint-disable-next-line functional/no-expression-statement
         context.report({
           node: node,
-          messageId: "errorStringPreferAs",
+          messageId: "errorStringGeneric",
         });
-      },
-      // eslint-disable-next-line functional/no-return-void
-      TSAsExpression: (node): void => {
-        // eslint-disable-next-line functional/no-conditional-statement
-        if (node.typeAnnotation.type === AST_NODE_TYPES.TSAnyKeyword) {
-          // Always allow `as any`. Other rules will catch it.
-          return;
-        }
+      }
+    };
 
-        // eslint-disable-next-line functional/no-conditional-statement
-        if (node.typeAnnotation.type === AST_NODE_TYPES.TSUnknownKeyword) {
-          // Always allow `as unknown`.
-          return;
-        }
-
-        // eslint-disable-next-line functional/no-conditional-statement
-        if (
-          node.typeAnnotation.type === AST_NODE_TYPES.TSTypeReference &&
-          node.typeAnnotation.typeName.type === AST_NODE_TYPES.Identifier &&
-          node.typeAnnotation.typeName.name === "const"
-        ) {
-          // Always allow `as const`.
-          return;
-        }
-
-        // The right hand side of the "as".
-        const destinationNode = parserServices.esTreeNodeToTSNodeMap.get(node);
-        const rawDestinationType = checker.getTypeAtLocation(destinationNode);
-
-        // The left hand side of the "as".
-        const sourceNode = destinationNode.expression;
-        const rawSourceType = checker.getTypeAtLocation(sourceNode);
-
-        // eslint-disable-next-line functional/no-conditional-statement
-        if (isUnsafe(rawDestinationType, rawSourceType)) {
-          // eslint-disable-next-line functional/no-expression-statement
-          context.report({
-            node: node,
-            messageId: "errorStringGeneric",
-          });
-        }
-      },
+    return {
+      TSTypeAssertion: reportUnsafe,
+      TSAsExpression: reportUnsafe,
     };
   },
 };
