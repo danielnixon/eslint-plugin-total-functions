@@ -11,9 +11,9 @@
     "@stryker-mutator/jest-runner": "^3.3.1",
     "@stryker-mutator/typescript": "^3.3.1",
     "@types/eslint": "^7.2.0",
-    "@types/jest": "^26.0.3",
-    "@typescript-eslint/eslint-plugin": "^3.5.0",
-    "@typescript-eslint/parser": "^3.5.0",
+    "@types/jest": "^26.0.4",
+    "@typescript-eslint/eslint-plugin": "^3.6.1",
+    "@typescript-eslint/parser": "^3.6.1",
     "codecov": "^3.7.0",
     "eslint": "^7.4.0",
     "eslint-config-prettier": "^6.11.0",
@@ -21,23 +21,23 @@
     "eslint-plugin-jest": "^23.18.0",
     "eslint-plugin-prettier": "^3.1.4",
     "eslint-plugin-sonarjs": "^0.5.0",
-    "eslint-plugin-total-functions": "^1.35.2",
+    "eslint-plugin-total-functions": "^1.37.0",
     "jest": "^26.1.0",
     "prettier": "^2.0.5",
-    "ts-jest": "^26.1.1",
+    "ts-jest": "^26.1.2",
     "type-coverage": "^2.8.4",
     "typescript": "^3.9.6"
   },
   "dependencies": {
-    "@typescript-eslint/eslint-plugin": "^3.5.0",
-    "@typescript-eslint/experimental-utils": "^3.5.0",
-    "@typescript-eslint/parser": "^3.5.0",
+    "@typescript-eslint/eslint-plugin": "^3.6.1",
+    "@typescript-eslint/experimental-utils": "^3.6.1",
+    "@typescript-eslint/parser": "^3.6.1",
     "total-functions": "^3.0.0",
     "tsutils": "^3.17.1"
   },
   "peerDependencies": {
-    "eslint": "^7.2.0",
-    "typescript": "^3.9.5"
+    "eslint": "^7.4.0",
+    "typescript": "^3.9.6"
   },
   "scripts": {
     "build": "tsc",
