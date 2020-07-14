@@ -76,8 +76,13 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
 
       // This is unsafe if...
       return (
-        // we're assigning from a readonly index signature to a mutable one, or
-        (sourceTypeHasReadonlyIndexSignature &&
+        // we're assigning from one object to another, and
+        // TODO this seems to be required to prevent a hang in https://github.com/oaf-project/oaf-react-router
+        // Need to work out why and formulate a test to reproduce
+        (isObjectType(destinationType) &&
+          isObjectType(sourceType) &&
+          // we're assigning from a readonly index signature to a mutable one, or
+          sourceTypeHasReadonlyIndexSignature &&
           !destinationTypeHasReadonlyIndexSignature) ||
         // we're assigning from a readonly index type to a mutable one.
         (destinationStringIndexType !== undefined &&
