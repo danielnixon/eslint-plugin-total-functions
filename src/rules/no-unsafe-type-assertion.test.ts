@@ -16,17 +16,17 @@ ruleTester.run("no-unsafe-type-assertion", rule, {
     // as const
     {
       filename: "file.ts",
-      code: "const foo = 'foo' as const;",
+      code: "const foo = { a: [] } as const;",
     },
     // as unknown
     {
       filename: "file.ts",
-      code: "const foo = 'foo' as unknown;",
+      code: "const foo = { a: [] } as unknown;",
     },
     // as any (dumb but will be caught by other rules)
     {
       filename: "file.ts",
-      code: "const foo = 'foo' as any;",
+      code: "const foo = { a: [] } as any;",
     },
     // as compatible type (object literal as type name)
     {
