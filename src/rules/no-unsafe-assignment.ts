@@ -229,8 +229,12 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
             t.destinationType !== destinationType && t.sourceType !== sourceType
         ) &&
         // and we statically know both the destination and the source type,
+        // TODO this seems to be required to prevent a hang in https://github.com/oaf-project/oaf-react-router
+        // Need to work out why and formulate a test to reproduce
         destinationType !== undefined &&
         sourceType !== undefined &&
+        // and the types we're assigning from and to are different,
+        destinationType !== sourceType &&
         // and we're either:
         // assigning from a type with readonly string index type to one with a mutable string index type, or
         (isUnsafeStringIndexAssignment(
