@@ -3,7 +3,7 @@ import {
   ESLintUtils,
   AST_NODE_TYPES,
 } from "@typescript-eslint/experimental-utils";
-import { isPropertyReadonlyInType, isObjectType } from "tsutils";
+import { isPropertyReadonlyInType } from "tsutils";
 import { get } from "total-functions";
 import { Type, SyntaxKind, Symbol, IndexKind } from "typescript";
 import { filterTypes, symbolToType } from "./common";
@@ -76,13 +76,8 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
 
       // This is unsafe if...
       return (
-        // we're assigning from one object to another, and
-        // TODO this seems to be required to prevent a hang in https://github.com/oaf-project/oaf-react-router
-        // Need to work out why and formulate a test to reproduce
-        (isObjectType(destinationType) &&
-          isObjectType(sourceType) &&
-          // we're assigning from a readonly index signature to a mutable one, or
-          sourceTypeHasReadonlyIndexSignature &&
+        // we're assigning from a readonly index signature to a mutable one, or
+        (sourceTypeHasReadonlyIndexSignature &&
           !destinationTypeHasReadonlyIndexSignature) ||
         // we're assigning from a readonly index type to a mutable one.
         (destinationStringIndexType !== undefined &&
@@ -108,10 +103,6 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
 
       // This is unsafe if...
       return (
-        // TODO this seems to be required to prevent a hang in https://github.com/oaf-project/oaf-react-router
-        // Need to work out why and formulate a test to reproduce
-        isObjectType(destinationType) &&
-        isObjectType(sourceType) &&
         // we're assigning from a readonly index type to a mutable one.
         destinationNumberIndexType !== undefined &&
         sourceNumberIndexType !== undefined &&
@@ -229,11 +220,11 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
             t.destinationType !== destinationType && t.sourceType !== sourceType
         ) &&
         // and we statically know both the destination and the source type,
-        // TODO this seems to be required to prevent a hang in https://github.com/oaf-project/oaf-react-router
-        // Need to work out why and formulate a test to reproduce
         destinationType !== undefined &&
         sourceType !== undefined &&
         // and the types we're assigning from and to are different,
+        // TODO this seems to be required to prevent a hang in https://github.com/oaf-project/oaf-react-router
+        // Need to work out why and formulate a test to reproduce
         destinationType !== sourceType &&
         // and we're either:
         // assigning from a type with readonly string index type to one with a mutable string index type, or
