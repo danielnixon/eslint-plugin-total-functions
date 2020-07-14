@@ -3,7 +3,7 @@ import {
   ESLintUtils,
   AST_NODE_TYPES,
 } from "@typescript-eslint/experimental-utils";
-import { isPropertyReadonlyInType } from "tsutils";
+import { isPropertyReadonlyInType, isObjectType } from "tsutils";
 import { get } from "total-functions";
 import { Type, SyntaxKind, Symbol, IndexKind } from "typescript";
 import { filterTypes, symbolToType } from "./common";
@@ -103,6 +103,10 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
 
       // This is unsafe if...
       return (
+        // TODO this seems to be required to prevent a hang in https://github.com/oaf-project/oaf-react-router
+        // Need to work out why and formulate a test to reproduce
+        isObjectType(destinationType) &&
+        isObjectType(sourceType) &&
         // we're assigning from a readonly index type to a mutable one.
         destinationNumberIndexType !== undefined &&
         sourceNumberIndexType !== undefined &&
