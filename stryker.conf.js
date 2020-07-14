@@ -1,6 +1,10 @@
 module.exports = function(config) {
   config.set({
-    mutator: "typescript",
+    mutator: {
+      name: "typescript",
+      // These are only error message strings (for UI/CLI) so only contribute noise to the mutation output & score.
+      excludedMutations: ["StringLiteral"]
+    },
     packageManager: "yarn",
     reporters: ["clear-text", "progress", "dashboard"],
     testRunner: "jest",
