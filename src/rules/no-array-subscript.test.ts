@@ -52,7 +52,7 @@ ruleTester.run("no-array-subscript", rule, {
     {
       filename: "file.ts",
       code:
-        "const arr = [0, 1, 2] as [number, number, number]; const foo = arr[42];",
+        "const arr = [0, 1, 2] as [number, number, number]; const foo = arr[3];",
     },
     // Array subscript access where array generic type is union including undefined.
     {
@@ -230,7 +230,7 @@ ruleTester.run("no-array-subscript", rule, {
     {
       filename: "file.ts",
       code:
-        "const arr = [0, 1, 2] as [number, number, ...number[]]; const foo = arr[3];",
+        "const arr = [0, 1, 2] as [number, number, ...number[]]; const foo = arr[2];",
       errors: [
         {
           messageId: "errorStringGeneric",

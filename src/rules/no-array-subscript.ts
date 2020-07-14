@@ -89,7 +89,7 @@ const noArraySubscript: RuleModule<"errorStringGeneric", readonly []> = {
         isTupleTypeReference(type) &&
         node.property.type === AST_NODE_TYPES.Literal &&
         typeof node.property.value === "number" &&
-        node.property.value <= type.target.minLength
+        node.property.value < type.target.minLength
       ) {
         // Allow tuples (with or without a ...rest element) if
         // the index we're accessing is known to be safe at compile time.
@@ -108,7 +108,7 @@ const noArraySubscript: RuleModule<"errorStringGeneric", readonly []> = {
         type.getStringIndexType() === undefined &&
         type.getNumberIndexType() === undefined
       ) {
-        // Allow object subscript access when there is no index signature in the object (i.e. when this object is not a Record<A, B>).
+        // Allow object subscript access when there is no index signature in the object (i.e. when this object is not a Record<string, B> or a Record<number, B>).
         // If this access is invalid TypeScript itself will catch it.
         return;
       }
