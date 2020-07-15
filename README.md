@@ -29,7 +29,7 @@ npm install eslint-plugin-total-functions --save-dev
 ## Setup
 
 1. Set up [ESLint + TypeScript](https://github.com/typescript-eslint/typescript-eslint/blob/master/docs/getting-started/linting/README.md).
-2. Turn on [eslint-plugin-functional](https://github.com/jonaskello/eslint-plugin-functional) (recommended). It's rules related to mutation and OO are more important than this plugin's rules and they'll help keep your types honest.
+2. Turn on [eslint-plugin-functional](https://github.com/jonaskello/eslint-plugin-functional) (recommended). Its rules related to mutation and OO are more important than this plugin's rules and they'll help keep your types honest.
 3. Update your `.eslintrc.js`:
 
 ```diff
