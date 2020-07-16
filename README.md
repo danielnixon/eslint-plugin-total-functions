@@ -112,12 +112,15 @@ const foo = {} as Foo; // This compiles
 foo.bar.toString(); // This explodes at runtime
 ```
 
-This is similar to the [consistent-type-assertions](https://github.com/typescript-eslint/typescript-eslint/blob/master/packages/eslint-plugin/docs/rules/consistent-type-assertions.md) rule from [typescript-eslint](https://github.com/typescript-eslint/typescript-eslint/tree/master/packages/eslint-plugin) (assuming you have the [objectLiteralTypeAssertions](https://github.com/typescript-eslint/typescript-eslint/blob/master/packages/eslint-plugin/docs/rules/consistent-type-assertions.md#objectliteraltypeassertions) option set appropriately) but it goes even further than that rule. For example, the following will _not_ be flagged by `consistent-type-assertions` (even with `objectLiteralTypeAssertions: "never"`) but will be flagged by this rule:
+This is similar to the [consistent-type-assertions](https://github.com/typescript-eslint/typescript-eslint/blob/master/packages/eslint-plugin/docs/rules/consistent-type-assertions.md) rule from [typescript-eslint](https://github.com/typescript-eslint/typescript-eslint/tree/master/packages/eslint-plugin), however:
+
+1. this rule is _weaker_ than `consistent-type-assertions` with its `assertionStyle` option set to `never` -- this rule will permit type assertions that it considers safe as opposed to blanket banning all type assertions, and
+2. this rule is _stronger_ than `consistent-type-assertions` with its `objectLiteralTypeAssertions` option set to `never`, for example:
 
 ```typescript
 type Foo = { readonly bar: number };
 const foo = {};
-const foo2 = foo as Foo; // Flagged by this rule, but not by consistent-type-assertions
+const foo2 = foo as Foo; // Flagged by this rule, but not by consistent-type-assertions (unless you set assertionStyle to never)
 foo2.bar.toString(); // This explodes at runtime
 ```
 
