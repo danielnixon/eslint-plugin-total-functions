@@ -124,6 +124,34 @@ ruleTester.run("no-unsafe-type-assertion", rule, {
     },
   ],
   invalid: [
+    // asserting unknown to anything
+    {
+      filename: "file.ts",
+      code: `
+        const foo: unknown = "";
+        const bar = foo as string;
+      `,
+      errors: [
+        {
+          messageId: "errorStringGeneric",
+          type: AST_NODE_TYPES.TSAsExpression,
+        },
+      ],
+    },
+    // asserting any to anything
+    {
+      filename: "file.ts",
+      code: `
+        const foo: any = "";
+        const bar = foo as string;
+      `,
+      errors: [
+        {
+          messageId: "errorStringGeneric",
+          type: AST_NODE_TYPES.TSAsExpression,
+        },
+      ],
+    },
     // as incompatible type (object literal as type name)
     {
       filename: "file.ts",

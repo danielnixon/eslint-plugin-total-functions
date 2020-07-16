@@ -5,7 +5,7 @@ import {
   AST_NODE_TYPES,
 } from "@typescript-eslint/experimental-utils";
 import { unionTypeParts } from "tsutils";
-import ts from "typescript";
+import ts, { TypeFlags } from "typescript";
 import { filterTypes, symbolToType } from "./common";
 
 /**
@@ -41,6 +41,15 @@ const noUnsafeTypeAssertion: RuleModule<
         readonly sourceType: ts.Type;
       }> = []
     ): boolean => {
+      // eslint-disable-next-line functional/no-conditional-statement
+      if (
+        rawSourceType.flags & TypeFlags.Any ||
+        rawSourceType.flags & TypeFlags.Unknown
+      ) {
+        // Asserting any or unknown to anything else is always unsafe.
+        return true;
+      }
+
       const { destinationType, sourceType } = filterTypes(
         rawDestinationType,
         rawSourceType
