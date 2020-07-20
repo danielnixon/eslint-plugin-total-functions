@@ -38,8 +38,9 @@ module.exports = {
     "no-loss-of-precision": "error",
     // Make typescript-eslint rules more aggressive.
     "@typescript-eslint/consistent-type-assertions": ["error", {
-      "assertionStyle": "as",
-      "objectLiteralTypeAssertions": "never"
-    }]
+      "assertionStyle": "never"
+    }],
+    // Don't need this given the above rule bans type assertions entirely.
+    "total-functions/no-unsafe-type-assertion": 0
   }
 };
