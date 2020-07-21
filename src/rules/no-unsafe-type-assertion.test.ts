@@ -51,27 +51,10 @@ ruleTester.run("no-unsafe-type-assertion", rule, {
       code:
         "type Foo = { readonly foo: string }; const foo = {foo: 'foo'}; const bar = foo as Foo;",
     },
-    // as compatible type (extra prop)
-    {
-      filename: "file.ts",
-      code:
-        "type Foo = { readonly foo: string }; const foo = {foo: 'foo', bar: 'bar'} as Foo;",
-    },
     // as compatible type (optional prop not provided)
     {
       filename: "file.ts",
       code: "type Foo = { readonly foo?: string }; const foo = {} as Foo;",
-    },
-    // as compatible type (prop that is union including undefined not provided)
-    {
-      filename: "file.ts",
-      code:
-        "type Foo = { readonly foo: string | undefined }; const foo = {} as Foo;",
-    },
-    // as compatible type (prop that is undefined not provided)
-    {
-      filename: "file.ts",
-      code: "type Foo = { readonly foo: undefined }; const foo = {} as Foo;",
     },
     // as exact same type (object)
     {
@@ -246,6 +229,41 @@ ruleTester.run("no-unsafe-type-assertion", rule, {
         const bar: Bar = { foo: { a: undefined } };
         const foobar = bar as Foo;
       `,
+      errors: [
+        {
+          messageId: "errorStringGeneric",
+          type: AST_NODE_TYPES.TSAsExpression,
+        },
+      ],
+    },
+    // as incompatible type (extra prop)
+    {
+      filename: "file.ts",
+      code:
+        "type Foo = { readonly foo: string }; const foo = {foo: 'foo', bar: 'bar'} as Foo;",
+      errors: [
+        {
+          messageId: "errorStringGeneric",
+          type: AST_NODE_TYPES.TSAsExpression,
+        },
+      ],
+    },
+    // as incompatible type (prop that is union including undefined not provided)
+    {
+      filename: "file.ts",
+      code:
+        "type Foo = { readonly foo: string | undefined }; const foo = {} as Foo;",
+      errors: [
+        {
+          messageId: "errorStringGeneric",
+          type: AST_NODE_TYPES.TSAsExpression,
+        },
+      ],
+    },
+    // as incompatible type (prop that is undefined not provided)
+    {
+      filename: "file.ts",
+      code: "type Foo = { readonly foo: undefined }; const foo = {} as Foo;",
       errors: [
         {
           messageId: "errorStringGeneric",

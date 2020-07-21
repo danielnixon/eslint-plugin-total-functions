@@ -4,9 +4,7 @@ import {
   TSESTree,
   AST_NODE_TYPES,
 } from "@typescript-eslint/experimental-utils";
-import { unionTypeParts } from "tsutils";
-import ts, { TypeFlags } from "typescript";
-import { filterTypes, symbolToType } from "./common";
+import ts from "typescript";
 
 /**
  * An ESLint rule to ban unsafe type assertions.
@@ -31,92 +29,30 @@ const noUnsafeTypeAssertion: RuleModule<
   },
   create: (context) => {
     const parserServices = ESLintUtils.getParserServices(context);
-    const checker = parserServices.program.getTypeChecker();
+    const rawChecker = parserServices.program.getTypeChecker();
+
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+    const checker = (rawChecker as unknown) as {
+      readonly isTypeAssignableTo?: (type1: ts.Type, type2: ts.Type) => boolean;
+    } & typeof rawChecker;
 
     const isUnsafe = (
       rawDestinationType: ts.Type,
-      rawSourceType: ts.Type,
-      seenTypes: ReadonlyArray<{
-        readonly destinationType: ts.Type;
-        readonly sourceType: ts.Type;
-      }> = []
+      rawSourceType: ts.Type
     ): boolean => {
       // eslint-disable-next-line functional/no-conditional-statement
       if (
-        rawSourceType.flags & TypeFlags.Any ||
-        rawSourceType.flags & TypeFlags.Unknown
+        rawSourceType.flags & ts.TypeFlags.Any ||
+        rawSourceType.flags & ts.TypeFlags.Unknown
       ) {
         // Asserting any or unknown to anything else is always unsafe.
         return true;
       }
 
-      const { destinationType, sourceType } = filterTypes(
-        rawDestinationType,
-        rawSourceType
+      return (
+        checker.isTypeAssignableTo !== undefined &&
+        !checker.isTypeAssignableTo(rawSourceType, rawDestinationType)
       );
-
-      // eslint-disable-next-line functional/no-conditional-statement
-      if (destinationType === undefined || sourceType === undefined) {
-        return false;
-      }
-
-      return destinationType.getProperties().some((destinationProperty) => {
-        const destinationPropertyType = symbolToType(
-          destinationProperty,
-          checker
-        );
-        const sourceProperty = sourceType.getProperty(destinationProperty.name);
-        const sourcePropertyType =
-          sourceProperty !== undefined
-            ? symbolToType(sourceProperty, checker)
-            : undefined;
-
-        const destinationPropertyIsOptional =
-          destinationProperty.flags & ts.SymbolFlags.Optional;
-
-        const destinationTypeParts =
-          destinationPropertyType !== undefined
-            ? unionTypeParts(destinationPropertyType)
-            : [];
-        const destinationPropertyAllowsUndefined = destinationTypeParts.some(
-          (t) => t.flags & ts.TypeFlags.Undefined
-        );
-
-        const sourcePropertyIsUndefined =
-          sourcePropertyType === undefined ||
-          unionTypeParts(sourcePropertyType).some(
-            (t) => t.flags & ts.TypeFlags.Undefined
-          );
-
-        const nextSeenTypes = seenTypes.concat([
-          { destinationType, sourceType },
-        ]);
-
-        const isUnsafePropertyAssignment =
-          sourcePropertyIsUndefined &&
-          !destinationPropertyAllowsUndefined &&
-          !destinationPropertyIsOptional;
-
-        // This is an unsafe assignment if...
-        return (
-          // we're not in an infinitely recursive type,
-          seenTypes.every(
-            (t) =>
-              t.destinationType !== destinationType &&
-              t.sourceType !== sourceType
-          ) &&
-          // and this is an unsafe property assignment, or
-          (isUnsafePropertyAssignment ||
-            // this is unsafe recursively
-            (destinationPropertyType !== undefined &&
-              sourcePropertyType !== undefined &&
-              isUnsafe(
-                destinationPropertyType,
-                sourcePropertyType,
-                nextSeenTypes
-              )))
-        );
-      });
     };
 
     const reportUnsafe = (
