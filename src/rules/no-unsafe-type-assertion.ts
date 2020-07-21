@@ -6,6 +6,10 @@ import {
 } from "@typescript-eslint/experimental-utils";
 import ts from "typescript";
 
+type TypeChecker = ts.TypeChecker & {
+  readonly isTypeAssignableTo?: (type1: ts.Type, type2: ts.Type) => boolean;
+};
+
 /**
  * An ESLint rule to ban unsafe type assertions.
  */
@@ -29,12 +33,7 @@ const noUnsafeTypeAssertion: RuleModule<
   },
   create: (context) => {
     const parserServices = ESLintUtils.getParserServices(context);
-    const rawChecker = parserServices.program.getTypeChecker();
-
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-    const checker = (rawChecker as unknown) as {
-      readonly isTypeAssignableTo?: (type1: ts.Type, type2: ts.Type) => boolean;
-    } & typeof rawChecker;
+    const checker: TypeChecker = parserServices.program.getTypeChecker();
 
     const isUnsafe = (
       rawDestinationType: ts.Type,
