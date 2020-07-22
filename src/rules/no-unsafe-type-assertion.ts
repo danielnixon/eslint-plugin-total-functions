@@ -1,9 +1,5 @@
 import { RuleModule } from "@typescript-eslint/experimental-utils/dist/ts-eslint";
-import {
-  ESLintUtils,
-  TSESTree,
-  AST_NODE_TYPES,
-} from "@typescript-eslint/experimental-utils";
+import { ESLintUtils, TSESTree } from "@typescript-eslint/experimental-utils";
 import ts from "typescript";
 
 type TypeChecker = ts.TypeChecker & {
@@ -58,16 +54,6 @@ const noUnsafeTypeAssertion: RuleModule<
       node: TSESTree.TSTypeAssertion | TSESTree.TSAsExpression
       // eslint-disable-next-line functional/no-return-void
     ): void => {
-      // eslint-disable-next-line functional/no-conditional-statement
-      if (
-        node.typeAnnotation.type === AST_NODE_TYPES.TSTypeReference &&
-        node.typeAnnotation.typeName.type === AST_NODE_TYPES.Identifier &&
-        node.typeAnnotation.typeName.name === "const"
-      ) {
-        // Always allow `as const`.
-        return;
-      }
-
       // The right hand side of the "as".
       const destinationNode = parserServices.esTreeNodeToTSNodeMap.get(node);
       const rawDestinationType = checker.getTypeAtLocation(destinationNode);
