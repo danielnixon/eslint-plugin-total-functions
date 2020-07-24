@@ -81,7 +81,7 @@ const noArrayDestructuring: RuleModule<"errorStringGeneric", readonly []> = {
 
           const propertyName =
             prop.propertyName !== undefined &&
-            prop.propertyName.kind === ts.SyntaxKind.StringLiteral
+            prop.propertyName.kind !== ts.SyntaxKind.ComputedPropertyName
               ? prop.propertyName.text
               : prop.name.kind === ts.SyntaxKind.Identifier
               ? prop.name.text

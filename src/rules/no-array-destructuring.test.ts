@@ -47,6 +47,16 @@ ruleTester.run("no-array-destructuring", rule, {
       filename: "file.ts",
       code: "const obj = { 'a': 'a' }; const { a } = obj;",
     },
+    // Object destructuring (numeric property).
+    {
+      filename: "file.ts",
+      code: `
+        const obj = { 42: { a: "a" } };
+        const {
+          42: { a },
+        } = obj;      
+      `,
+    },
     // Object destructuring (with rest element).
     {
       filename: "file.ts",
