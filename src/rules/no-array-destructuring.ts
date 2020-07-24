@@ -65,15 +65,37 @@ const noArrayDestructuring: RuleModule<"errorStringGeneric", readonly []> = {
       // eslint-disable-next-line functional/no-return-void
       ObjectPattern: (node): void => {
         const tsNode = parserServices.esTreeNodeToTSNodeMap.get(node);
+
+        // eslint-disable-next-line functional/no-conditional-statement
+        if (tsNode.kind !== ts.SyntaxKind.ObjectBindingPattern) {
+          return;
+        }
+
         const type = checker.getTypeAtLocation(tsNode);
 
         // True if every element we're destructuring is known to exist at compile time (or is the rest element).
-        const isSafe = node.properties.every(
-          (prop) =>
-            prop.type === AST_NODE_TYPES.RestElement ||
-            (prop.key.type === AST_NODE_TYPES.Identifier &&
-              type.getProperty(prop.key.name) !== undefined)
-        );
+        const isSafe = tsNode.elements.every((prop) => {
+          const isRestElement =
+            parserServices.tsNodeToESTreeNodeMap.get(prop).type ===
+            AST_NODE_TYPES.RestElement;
+
+          const propertyName =
+            prop.propertyName !== undefined &&
+            prop.propertyName.kind === ts.SyntaxKind.StringLiteral
+              ? prop.propertyName.text
+              : prop.name.kind === ts.SyntaxKind.Identifier
+              ? prop.name.text
+              : undefined;
+
+          return (
+            isRestElement ||
+            type
+              .getProperties()
+              .some(
+                (p) => p.name === propertyName || p.escapedName === propertyName
+              )
+          );
+        });
 
         // eslint-disable-next-line functional/no-conditional-statement
         if (isSafe) {
