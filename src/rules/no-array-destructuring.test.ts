@@ -60,7 +60,22 @@ ruleTester.run("no-array-destructuring", rule, {
         type Foo = {
           readonly "foo-bar": number;
         };
-        const { "foo-bar": errorCode }: Foo = { "foo-bar": 42 };
+        const { "foo-bar": fooBar }: Foo = { "foo-bar": 42 };
+      `,
+    },
+    // Object destructuring (nested).
+    // https://github.com/danielnixon/eslint-plugin-total-functions/issues/37
+    {
+      filename: "file.ts",
+      code: `
+        type Foo = {
+          readonly foo: {
+            readonly bar: number;
+          };
+        };
+        const {
+          foo: { bar: bazQux },
+        }: Foo = { foo: { bar: 42 } };
       `,
     },
   ],
