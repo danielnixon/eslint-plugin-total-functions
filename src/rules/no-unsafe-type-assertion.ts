@@ -29,6 +29,7 @@ const noUnsafeTypeAssertion: RuleModule<
   },
   create: (context) => {
     const parserServices = ESLintUtils.getParserServices(context);
+    // TODO https://github.com/danielnixon/eslint-plugin-total-functions/issues/39
     const checker: TypeChecker = parserServices.program.getTypeChecker();
 
     const isUnsafe = (
