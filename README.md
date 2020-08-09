@@ -14,8 +14,6 @@
 
 An ESLint plugin to enforce the use of total functions (and prevent the use of [partial functions](https://wiki.haskell.org/Partial_functions)) in TypeScript. If you like your types to tell the truth, this is the ESLint plugin for you.
 
-Intended to be used with [strictNullChecks](https://www.typescriptlang.org/docs/handbook/compiler-options.html) enabled.
-
 ## Installation
 
 ```sh
@@ -28,9 +26,10 @@ npm install eslint-plugin-total-functions --save-dev
 
 ## Setup
 
-1. Set up [ESLint + TypeScript](https://github.com/typescript-eslint/typescript-eslint/blob/master/docs/getting-started/linting/README.md).
-2. Turn on [eslint-plugin-functional](https://github.com/jonaskello/eslint-plugin-functional) (recommended). Its rules related to mutation and OO are more important than this plugin's rules and they'll help keep your types honest.
-3. Update your `.eslintrc.js`:
+1. Turn on TypeScript's [strict mode](https://www.typescriptlang.org/docs/handbook/compiler-options.html).
+2. Set up [ESLint + TypeScript](https://github.com/typescript-eslint/typescript-eslint/blob/master/docs/getting-started/linting/README.md).
+3. Turn on [eslint-plugin-functional](https://github.com/jonaskello/eslint-plugin-functional) (recommended). Its rules related to mutation and OO are more important than this plugin's rules and they'll help keep your types honest.
+4. Update your `.eslintrc.js`:
 
 ```diff
 module.exports = {
