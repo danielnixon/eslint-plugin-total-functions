@@ -67,7 +67,7 @@ const bar = record["bar"]; // bar has type string, not string | undefined
 bar.toUpperCase(); // This explodes at runtime
 
 const str = "";
-const baz = str[0]; // bar has type string, not string | undefined
+const baz = str[0]; // baz has type string, not string | undefined
 baz.toUpperCase(); // This explodes at runtime
 ```
 
