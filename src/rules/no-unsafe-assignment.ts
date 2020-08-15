@@ -252,6 +252,16 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
     return {
       // eslint-disable-next-line functional/no-return-void
       TSTypeAssertion: (node): void => {
+        // eslint-disable-next-line functional/no-conditional-statement
+        if (
+          node.typeAnnotation.type === AST_NODE_TYPES.TSTypeReference &&
+          node.typeAnnotation.typeName.type === AST_NODE_TYPES.Identifier &&
+          node.typeAnnotation.typeName.name === "const"
+        ) {
+          // Always allow `as const`.
+          return;
+        }
+
         const destinationNode = parserServices.esTreeNodeToTSNodeMap.get(node);
         const destinationType = checker.getTypeAtLocation(destinationNode);
         const sourceNode = destinationNode.expression;
@@ -268,6 +278,16 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
       },
       // eslint-disable-next-line functional/no-return-void
       TSAsExpression: (node): void => {
+        // eslint-disable-next-line functional/no-conditional-statement
+        if (
+          node.typeAnnotation.type === AST_NODE_TYPES.TSTypeReference &&
+          node.typeAnnotation.typeName.type === AST_NODE_TYPES.Identifier &&
+          node.typeAnnotation.typeName.name === "const"
+        ) {
+          // Always allow `as const`.
+          return;
+        }
+
         const destinationNode = parserServices.esTreeNodeToTSNodeMap.get(node);
         const destinationType = checker.getTypeAtLocation(destinationNode);
         const sourceNode = destinationNode.expression;

@@ -450,6 +450,16 @@ ruleTester.run("no-unsafe-assignment", rule, {
         Object.keys({}) as ReadonlyArray<string>;
       `,
     },
+    // as const
+    {
+      filename: "file.ts",
+      code: "const foo = { a: [] } as const;",
+    },
+    // as unknown
+    {
+      filename: "file.ts",
+      code: "const foo = { a: [] } as unknown;",
+    },
     /**
      * Return statement
      */
