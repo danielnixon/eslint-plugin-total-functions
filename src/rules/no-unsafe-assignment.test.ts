@@ -583,6 +583,29 @@ ruleTester.run("no-unsafe-assignment", rule, {
         },
       ],
     },
+    // readonly -> mutable (rest parameter)
+    {
+      filename: "file.ts",
+      code: `
+        type MutableA = { a: string };
+        type ReadonlyA = { readonly a: string };
+        
+        const foo = (...as: readonly MutableA[]): void => {
+          return;
+        };
+        
+        const ma: MutableA = { a: "" };
+        const ra: ReadonlyA = { a: "" };
+        
+        foo(ma, ra);
+      `,
+      errors: [
+        {
+          messageId: "errorStringCallExpressionReadonlyToMutable",
+          type: AST_NODE_TYPES.ObjectExpression,
+        },
+      ],
+    },
     /**
      * Assignment expressions
      */
