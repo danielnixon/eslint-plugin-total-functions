@@ -26,6 +26,16 @@ ruleTester.run("no-unsafe-assignment", rule, {
         foo();
       `,
     },
+    // zero parameters with extra argument (TypeScript will catch this so we don't flag it)
+    {
+      filename: "file.ts",
+      code: `
+        const foo = () => {
+          return undefined;
+        };
+        foo("");
+      `,
+    },
     // non-object parameter
     {
       filename: "file.ts",
@@ -602,7 +612,7 @@ ruleTester.run("no-unsafe-assignment", rule, {
       errors: [
         {
           messageId: "errorStringCallExpressionReadonlyToMutable",
-          type: AST_NODE_TYPES.ObjectExpression,
+          type: AST_NODE_TYPES.Identifier,
         },
       ],
     },

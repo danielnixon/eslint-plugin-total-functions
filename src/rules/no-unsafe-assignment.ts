@@ -381,12 +381,13 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
 
         // eslint-disable-next-line functional/no-expression-statement
         node.arguments.forEach((argument, i) => {
-          // This is the parameter that corresponds to the current argument.
-          const parameter = get(parameters, i);
+          // This is the parameter that corresponds to the current argument,
+          // OR it's the last parameter, which is required to handle rest arguments (more arguments than parameters).
+          const parameter =
+            get(parameters, i) ?? get(parameters, parameters.length - 1);
 
           // eslint-disable-next-line functional/no-conditional-statement
           if (parameter === undefined) {
-            // TODO: if we're dealing with a rest parameter here we need to go back and get the last parameter.
             return;
           }
 
