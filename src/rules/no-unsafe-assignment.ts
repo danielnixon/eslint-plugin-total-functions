@@ -211,6 +211,7 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
       return typePairs.some(({ sourceType, destinationType }) => {
         const nextSeenTypes = seenTypes.concat({ destinationType, sourceType });
 
+        // TODO this needs to compare function return types for readonly -> mutable
         // This is an unsafe assignment if...
         return (
           // we're not in an infinitely recursive type,
