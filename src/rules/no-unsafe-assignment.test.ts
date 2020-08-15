@@ -453,12 +453,39 @@ ruleTester.run("no-unsafe-assignment", rule, {
     // as const
     {
       filename: "file.ts",
-      code: "const foo = { a: [] } as const;",
+      code: `
+        const foo: readonly string[] = [];
+
+        const bar = [
+          { key: -1, value: "" },
+          ...foo.map((c, i) => ({
+            key: i,
+            value: c,
+          })),
+        ] as const;
+      `,
+    },
+    // <const>
+    {
+      filename: "file.ts",
+      code: `
+        const foo: readonly string[] = [];
+
+        const bar = <const>[
+          { key: -1, value: "" },
+          ...foo.map((c, i) => ({
+            key: i,
+            value: c,
+          })),
+        ];
+      `,
     },
     // as unknown
     {
       filename: "file.ts",
-      code: "const foo = { a: [] } as unknown;",
+      code: `
+        const foo = [{ key: -1, label: "", value: "" }] as unknown;
+      `,
     },
     /**
      * Return statement
