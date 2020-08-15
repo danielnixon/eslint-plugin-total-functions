@@ -266,41 +266,8 @@ ruleTester.run("no-unsafe-assignment", rule, {
         const foo = ro.concat(ro, mut);
       `,
     },
-    // readonly (union) -> mutable (union)
-    // TODO this should be invalid.
-    {
-      filename: "file.ts",
-      code: `
-        type MutableA = { a: string };
-        type ReadonlyA = { readonly a: string };
-        type MutableB = { b: string };
-        type ReadonlyB = { readonly b: string };
-        const mutate = (mut: MutableA | MutableB): void => {
-          return;
-        };
-        const ro: ReadonlyA | ReadonlyB = { a: "" };
-        mutate(ro);
-      `,
-    },
-    // readonly (union) -> mixed (union)
-    // TODO this should be invalid.
-    // We could flag this by pairing (and discarding) the ReadonlyAs in `filterTypes`, leaving just ReadonlyB -> MutableB
-    {
-      filename: "file.ts",
-      code: `
-        type ReadonlyA = { readonly a: string };
-        type MutableB = { b: string };
-        type ReadonlyB = { readonly b: string };
-        const mutate = (mut: ReadonlyA | MutableB): void => {
-          return;
-        };
-        const ro: ReadonlyA | ReadonlyB = { a: "" };
-        mutate(ro);
-      `,
-    },
     // mixed (union) -> mixed (union)
     // The readonlys align and mutables align, so no surprising mutation can arise.
-    // TODO if/when the above is rendered invalid, this must remain valid.
     {
       filename: "file.ts",
       code: `
@@ -309,7 +276,7 @@ ruleTester.run("no-unsafe-assignment", rule, {
         const func = (foo: MutableA | ReadonlyB): void => {
           return;
         };
-        const foo: MutableA | ReadonlyB = { a: "" };
+        const foo: MutableA | ReadonlyB = Date.now() > 0 ? { a: "" } : { b: "" };
         func(foo);
       `,
     },
@@ -608,6 +575,47 @@ ruleTester.run("no-unsafe-assignment", rule, {
         const ra: ReadonlyA = { a: "" };
         
         foo(ma, ra);
+      `,
+      errors: [
+        {
+          messageId: "errorStringCallExpressionReadonlyToMutable",
+          type: AST_NODE_TYPES.Identifier,
+        },
+      ],
+    },
+    // readonly (union) -> mutable (union)
+    {
+      filename: "file.ts",
+      code: `
+        type MutableA = { a: string };
+        type ReadonlyA = { readonly a: string };
+        type MutableB = { b: string };
+        type ReadonlyB = { readonly b: string };
+        const mutate = (mut: MutableA | MutableB): void => {
+          return;
+        };
+        const ro: ReadonlyA | ReadonlyB = { a: "" };
+        mutate(ro);
+      `,
+      errors: [
+        {
+          messageId: "errorStringCallExpressionReadonlyToMutable",
+          type: AST_NODE_TYPES.Identifier,
+        },
+      ],
+    },
+    // readonly (union) -> mixed (union)
+    {
+      filename: "file.ts",
+      code: `
+        type ReadonlyA = { readonly a: string };
+        type MutableB = { b: string };
+        type ReadonlyB = { readonly b: string };
+        const mutate = (mut: ReadonlyA | MutableB): void => {
+          return;
+        };
+        const ro: ReadonlyA | ReadonlyB = Date.now() > 0 ? { a: "" } : { b: "" };
+        mutate(ro);
       `,
       errors: [
         {

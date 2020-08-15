@@ -1,39 +1,50 @@
 import { isObjectType, unionTypeParts } from "tsutils";
 import { get } from "total-functions";
-import { Type, TypeChecker, Symbol } from "typescript";
+import { Type, TypeChecker as RawTypeChecker, Symbol } from "typescript";
+
+export type TypeChecker = RawTypeChecker & {
+  readonly isTypeAssignableTo?: (type1: Type, type2: Type) => boolean;
+};
 
 export const single = <A>(as: ReadonlyArray<A>): A | undefined =>
   as.length === 1 ? get(as, 0) : undefined;
 
 /**
- * Throws away non-object types (string, number, boolean, etc) because we don't check those for readonly -> mutable assignment.
+ * Throws away non-object types (string, number, boolean, etc) because we don't check those for readonly -> mutable assignment
+ * and returns an array of pairs of types that are assignable.
  */
-export const filterTypes = (
+export const assignableObjectPairs = (
   rawDestinationType: Type,
-  rawSourceType: Type
-): {
-  readonly destinationType: Type | undefined;
-  readonly sourceType: Type | undefined;
-} => {
-  // TODO if the destination is a union containing _all_ mutable types, we're assigning to mutable.
-  // TODO if the destination contains a mix of mutable and readonly types, we don't know if we're assigning
-  // to mutable unless we can narrow down which destination (parameter) types apply to the given source (argument) types.
-  // TODO if the sourceType is a union containing _any_ readonly types, we're assigning from readonly.
+  rawSourceType: Type,
+  checker: TypeChecker
+): ReadonlyArray<{
+  readonly destinationType: Type;
+  readonly sourceType: Type;
+}> => {
+  const isAssignableTo = checker.isTypeAssignableTo;
+  // eslint-disable-next-line functional/no-conditional-statement
+  if (isAssignableTo === undefined) {
+    return [];
+  }
 
-  const filteredDestinationTypes = unionTypeParts(
-    rawDestinationType
-  ).filter((t) => isObjectType(t));
-  const destinationType = single(filteredDestinationTypes);
-
-  const filteredSourceTypes = unionTypeParts(rawSourceType).filter((t) =>
+  const destinationTypeParts = unionTypeParts(rawDestinationType).filter((t) =>
     isObjectType(t)
   );
-  const sourceType = single(filteredSourceTypes);
 
-  return {
-    destinationType,
-    sourceType,
-  };
+  const sourceTypeParts = unionTypeParts(rawSourceType).filter((t) =>
+    isObjectType(t)
+  );
+
+  return sourceTypeParts.flatMap((sourceTypePart) =>
+    destinationTypeParts
+      .filter((destinationTypePart) =>
+        isAssignableTo(sourceTypePart, destinationTypePart)
+      )
+      .map((destinationTypePart) => ({
+        sourceType: sourceTypePart,
+        destinationType: destinationTypePart,
+      }))
+  );
 };
 
 export const symbolToType = (

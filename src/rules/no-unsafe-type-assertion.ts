@@ -1,10 +1,7 @@
 import { RuleModule } from "@typescript-eslint/experimental-utils/dist/ts-eslint";
 import { ESLintUtils, TSESTree } from "@typescript-eslint/experimental-utils";
 import ts from "typescript";
-
-type TypeChecker = ts.TypeChecker & {
-  readonly isTypeAssignableTo?: (type1: ts.Type, type2: ts.Type) => boolean;
-};
+import { TypeChecker } from "./common";
 
 /**
  * An ESLint rule to ban unsafe type assertions.
