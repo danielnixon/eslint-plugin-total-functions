@@ -1,11 +1,11 @@
-import noArraySubscript from "./no-array-subscript";
-import noArrayDestructuring from "./no-array-destructuring";
+import noUnsafeSubscript from "./no-unsafe-subscript";
+import noUnsafeDestructuring from "./no-unsafe-destructuring";
 import noUnsafeTypeAssertion from "./no-unsafe-type-assertion";
 import noUnsafeAssignment from "./no-unsafe-assignment";
 
 export default {
-  "no-array-subscript": noArraySubscript,
-  "no-array-destructuring": noArrayDestructuring,
+  "no-unsafe-subscript": noUnsafeSubscript,
+  "no-unsafe-destructuring": noUnsafeDestructuring,
   "no-unsafe-type-assertion": noUnsafeTypeAssertion,
   "no-unsafe-assignment": noUnsafeAssignment,
 };

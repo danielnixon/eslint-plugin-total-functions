@@ -53,7 +53,7 @@ Alternatively you can configure individual rules separately (see below).
 
 ## Rules
 
-### total-functions/no-array-subscript
+### total-functions/no-unsafe-subscript
 
 Bans unsafe array and object subscript access, for example:
 
@@ -77,9 +77,9 @@ Tuples and (non-record) objects are allowed.
 
 There are other ways to avoid this issue, such as [fp-ts's lookup](https://gcanti.github.io/fp-ts/modules/Array.ts.html#lookup), but the `get` function from total-functions is smart enough to exclude `undefined` when dealing with tuples and objects.
 
-For examples of subscript access that this rule considers valid and invalid, see [no-array-subscript.test.ts](https://github.com/danielnixon/eslint-plugin-total-functions/blob/master/src/rules/no-array-subscript.test.ts).
+For examples of subscript access that this rule considers valid and invalid, see [no-unsafe-subscript.test.ts](https://github.com/danielnixon/eslint-plugin-total-functions/blob/master/src/rules/no-unsafe-subscript.test.ts).
 
-### total-functions/no-array-destructuring
+### total-functions/no-unsafe-destructuring
 
 Bans unsafe array and object destructuring, for example:
 
@@ -99,7 +99,7 @@ bar.toUpperCase(); // This explodes at runtime
 
 Destructuring tuples is allowed, as long as you're within the length of the tuple.
 
-For examples of destructuring that this rule considers valid and invalid, see [no-array-destructuring.test.ts](https://github.com/danielnixon/eslint-plugin-total-functions/blob/master/src/rules/no-array-destructuring.test.ts).
+For examples of destructuring that this rule considers valid and invalid, see [no-unsafe-destructuring.test.ts](https://github.com/danielnixon/eslint-plugin-total-functions/blob/master/src/rules/no-unsafe-destructuring.test.ts).
 
 ### total-functions/no-unsafe-type-assertion
 

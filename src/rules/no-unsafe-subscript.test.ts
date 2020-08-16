@@ -1,4 +1,4 @@
-import rule from "./no-array-subscript";
+import rule from "./no-unsafe-subscript";
 import { RuleTester } from "@typescript-eslint/experimental-utils/dist/ts-eslint";
 import { AST_NODE_TYPES } from "@typescript-eslint/experimental-utils/dist/ts-estree";
 
@@ -11,7 +11,7 @@ const ruleTester = new RuleTester({
 });
 
 // eslint-disable-next-line functional/no-expression-statement
-ruleTester.run("no-array-subscript", rule, {
+ruleTester.run("no-unsafe-subscript", rule, {
   valid: [
     // Regular array property access.
     {
