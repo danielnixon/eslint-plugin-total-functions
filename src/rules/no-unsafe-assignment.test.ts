@@ -368,19 +368,6 @@ ruleTester.run("no-unsafe-assignment", rule, {
         const func = (): MutableA => ro;
       `,
     },
-    // Arrow function (block form) (readonly -> mutable)
-    // TODO this should be invalid
-    {
-      filename: "file.ts",
-      code: `
-        type MutableA = { a: string };
-        type ReadonlyA = { readonly a: string };
-        const ro: ReadonlyA = { a: "" };
-        const func = (): MutableA => {
-          return ro;
-        };
-      `,
-    },
     /**
      * type assertions
      */
@@ -490,8 +477,34 @@ ruleTester.run("no-unsafe-assignment", rule, {
     /**
      * Return statement
      */
-    // mutable -> readonly (function return)
-    // TODO this should be invalid
+    // mutable -> mutable (function return)
+    {
+      filename: "file.ts",
+      code: `
+        type MutableA = { a: string };
+        type ReadonlyA = { readonly a: string };
+
+        function foo(): MutableA {
+          const ma: MutableA = { a: "" };
+          return ma;
+        }
+      `,
+    },
+    // readonly -> readonly (function return)
+    {
+      filename: "file.ts",
+      code: `
+        type MutableA = { a: string };
+        type ReadonlyA = { readonly a: string };
+
+        function foo(): ReadonlyA {
+          const ma: ReadonlyA = { a: "" };
+          return ma;
+        }
+      `,
+    },
+    // mutable -> readonly (function return) (caveat mutator)
+    // TODO this is unsafe but you're already using a mutable type so it's not a priority for this rule to flag
     {
       filename: "file.ts",
       code: `
@@ -501,6 +514,15 @@ ruleTester.run("no-unsafe-assignment", rule, {
         function foo(): ReadonlyA {
           const ma: MutableA = { a: "" };
           return ma;
+        }
+      `,
+    },
+    // void (function return)
+    {
+      filename: "file.ts",
+      code: `
+        function foo(): void {
+          return;
         }
       `,
     },
@@ -862,6 +884,46 @@ ruleTester.run("no-unsafe-assignment", rule, {
         {
           messageId: "errorStringTSTypeAssertionReadonlyToMutable",
           type: AST_NODE_TYPES.TSTypeAssertion,
+        },
+      ],
+    },
+    /**
+     * Return statement
+     */
+    // readonly -> mutable (function return)
+    {
+      filename: "file.ts",
+      code: `
+        type MutableA = { a: string };
+        type ReadonlyA = { readonly a: string };
+
+        function foo(): MutableA {
+          const ma: ReadonlyA = { a: "" };
+          return ma;
+        }
+      `,
+      errors: [
+        {
+          messageId: "errorStringArrowFunctionExpressionReadonlyToMutable",
+          type: AST_NODE_TYPES.ReturnStatement,
+        },
+      ],
+    },
+    // Arrow function (block form) (readonly -> mutable)
+    {
+      filename: "file.ts",
+      code: `
+        type MutableA = { a: string };
+        type ReadonlyA = { readonly a: string };
+        const ro: ReadonlyA = { a: "" };
+        const func = (): MutableA => {
+          return ro;
+        };
+      `,
+      errors: [
+        {
+          messageId: "errorStringArrowFunctionExpressionReadonlyToMutable",
+          type: AST_NODE_TYPES.ReturnStatement,
         },
       ],
     },
