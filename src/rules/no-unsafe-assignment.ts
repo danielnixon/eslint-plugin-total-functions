@@ -5,7 +5,7 @@ import {
 } from "@typescript-eslint/experimental-utils";
 import { isPropertyReadonlyInType } from "tsutils";
 import { get } from "total-functions";
-import { Type, SyntaxKind, Symbol, IndexKind, Node } from "typescript";
+import { Type, Symbol, IndexKind, Node } from "typescript";
 import { assignableObjectPairs, TypeChecker } from "./common";
 
 type MessageId =
@@ -450,55 +450,19 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
       },
       // eslint-disable-next-line functional/no-return-void
       CallExpression: (node): void => {
-        const callExpressionNode = parserServices.esTreeNodeToTSNodeMap.get(
-          node
-        );
-        const signature = checker.getResolvedSignature(callExpressionNode);
-        const parameters = signature !== undefined ? signature.parameters : [];
-        const tsNode = parserServices.esTreeNodeToTSNodeMap.get(node.callee);
+        const tsNode = parserServices.esTreeNodeToTSNodeMap.get(node);
 
         // eslint-disable-next-line functional/no-expression-statement
-        node.arguments.forEach((argument, i) => {
-          // This is the parameter that corresponds to the current argument,
-          // OR it's the last parameter, which is required to handle rest arguments (more arguments than parameters).
-          const parameter =
-            get(parameters, i) ?? get(parameters, parameters.length - 1);
-
-          // eslint-disable-next-line functional/no-conditional-statement
-          if (parameter === undefined) {
-            return;
-          }
-
-          const rawParamType = checker.getTypeOfSymbolAtLocation(
-            parameter,
-            tsNode
-          );
-
-          const numberIndexType = rawParamType.getNumberIndexType();
-
-          // TODO: work out which declaration applies in this case.
-          // For now we just conclude that this is a rest param if it's a rest param in _all_ declarations.
-          const isRestParam =
-            rawParamType.symbol !== undefined &&
-            rawParamType.symbol.declarations !== undefined &&
-            rawParamType.symbol.declarations.every(
-              (d) => d.kind & SyntaxKind.RestType
-            ) &&
-            numberIndexType !== undefined;
-
-          const paramType = isRestParam ? numberIndexType : rawParamType;
-
-          const argumentTsNode = parserServices.esTreeNodeToTSNodeMap.get(
-            argument
-          );
-          const argumentType = checker.getTypeAtLocation(argumentTsNode);
+        tsNode.arguments.forEach((argument, i) => {
+          const argumentType = checker.getTypeAtLocation(argument);
+          const paramType = checker.getContextualType(argument);
 
           // eslint-disable-next-line functional/no-conditional-statement
           if (
             paramType !== undefined &&
             isUnsafeAssignment(
-              tsNode,
-              argumentTsNode,
+              argument,
+              argument,
               paramType,
               argumentType,
               checker
@@ -506,7 +470,7 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
           ) {
             // eslint-disable-next-line functional/no-expression-statement
             context.report({
-              node: argument,
+              node: get(node.arguments, i) ?? node,
               messageId: "errorStringCallExpressionReadonlyToMutable",
             });
           }
