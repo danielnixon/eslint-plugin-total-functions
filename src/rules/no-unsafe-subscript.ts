@@ -11,7 +11,7 @@ import ts from "typescript";
  * An ESLint rule to ban unsafe usage of the array/object index operator, which is not well-typed in TypeScript.
  * @see https://github.com/Microsoft/TypeScript/issues/13778
  */
-const noArraySubscript: RuleModule<"errorStringGeneric", readonly []> = {
+const noUnsafeSubscript: RuleModule<"errorStringGeneric", readonly []> = {
   meta: {
     type: "problem",
     docs: {
@@ -133,4 +133,4 @@ const noArraySubscript: RuleModule<"errorStringGeneric", readonly []> = {
   },
 };
 
-export default noArraySubscript;
+export default noUnsafeSubscript;

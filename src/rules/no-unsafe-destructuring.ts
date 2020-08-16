@@ -9,7 +9,7 @@ import ts from "typescript";
 /**
  * An ESLint rule to ban unsafe array/object destructuring, which is not well-typed in TypeScript.
  */
-const noArrayDestructuring: RuleModule<"errorStringGeneric", readonly []> = {
+const noUnsafeDestructuring: RuleModule<"errorStringGeneric", readonly []> = {
   meta: {
     type: "problem",
     docs: {
@@ -112,4 +112,4 @@ const noArrayDestructuring: RuleModule<"errorStringGeneric", readonly []> = {
   },
 };
 
-export default noArrayDestructuring;
+export default noUnsafeDestructuring;
