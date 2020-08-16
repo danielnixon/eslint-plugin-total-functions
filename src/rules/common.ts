@@ -1,13 +1,9 @@
 import { isObjectType, unionTypeParts } from "tsutils";
-import { get } from "total-functions";
-import { Type, TypeChecker as RawTypeChecker, Symbol } from "typescript";
+import { Type, TypeChecker as RawTypeChecker } from "typescript";
 
 export type TypeChecker = RawTypeChecker & {
   readonly isTypeAssignableTo?: (type1: Type, type2: Type) => boolean;
 };
-
-export const single = <A>(as: ReadonlyArray<A>): A | undefined =>
-  as.length === 1 ? get(as, 0) : undefined;
 
 /**
  * Throws away non-object types (string, number, boolean, etc) because we don't check those for readonly -> mutable assignment
@@ -47,15 +43,3 @@ export const assignableObjectPairs = (
   );
 };
 
-export const symbolToType = (
-  // eslint-disable-next-line @typescript-eslint/ban-types
-  s: Symbol,
-  checker: TypeChecker
-): Type | undefined => {
-  const declarations = s.getDeclarations() || [];
-  // TODO: How to choose declaration when there are multiple?
-  const declaration = single(declarations);
-  return declaration !== undefined
-    ? checker.getTypeAtLocation(declaration)
-    : undefined;
-};

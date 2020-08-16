@@ -5,8 +5,8 @@ import {
 } from "@typescript-eslint/experimental-utils";
 import { isPropertyReadonlyInType } from "tsutils";
 import { get } from "total-functions";
-import { Type, SyntaxKind, Symbol, IndexKind } from "typescript";
-import { assignableObjectPairs, symbolToType, TypeChecker } from "./common";
+import { Type, SyntaxKind, Symbol, IndexKind, Node } from "typescript";
+import { assignableObjectPairs, TypeChecker } from "./common";
 
 type MessageId =
   | "errorStringCallExpressionReadonlyToMutable"
@@ -49,6 +49,8 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
     const checker: TypeChecker = parserServices.program.getTypeChecker();
 
     const isUnsafeStringIndexAssignment = (
+      destinationNode: Node,
+      sourceNode: Node,
       destinationType: Type,
       sourceType: Type,
       seenTypes: ReadonlyArray<{
@@ -83,6 +85,8 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
         (destinationStringIndexType !== undefined &&
           sourceStringIndexType !== undefined &&
           isUnsafeAssignment(
+            destinationNode,
+            sourceNode,
             destinationStringIndexType,
             sourceStringIndexType,
             checker,
@@ -92,6 +96,8 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
     };
 
     const isUnsafeNumberIndexAssignment = (
+      destinationNode: Node,
+      sourceNode: Node,
       destinationType: Type,
       sourceType: Type,
       checker: TypeChecker,
@@ -109,6 +115,8 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
         destinationNumberIndexType !== undefined &&
         sourceNumberIndexType !== undefined &&
         isUnsafeAssignment(
+          destinationNode,
+          sourceNode,
           destinationNumberIndexType,
           sourceNumberIndexType,
           checker,
@@ -118,6 +126,8 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
     };
 
     const isUnsafePropertyAssignmentRec = (
+      destinationNode: Node,
+      sourceNode: Node,
       // eslint-disable-next-line @typescript-eslint/ban-types
       destinationProperty: Symbol,
       // eslint-disable-next-line @typescript-eslint/ban-types
@@ -128,16 +138,21 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
         readonly sourceType: Type;
       }>
     ): boolean => {
-      const destinationPropertyType = symbolToType(
+      const destinationPropertyType = checker.getTypeOfSymbolAtLocation(
         destinationProperty,
-        checker
+        destinationNode
       );
-      const sourcePropertyType = symbolToType(sourceProperty, checker);
+      const sourcePropertyType = checker.getTypeOfSymbolAtLocation(
+        sourceProperty,
+        sourceNode
+      );
 
       return (
         destinationPropertyType !== undefined &&
         sourcePropertyType !== undefined &&
         isUnsafeAssignment(
+          destinationNode,
+          sourceNode,
           destinationPropertyType,
           sourcePropertyType,
           checker,
@@ -147,6 +162,8 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
     };
 
     const isUnsafePropertyAssignment = (
+      destinationNode: Node,
+      sourceNode: Node,
       destinationType: Type,
       sourceType: Type,
       checker: TypeChecker,
@@ -185,6 +202,8 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
         ]);
 
         return isUnsafePropertyAssignmentRec(
+          destinationNode,
+          sourceNode,
           destinationProperty,
           sourceProperty,
           checker,
@@ -194,6 +213,8 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
     };
 
     const isUnsafeAssignment = (
+      destinationNode: Node,
+      sourceNode: Node,
       rawDestinationType: Type,
       rawSourceType: Type,
       checker: TypeChecker,
@@ -227,12 +248,16 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
           // and we're either:
           // assigning from a type with readonly string index type to one with a mutable string index type, or
           (isUnsafeStringIndexAssignment(
+            destinationNode,
+            sourceNode,
             destinationType,
             sourceType,
             nextSeenTypes
           ) ||
             // assigning from a type with readonly number index type to one with a mutable number index type, or
             isUnsafeNumberIndexAssignment(
+              destinationNode,
+              sourceNode,
               destinationType,
               sourceType,
               checker,
@@ -240,6 +265,8 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
             ) ||
             // assigning from a type with one or more readonly properties to one with one or more mutable properties with the same name(s).
             isUnsafePropertyAssignment(
+              destinationNode,
+              sourceNode,
               destinationType,
               sourceType,
               checker,
@@ -268,7 +295,15 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
         const sourceType = checker.getTypeAtLocation(sourceNode);
 
         // eslint-disable-next-line functional/no-conditional-statement
-        if (isUnsafeAssignment(destinationType, sourceType, checker)) {
+        if (
+          isUnsafeAssignment(
+            destinationNode,
+            sourceNode,
+            destinationType,
+            sourceType,
+            checker
+          )
+        ) {
           // eslint-disable-next-line functional/no-expression-statement
           context.report({
             node: node,
@@ -294,7 +329,15 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
         const sourceType = checker.getTypeAtLocation(sourceNode);
 
         // eslint-disable-next-line functional/no-conditional-statement
-        if (isUnsafeAssignment(destinationType, sourceType, checker)) {
+        if (
+          isUnsafeAssignment(
+            destinationNode,
+            sourceNode,
+            destinationType,
+            sourceType,
+            checker
+          )
+        ) {
           // eslint-disable-next-line functional/no-expression-statement
           context.report({
             node: node,
@@ -332,7 +375,14 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
           // eslint-disable-next-line functional/no-conditional-statement
           if (
             rightType !== undefined &&
-            isUnsafeAssignment(leftType, rightType, checker)
+            rightTsNode !== undefined &&
+            isUnsafeAssignment(
+              leftTsNode,
+              rightTsNode,
+              leftType,
+              rightType,
+              checker
+            )
           ) {
             // eslint-disable-next-line functional/no-expression-statement
             context.report({
@@ -353,7 +403,15 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
         const rightType = checker.getTypeAtLocation(rightTsNode);
 
         // eslint-disable-next-line functional/no-conditional-statement
-        if (isUnsafeAssignment(leftType, rightType, checker)) {
+        if (
+          isUnsafeAssignment(
+            leftTsNode,
+            rightTsNode,
+            leftType,
+            rightType,
+            checker
+          )
+        ) {
           // eslint-disable-next-line functional/no-expression-statement
           context.report({
             node: node,
@@ -372,18 +430,23 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
         if (node.returnType === undefined) {
           return;
         }
-
-        const destinationType = checker.getTypeAtLocation(
-          parserServices.esTreeNodeToTSNodeMap.get(
-            node.returnType.typeAnnotation
-          )
+        const destinationNode = parserServices.esTreeNodeToTSNodeMap.get(
+          node.returnType.typeAnnotation
         );
-        const sourceType = checker.getTypeAtLocation(
-          parserServices.esTreeNodeToTSNodeMap.get(node.body)
-        );
+        const destinationType = checker.getTypeAtLocation(destinationNode);
+        const sourceNode = parserServices.esTreeNodeToTSNodeMap.get(node.body);
+        const sourceType = checker.getTypeAtLocation(sourceNode);
 
         // eslint-disable-next-line functional/no-conditional-statement
-        if (isUnsafeAssignment(destinationType, sourceType, checker)) {
+        if (
+          isUnsafeAssignment(
+            destinationNode,
+            sourceNode,
+            destinationType,
+            sourceType,
+            checker
+          )
+        ) {
           // eslint-disable-next-line functional/no-expression-statement
           context.report({
             node: node.body,
@@ -439,7 +502,13 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
           // eslint-disable-next-line functional/no-conditional-statement
           if (
             paramType !== undefined &&
-            isUnsafeAssignment(paramType, argumentType, checker)
+            isUnsafeAssignment(
+              tsNode,
+              argumentTsNode,
+              paramType,
+              argumentType,
+              checker
+            )
           ) {
             // eslint-disable-next-line functional/no-expression-statement
             context.report({
