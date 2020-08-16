@@ -42,7 +42,7 @@
   "scripts": {
     "build": "tsc",
     "lint": "eslint src --ext .ts,.tsx",
-    "type-coverage": "type-coverage --strict --detail --ignore-catch",
+    "type-coverage": "type-coverage --strict --detail",
     "format": "prettier --write 'src/**/*.{ts,tsx}'",
     "test": "jest",
     "release": "yarn build && yarn lint && yarn type-coverage && yarn publish"
