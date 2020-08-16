@@ -147,17 +147,13 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
         sourceNode
       );
 
-      return (
-        destinationPropertyType !== undefined &&
-        sourcePropertyType !== undefined &&
-        isUnsafeAssignment(
-          destinationNode,
-          sourceNode,
-          destinationPropertyType,
-          sourcePropertyType,
-          checker,
-          seenTypes
-        )
+      return isUnsafeAssignment(
+        destinationNode,
+        sourceNode,
+        destinationPropertyType,
+        sourcePropertyType,
+        checker,
+        seenTypes
       );
     };
 
@@ -197,9 +193,7 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
           return true;
         }
 
-        const nextSeenTypes = seenTypes.concat([
-          { destinationType, sourceType },
-        ]);
+        const nextSeenTypes = seenTypes.concat({ destinationType, sourceType });
 
         return isUnsafePropertyAssignmentRec(
           destinationNode,
