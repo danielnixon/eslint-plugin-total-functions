@@ -352,24 +352,24 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
             return;
           }
 
+          // eslint-disable-next-line functional/no-conditional-statement
+          if (declaration.init === null) {
+            // If there is no initial value then there's no risk of assigning mutable to readonly.
+            return;
+          }
+
           const leftTsNode = parserServices.esTreeNodeToTSNodeMap.get(
             declaration.id
           );
-          const rightTsNode =
-            declaration.init !== null
-              ? parserServices.esTreeNodeToTSNodeMap.get(declaration.init)
-              : undefined;
+          const rightTsNode = parserServices.esTreeNodeToTSNodeMap.get(
+            declaration.init
+          );
 
           const leftType = checker.getTypeAtLocation(leftTsNode);
-          const rightType =
-            rightTsNode !== undefined
-              ? checker.getTypeAtLocation(rightTsNode)
-              : undefined;
+          const rightType = checker.getTypeAtLocation(rightTsNode);
 
           // eslint-disable-next-line functional/no-conditional-statement
           if (
-            rightType !== undefined &&
-            rightTsNode !== undefined &&
             isUnsafeAssignment(
               leftTsNode,
               rightTsNode,
