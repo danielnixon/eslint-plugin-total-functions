@@ -11,6 +11,7 @@
 
 [![dependencies Status](https://david-dm.org/danielnixon/eslint-plugin-total-functions/status.svg)](https://david-dm.org/danielnixon/eslint-plugin-total-functions)
 [![devDependencies Status](https://david-dm.org/danielnixon/eslint-plugin-total-functions/dev-status.svg)](https://david-dm.org/danielnixon/eslint-plugin-total-functions?type=dev)
+[![peerDependencies Status](https://david-dm.org/danielnixon/eslint-plugin-total-functions/peer-status.svg)](https://david-dm.org/danielnixon/eslint-plugin-total-functions?type=peer)
 
 An ESLint plugin to enforce the use of total functions (and prevent the use of [partial functions](https://wiki.haskell.org/Partial_functions)) in TypeScript. If you like your types to tell the truth, this is the ESLint plugin for you.
 
