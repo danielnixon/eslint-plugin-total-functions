@@ -22,8 +22,7 @@ const noUnsafeSubscript: RuleModule<"errorStringGeneric", readonly []> = {
       url: "https://github.com/danielnixon/eslint-plugin-total-functions",
     },
     messages: {
-      errorStringGeneric:
-        "This subscript access is not type-safe in TypeScript.",
+      errorStringGeneric: "This member access is not type-safe in TypeScript.",
     },
     schema: [],
   },
