@@ -177,6 +177,22 @@ ruleTester.run("no-unsafe-subscript", rule, {
       code:
         "const arr = [0]; const foo = { foo: arr[0] } as { readonly foo: number | undefined };",
     },
+    // Record (calculated property access) includes undefined in record type
+    {
+      filename: "file.ts",
+      code: `
+        const record: Record<string, string | undefined> = { foo: 'foo' };
+        const bar = record['bar'];
+      `,
+    },
+    // Record (regular property access) includes undefined in record type
+    {
+      filename: "file.ts",
+      code: `
+        const record: Record<string, string | undefined> = { foo: 'foo' };
+        const bar = record.bar;
+      `,
+    },
   ],
   invalid: [
     // Partial tuple property access with non-literal (but const) key (within range of tuple portion).
@@ -250,11 +266,27 @@ ruleTester.run("no-unsafe-subscript", rule, {
         },
       ],
     },
-    // Record
+    // Record (calculated property access)
     {
       filename: "file.ts",
-      code:
-        "const record = { foo: 'foo' } as Record<string, string>; const bar = record['foo'];",
+      code: `
+        const record: Record<string, string> = { foo: 'foo' };
+        const bar = record['bar'];
+      `,
+      errors: [
+        {
+          messageId: "errorStringGeneric",
+          type: AST_NODE_TYPES.MemberExpression,
+        },
+      ],
+    },
+    // Record (regular property access)
+    {
+      filename: "file.ts",
+      code: `
+        const record: Record<string, string> = { foo: 'foo' };
+        const bar = record.bar;
+      `,
       errors: [
         {
           messageId: "errorStringGeneric",

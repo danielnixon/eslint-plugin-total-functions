@@ -36,12 +36,6 @@ const noUnsafeSubscript: RuleModule<"errorStringGeneric", readonly []> = {
       node: TSESTree.MemberExpression | TSESTree.OptionalMemberExpression
       // eslint-disable-next-line functional/no-return-void, sonarjs/cognitive-complexity
     ): void => {
-      // eslint-disable-next-line functional/no-conditional-statement
-      if (!node.computed) {
-        // Allow non-computed (regular) property access.
-        return;
-      }
-
       const contextualType = checker.getContextualType(
         parserServices.esTreeNodeToTSNodeMap.get(node)
       );
@@ -80,7 +74,19 @@ const noUnsafeSubscript: RuleModule<"errorStringGeneric", readonly []> = {
           (t) => t.flags & ts.TypeFlags.Undefined
         )
       ) {
-        // Allow subscript access if undefined is already in the array type.
+        // Allow member access if undefined is already in the array type.
+        return;
+      }
+
+      const stringIndexType = type.getStringIndexType();
+      // eslint-disable-next-line functional/no-conditional-statement
+      if (
+        stringIndexType !== undefined &&
+        unionTypeParts(stringIndexType).some(
+          (t) => t.flags & ts.TypeFlags.Undefined
+        )
+      ) {
+        // Allow member access if undefined is already in the record type.
         return;
       }
 
@@ -108,8 +114,17 @@ const noUnsafeSubscript: RuleModule<"errorStringGeneric", readonly []> = {
         type.getStringIndexType() === undefined &&
         type.getNumberIndexType() === undefined
       ) {
-        // Allow object subscript access when there is no index signature in the object (i.e. when this object is not a Record<string, B> or a Record<number, B>).
+        // Allow member access when there is no index signature in the object (i.e. when this object is not a Record<string, B> or a Record<number, B>).
         // If this access is invalid TypeScript itself will catch it.
+        return;
+      }
+
+      // eslint-disable-next-line functional/no-conditional-statement
+      if (
+        node.property.type === AST_NODE_TYPES.Identifier &&
+        type.getProperty(node.property.name) !== undefined
+      ) {
+        // Allow member access if the object type is known to contain a member with that name.
         return;
       }
 
