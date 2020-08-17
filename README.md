@@ -67,9 +67,12 @@ const record: Record<string, string> = { foo: "foo" };
 const bar = record["bar"]; // bar has type string, not string | undefined
 bar.toUpperCase(); // This explodes at runtime
 
-const str = "";
-const baz = str[0]; // baz has type string, not string | undefined
+const bar = record.baz; // baz has type string, not string | undefined
 baz.toUpperCase(); // This explodes at runtime
+
+const str = "";
+const s = str[0]; // s has type string, not string | undefined
+s.toUpperCase(); // This explodes at runtime
 ```
 
 See [TypeScript issue #13778](https://github.com/Microsoft/TypeScript/issues/13778) for the corresponding issue and [total-functions](https://github.com/danielnixon/total-functions#get-type-safe-array-index-operator) for a safe (total) alternative.
