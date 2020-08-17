@@ -56,7 +56,7 @@ Alternatively you can configure individual rules separately (see below).
 
 ### total-functions/no-unsafe-subscript
 
-Bans unsafe array and object subscript access, for example:
+Bans unsafe array and object member access, for example:
 
 ```typescript
 const a: string[] = [];
@@ -77,7 +77,7 @@ s.toUpperCase(); // This explodes at runtime
 
 See [TypeScript issue #13778](https://github.com/Microsoft/TypeScript/issues/13778) for the corresponding issue and [total-functions](https://github.com/danielnixon/total-functions#get-type-safe-array-index-operator) for a safe (total) alternative.
 
-Tuples and non-record objects (no index signature) are allowed.
+Tuples and non-record objects (no index signature) are allowed. Records are allowed if their value type includes `undefined`.
 
 There are other ways to avoid this issue, such as [fp-ts's lookup](https://gcanti.github.io/fp-ts/modules/Array.ts.html#lookup), but the `get` function from total-functions is smart enough to exclude `undefined` when dealing with tuples and objects.
 
