@@ -81,7 +81,7 @@ Tuples and non-record objects (no index signature) are allowed. Records are allo
 
 There are other ways to avoid this issue, such as [fp-ts's lookup](https://gcanti.github.io/fp-ts/modules/Array.ts.html#lookup), but the `get` function from total-functions is smart enough to exclude `undefined` when dealing with tuples and objects.
 
-For examples of subscript access that this rule considers valid and invalid, see [no-unsafe-subscript.test.ts](https://github.com/danielnixon/eslint-plugin-total-functions/blob/master/src/rules/no-unsafe-subscript.test.ts).
+For examples of member access that this rule considers valid and invalid, see [no-unsafe-subscript.test.ts](https://github.com/danielnixon/eslint-plugin-total-functions/blob/master/src/rules/no-unsafe-subscript.test.ts).
 
 ### total-functions/no-unsafe-destructuring
 
