@@ -45,12 +45,13 @@ const noUnsafeDestructuring: RuleModule<"errorStringGeneric", readonly []> = {
         }
 
         const numberIndexType = type.getNumberIndexType();
-        const typeParts =
-          numberIndexType !== undefined ? unionTypeParts(numberIndexType) : [];
 
         // eslint-disable-next-line functional/no-conditional-statement
         if (
-          typeParts.find((t) => t.flags & ts.TypeFlags.Undefined) !== undefined
+          numberIndexType !== undefined &&
+          unionTypeParts(numberIndexType).find(
+            (t) => t.flags & ts.TypeFlags.Undefined
+          ) !== undefined
         ) {
           // Allow destructuring if undefined is already in the array type.
           return;
