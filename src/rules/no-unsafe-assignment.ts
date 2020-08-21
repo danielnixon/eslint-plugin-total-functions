@@ -415,11 +415,6 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
       },
       // eslint-disable-next-line functional/no-return-void
       ReturnStatement: (node): void => {
-        // eslint-disable-next-line functional/no-conditional-statement
-        if (node.argument === null) {
-          return;
-        }
-
         const tsNode = parserServices.esTreeNodeToTSNodeMap.get(node);
 
         // eslint-disable-next-line functional/no-conditional-statement
