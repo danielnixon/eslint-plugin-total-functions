@@ -738,6 +738,24 @@ ruleTester.run("no-unsafe-assignment", rule, {
         },
       ],
     },
+    // readonly -> mutable (short-circuiting assignment)
+    {
+      filename: "file.ts",
+      code: `
+        type MutableA = { a: string };
+        type ReadonlyA = { readonly a: string };
+
+        const readonlyA: ReadonlyA = { a: "readonly?" };
+        let mutableA: MutableA | undefined;
+        mutableA ??= readonlyA;
+      `,
+      errors: [
+        {
+          messageId: "errorStringAssignmentExpressionReadonlyToMutable",
+          type: AST_NODE_TYPES.AssignmentExpression,
+        },
+      ],
+    },
     /**
      * Variable declaration
      */
