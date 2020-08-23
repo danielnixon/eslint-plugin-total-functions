@@ -1,8 +1,5 @@
 import { RuleModule } from "@typescript-eslint/experimental-utils/dist/ts-eslint";
-import {
-  ESLintUtils,
-  AST_NODE_TYPES,
-} from "@typescript-eslint/experimental-utils";
+import { ESLintUtils } from "@typescript-eslint/experimental-utils";
 import { isTupleTypeReference, unionTypeParts } from "tsutils";
 import ts from "typescript";
 
@@ -32,6 +29,13 @@ const noUnsafeDestructuring: RuleModule<"errorStringGeneric", readonly []> = {
       // eslint-disable-next-line functional/no-return-void
       ArrayPattern: (node): void => {
         const tsNode = parserServices.esTreeNodeToTSNodeMap.get(node);
+
+        // eslint-disable-next-line functional/no-conditional-statement
+        if (tsNode.kind === ts.SyntaxKind.ArrayLiteralExpression) {
+          // TODO: how does an ESLint ArrayPattern map to a TypeScript ArrayLiteralExpression?
+          return;
+        }
+
         const type = checker.getTypeAtLocation(tsNode);
 
         // eslint-disable-next-line functional/no-conditional-statement
@@ -68,7 +72,8 @@ const noUnsafeDestructuring: RuleModule<"errorStringGeneric", readonly []> = {
         const tsNode = parserServices.esTreeNodeToTSNodeMap.get(node);
 
         // eslint-disable-next-line functional/no-conditional-statement
-        if (tsNode.kind !== ts.SyntaxKind.ObjectBindingPattern) {
+        if (tsNode.kind === ts.SyntaxKind.ObjectLiteralExpression) {
+          // TODO: how does an ESLint ObjectPattern map to a TypeScript ObjectLiteralExpression?
           return;
         }
 
@@ -76,9 +81,7 @@ const noUnsafeDestructuring: RuleModule<"errorStringGeneric", readonly []> = {
 
         // True if every element we're destructuring is known to exist at compile time (or is the rest element).
         const isSafe = tsNode.elements.every((prop) => {
-          const isRestElement =
-            parserServices.tsNodeToESTreeNodeMap.get(prop).type ===
-            AST_NODE_TYPES.RestElement;
+          const isRestElement = prop.dotDotDotToken !== undefined;
 
           const propertyName =
             prop.propertyName !== undefined &&
