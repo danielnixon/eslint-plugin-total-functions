@@ -2,6 +2,7 @@ import { RuleModule } from "@typescript-eslint/experimental-utils/dist/ts-eslint
 import { ESLintUtils, TSESTree } from "@typescript-eslint/experimental-utils";
 import ts from "typescript";
 import { TypeChecker } from "./common";
+import { isTypeFlagSet } from "tsutils";
 
 /**
  * An ESLint rule to ban unsafe type assertions.
@@ -35,8 +36,8 @@ const noUnsafeTypeAssertion: RuleModule<
     ): boolean => {
       // eslint-disable-next-line functional/no-conditional-statement
       if (
-        rawSourceType.flags & ts.TypeFlags.Any ||
-        rawSourceType.flags & ts.TypeFlags.Unknown
+        isTypeFlagSet(rawSourceType, ts.TypeFlags.Any) ||
+        isTypeFlagSet(rawSourceType, ts.TypeFlags.Unknown)
       ) {
         // Asserting any or unknown to anything else is always unsafe.
         return true;

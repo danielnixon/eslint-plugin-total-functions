@@ -40,6 +40,11 @@ module.exports = {
     "@typescript-eslint/consistent-type-assertions": ["error", {
       "assertionStyle": "never"
     }],
+    "@typescript-eslint/strict-boolean-expressions": ["error", {
+      "allowString": false,
+      "allowNumber": false,
+      "allowNullableObject": false
+    }],
     // Don't need this given the above rule bans type assertions entirely.
     "total-functions/no-unsafe-type-assertion": 0
   }
