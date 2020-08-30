@@ -144,6 +144,7 @@ See also:
 * https://github.com/jonaskello/eslint-plugin-functional/issues/113
 
 # See Also
+* https://github.com/danielnixon/eslint-config-typed-fp
 * https://github.com/danielnixon/readonly-types
 * https://github.com/danielnixon/total-functions
 * https://github.com/jonaskello/eslint-plugin-functional
