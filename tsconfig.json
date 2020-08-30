@@ -1,11 +1,11 @@
 {
   "compilerOptions": {
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
+    /* Visit https://aka.ms/tsconfig.json to read more about this file */
+    
+    /* Basic Options */
     "lib": ["esnext"],
     "target": "ES2015",
     "module": "CommonJS",
-    "moduleResolution": "node",
     "declaration": true,                      /* Generates corresponding '.d.ts' file. */
     "outDir": "dist",                         /* Redirect output structure to the directory. */
 
@@ -24,6 +24,14 @@
     "noUnusedParameters": true,            /* Report errors on unused parameters. */
     "noImplicitReturns": true,             /* Report error when not all code paths in function return a value. */
     "noFallthroughCasesInSwitch": true,    /* Report errors for fallthrough cases in switch statement. */
+
+    /* Module Resolution Options */
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    
+    /* Advanced Options */
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
   },
   "include": ["src/**/*.ts"]
 }
