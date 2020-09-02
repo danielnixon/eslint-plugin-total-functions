@@ -362,7 +362,7 @@ ruleTester.run("no-unsafe-subscript", rule, {
       errors: [
         {
           messageId: "errorStringGeneric",
-          type: AST_NODE_TYPES.OptionalMemberExpression,
+          type: AST_NODE_TYPES.MemberExpression,
         },
       ],
     },

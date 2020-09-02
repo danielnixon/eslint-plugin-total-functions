@@ -32,7 +32,7 @@ const noUnsafeSubscript: RuleModule<"errorStringGeneric", readonly []> = {
     const checker = parserServices.program.getTypeChecker();
 
     const reportUnsafeSubscriptAccess = (
-      node: TSESTree.MemberExpression | TSESTree.OptionalMemberExpression
+      node: TSESTree.MemberExpression
       // eslint-disable-next-line functional/no-return-void, sonarjs/cognitive-complexity
     ): void => {
       const contextualType = checker.getContextualType(
@@ -135,10 +135,6 @@ const noUnsafeSubscript: RuleModule<"errorStringGeneric", readonly []> = {
     };
 
     return {
-      // eslint-disable-next-line functional/no-return-void
-      OptionalMemberExpression: (node): void => {
-        return reportUnsafeSubscriptAccess(node);
-      },
       // eslint-disable-next-line functional/no-return-void
       MemberExpression: (node): void => {
         return reportUnsafeSubscriptAccess(node);
