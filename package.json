@@ -31,7 +31,7 @@
   },
   "dependencies": {
     "@typescript-eslint/eslint-plugin": "^3.10.0",
-    "@typescript-eslint/experimental-utils": "^3.10.0",
+    "@typescript-eslint/experimental-utils": "^4.0.1",
     "@typescript-eslint/parser": "^3.10.0",
     "total-functions": "^3.0.0",
     "tsutils": "^3.17.1"
