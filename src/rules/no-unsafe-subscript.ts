@@ -17,7 +17,7 @@ const noUnsafeSubscript: RuleModule<"errorStringGeneric", readonly []> = {
     docs: {
       category: "Possible Errors",
       description:
-        "Array and object subscript access are not type-safe in TypeScript.",
+        "Array and object member access are not type-safe in TypeScript.",
       recommended: "error",
       url: "https://github.com/danielnixon/eslint-plugin-total-functions",
     },
@@ -35,22 +35,6 @@ const noUnsafeSubscript: RuleModule<"errorStringGeneric", readonly []> = {
       node: TSESTree.MemberExpression
       // eslint-disable-next-line functional/no-return-void, sonarjs/cognitive-complexity
     ): void => {
-      const contextualType = checker.getContextualType(
-        parserServices.esTreeNodeToTSNodeMap.get(node)
-      );
-
-      // eslint-disable-next-line functional/no-conditional-statement
-      if (
-        contextualType !== undefined &&
-        unionTypeParts(contextualType).some(
-          (t) => t.flags & ts.TypeFlags.Undefined
-        )
-      ) {
-        // Contextual type includes (or is) undefined.
-        // See https://www.typescriptlang.org/docs/handbook/type-inference.html#contextual-typing
-        return;
-      }
-
       // eslint-disable-next-line functional/no-conditional-statement
       if (
         node.parent !== undefined &&
@@ -59,6 +43,30 @@ const noUnsafeSubscript: RuleModule<"errorStringGeneric", readonly []> = {
       ) {
         // This is the left hand side of an array assignment, so there's no partiality issue here.
         // eslint-plugin-functional will catch the mutation.
+        return;
+      }
+
+      const contextualType = checker.getContextualType(
+        parserServices.esTreeNodeToTSNodeMap.get(node)
+      );
+
+      const contextualTypeContainsUndefined =
+        contextualType !== undefined &&
+        unionTypeParts(contextualType).some(
+          (t) => t.flags & ts.TypeFlags.Undefined
+        );
+
+      // If this is the right hand side of an assignment or declaration we can't trust the contextual type.
+      // See https://github.com/danielnixon/eslint-plugin-total-functions/issues/68 for details.
+      const isRhsOfAssignment =
+        node.parent !== undefined &&
+        (node.parent.type === AST_NODE_TYPES.AssignmentExpression ||
+          node.parent.type === AST_NODE_TYPES.VariableDeclarator);
+
+      // eslint-disable-next-line functional/no-conditional-statement
+      if (contextualTypeContainsUndefined && !isRhsOfAssignment) {
+        // Contextual type includes (or is) undefined.
+        // See https://www.typescriptlang.org/docs/handbook/type-inference.html#contextual-typing
         return;
       }
 

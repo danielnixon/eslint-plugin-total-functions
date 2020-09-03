@@ -85,17 +85,6 @@ ruleTester.run("no-unsafe-subscript", rule, {
       filename: "file.ts",
       code: "const arr = [0, 1, 2]; arr[0] = 42;",
     },
-    // Result immediately assigned to type that includes undefined, so we can ignore the partiality.
-    {
-      filename: "file.ts",
-      code:
-        "const arr = [0, 1, 2]; let foo: number | undefined = undefined; foo = arr[0];",
-    },
-    // Result used to initialise a value that includes undefined.
-    {
-      filename: "file.ts",
-      code: "const arr = [0, 1, 2]; const foo: number | undefined = arr[0];",
-    },
     // Type assertion to add undefined.
     {
       filename: "file.ts",
@@ -373,6 +362,33 @@ ruleTester.run("no-unsafe-subscript", rule, {
         const str = "a string";
         const bar = str[42];
       `,
+      errors: [
+        {
+          messageId: "errorStringGeneric",
+          type: AST_NODE_TYPES.MemberExpression,
+        },
+      ],
+    },
+    // Result immediately assigned to type that includes undefined, so we can ignore the partiality.
+    // This is NOT safe due to definite assignment analysis 🤦
+    // see https://github.com/danielnixon/eslint-plugin-total-functions/issues/68 for details
+    {
+      filename: "file.ts",
+      code:
+        "const arr = [0, 1, 2]; let foo: number | undefined = undefined; foo = arr[0];",
+      errors: [
+        {
+          messageId: "errorStringGeneric",
+          type: AST_NODE_TYPES.MemberExpression,
+        },
+      ],
+    },
+    // Result used to initialise a value that includes undefined.
+    // This is NOT safe due to definite assignment analysis 🤦
+    // see https://github.com/danielnixon/eslint-plugin-total-functions/issues/68 for details
+    {
+      filename: "file.ts",
+      code: "const arr = [0, 1, 2]; const foo: number | undefined = arr[0];",
       errors: [
         {
           messageId: "errorStringGeneric",
