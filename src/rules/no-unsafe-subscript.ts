@@ -46,30 +46,6 @@ const noUnsafeSubscript: RuleModule<"errorStringGeneric", readonly []> = {
         return;
       }
 
-      const contextualType = checker.getContextualType(
-        parserServices.esTreeNodeToTSNodeMap.get(node)
-      );
-
-      const contextualTypeContainsUndefined =
-        contextualType !== undefined &&
-        unionTypeParts(contextualType).some(
-          (t) => t.flags & ts.TypeFlags.Undefined
-        );
-
-      // If this is the right hand side of an assignment or declaration we can't trust the contextual type.
-      // See https://github.com/danielnixon/eslint-plugin-total-functions/issues/68 for details.
-      const isRhsOfAssignment =
-        node.parent !== undefined &&
-        (node.parent.type === AST_NODE_TYPES.AssignmentExpression ||
-          node.parent.type === AST_NODE_TYPES.VariableDeclarator);
-
-      // eslint-disable-next-line functional/no-conditional-statement
-      if (contextualTypeContainsUndefined && !isRhsOfAssignment) {
-        // Contextual type includes (or is) undefined.
-        // See https://www.typescriptlang.org/docs/handbook/type-inference.html#contextual-typing
-        return;
-      }
-
       const tsNode = parserServices.esTreeNodeToTSNodeMap.get(node.object);
       const type = checker.getTypeAtLocation(tsNode);
 
