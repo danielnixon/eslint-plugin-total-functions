@@ -144,6 +144,7 @@ See also:
 * https://github.com/jonaskello/eslint-plugin-functional/issues/113
 
 # See Also
+* [TypeScript for Functional Programmers](https://www.typescriptlang.org/docs/handbook/typescript-in-5-minutes-func.html)
 * https://github.com/danielnixon/eslint-config-typed-fp
 * https://github.com/danielnixon/readonly-types
 * https://github.com/danielnixon/total-functions
