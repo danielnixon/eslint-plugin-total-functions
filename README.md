@@ -150,3 +150,4 @@ See also:
 * https://github.com/jonaskello/eslint-plugin-functional
 * https://github.com/gcanti/fp-ts
 * https://github.com/plantain-00/type-coverage
+* https://github.com/immutable-js/immutable-js
