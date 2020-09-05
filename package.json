@@ -19,7 +19,7 @@
     "eslint-config-prettier": "^6.11.0",
     "eslint-config-typed-fp": "^0.2.0",
     "eslint-plugin-functional": "^3.0.2",
-    "eslint-plugin-jest": "^23.20.0",
+    "eslint-plugin-jest": "^24.0.0",
     "eslint-plugin-prettier": "^3.1.4",
     "eslint-plugin-sonarjs": "^0.5.0",
     "eslint-plugin-total-functions": "^3.0.0",
