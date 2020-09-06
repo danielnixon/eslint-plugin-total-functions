@@ -54,6 +54,14 @@ Alternatively you can configure individual rules separately (see below).
 
 ## Rules
 
+| Rule                      | Recommended  | All          | Fixer? |
+| :------------------------ | :----------: | -----------: | -----: |
+|  no-unsafe-subscript      | ✅           | ✅           |        |
+|  no-unsafe-destructuring  | ✅           | ✅           |        |
+|  no-unsafe-type-assertion | ✅           | ✅           |        |
+|  no-unsafe-assignment     | ✅           | ✅           |        |
+|  require-strict-mode      | ✅           | ✅           |        |
+
 ### total-functions/no-unsafe-subscript
 
 Bans unsafe array and object member access, for example:
