@@ -7,10 +7,7 @@ import { isTypeFlagSet } from "tsutils";
 /**
  * An ESLint rule to ban unsafe type assertions.
  */
-const noUnsafeTypeAssertion: RuleModule<
-  "errorStringGeneric" | "errorStringPreferAs",
-  readonly []
-> = {
+const noUnsafeTypeAssertion: RuleModule<"errorStringGeneric", readonly []> = {
   meta: {
     type: "problem",
     docs: {
@@ -21,7 +18,6 @@ const noUnsafeTypeAssertion: RuleModule<
     },
     messages: {
       errorStringGeneric: "This type assertion is not type-safe.",
-      errorStringPreferAs: "Use the 'as' syntax for type assertions.",
     },
     schema: [],
   },
