@@ -27,7 +27,7 @@ npm install eslint-plugin-total-functions --save-dev
 
 ## Setup
 
-1. Turn on TypeScript's [strict mode](https://www.typescriptlang.org/docs/handbook/compiler-options.html).
+1. Turn on TypeScript's [strict mode](https://www.typescriptlang.org/tsconfig#strict).
 2. Set up [ESLint + TypeScript](https://github.com/typescript-eslint/typescript-eslint/blob/master/docs/getting-started/linting/README.md).
 3. Turn on [eslint-plugin-functional](https://github.com/jonaskello/eslint-plugin-functional) (recommended). Its rules related to mutation and OO are more important than this plugin's rules and they'll help keep your types honest.
 4. Update your `.eslintrc.js`:
@@ -142,6 +142,10 @@ See [TypeScript issue #13347](https://github.com/microsoft/TypeScript/issues/133
 See also:
 * https://github.com/danielnixon/eslint-plugin-total-functions/issues/21
 * https://github.com/jonaskello/eslint-plugin-functional/issues/113
+
+### total-functions/require-strict-mode
+
+The world is a very strange place when [strict mode](https://www.typescriptlang.org/tsconfig#strict) is disabled. This rule enforces strict mode.
 
 # See Also
 * [TypeScript for Functional Programmers](https://www.typescriptlang.org/docs/handbook/typescript-in-5-minutes-func.html)
