@@ -23,13 +23,13 @@ export const assignableObjectPairs = (
     return [];
   }
 
-  const destinationTypeParts = unionTypeParts(rawDestinationType).filter((t) =>
-    isObjectType(t)
-  );
+  const destinationTypeParts: readonly Type[] = unionTypeParts(
+    rawDestinationType
+  ).filter((t) => isObjectType(t));
 
-  const sourceTypeParts = unionTypeParts(rawSourceType).filter((t) =>
-    isObjectType(t)
-  );
+  const sourceTypeParts: readonly Type[] = unionTypeParts(
+    rawSourceType
+  ).filter((t) => isObjectType(t));
 
   return sourceTypeParts.flatMap((sourceTypePart) =>
     destinationTypeParts

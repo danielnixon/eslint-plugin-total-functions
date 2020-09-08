@@ -12,12 +12,12 @@
     "@stryker-mutator/typescript": "^3.3.1",
     "@types/eslint": "^7.2.1",
     "@types/jest": "^26.0.13",
-    "@typescript-eslint/eslint-plugin": "^4.0.1",
-    "@typescript-eslint/parser": "^4.0.1",
+    "@typescript-eslint/eslint-plugin": "^4.1.0",
+    "@typescript-eslint/parser": "^4.1.0",
     "codecov": "^3.7.2",
     "eslint": "^7.8.1",
     "eslint-config-prettier": "^6.11.0",
-    "eslint-config-typed-fp": "^0.8.0",
+    "eslint-config-typed-fp": "^0.9.0",
     "eslint-plugin-functional": "^3.0.2",
     "eslint-plugin-jest": "^24.0.0",
     "eslint-plugin-prettier": "^3.1.4",
@@ -30,9 +30,9 @@
     "typescript": "^4.0.2"
   },
   "dependencies": {
-    "@typescript-eslint/eslint-plugin": "^4.0.1",
-    "@typescript-eslint/experimental-utils": "^4.0.1",
-    "@typescript-eslint/parser": "^4.0.1",
+    "@typescript-eslint/eslint-plugin": "^4.1.0",
+    "@typescript-eslint/experimental-utils": "^4.1.0",
+    "@typescript-eslint/parser": "^4.1.0",
     "total-functions": "^3.0.0",
     "tsutils": "^3.17.1"
   },

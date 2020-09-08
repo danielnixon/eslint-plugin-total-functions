@@ -16,6 +16,11 @@ type MessageId =
   | "errorStringTSAsExpressionReadonlyToMutable"
   | "errorStringTSTypeAssertionReadonlyToMutable";
 
+type TypePairArray = ReadonlyArray<{
+  readonly destinationType: Type;
+  readonly sourceType: Type;
+}>;
+
 /**
  * An ESLint rule to ban unsafe assignment and declarations.
  */
@@ -53,10 +58,7 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
       sourceNode: Node,
       destinationType: Type,
       sourceType: Type,
-      seenTypes: ReadonlyArray<{
-        readonly destinationType: Type;
-        readonly sourceType: Type;
-      }>
+      seenTypes: TypePairArray
     ): boolean => {
       const destinationIndexInfo = checker.getIndexInfoOfType(
         destinationType,
@@ -101,10 +103,7 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
       destinationType: Type,
       sourceType: Type,
       checker: TypeChecker,
-      seenTypes: ReadonlyArray<{
-        readonly destinationType: Type;
-        readonly sourceType: Type;
-      }>
+      seenTypes: TypePairArray
     ): boolean => {
       const destinationNumberIndexType = destinationType.getNumberIndexType();
       const sourceNumberIndexType = sourceType.getNumberIndexType();
@@ -133,10 +132,7 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
       // eslint-disable-next-line @typescript-eslint/ban-types
       sourceProperty: Symbol,
       checker: TypeChecker,
-      seenTypes: ReadonlyArray<{
-        readonly destinationType: Type;
-        readonly sourceType: Type;
-      }>
+      seenTypes: TypePairArray
     ): boolean => {
       const destinationPropertyType = checker.getTypeOfSymbolAtLocation(
         destinationProperty,
@@ -163,10 +159,7 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
       destinationType: Type,
       sourceType: Type,
       checker: TypeChecker,
-      seenTypes: ReadonlyArray<{
-        readonly destinationType: Type;
-        readonly sourceType: Type;
-      }>
+      seenTypes: TypePairArray
     ): boolean => {
       return destinationType.getProperties().some((destinationProperty) => {
         const sourceProperty = sourceType.getProperty(destinationProperty.name);
@@ -193,7 +186,10 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
           return true;
         }
 
-        const nextSeenTypes = seenTypes.concat({ destinationType, sourceType });
+        const nextSeenTypes: TypePairArray = seenTypes.concat({
+          destinationType,
+          sourceType,
+        });
 
         return isUnsafePropertyAssignmentRec(
           destinationNode,
@@ -212,10 +208,7 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
       rawDestinationType: Type,
       rawSourceType: Type,
       checker: TypeChecker,
-      seenTypes: ReadonlyArray<{
-        readonly destinationType: Type;
-        readonly sourceType: Type;
-      }> = []
+      seenTypes: TypePairArray = []
     ): boolean => {
       const typePairs = assignableObjectPairs(
         rawDestinationType,
@@ -224,7 +217,10 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
       );
 
       return typePairs.some(({ sourceType, destinationType }) => {
-        const nextSeenTypes = seenTypes.concat({ destinationType, sourceType });
+        const nextSeenTypes: TypePairArray = seenTypes.concat({
+          destinationType,
+          sourceType,
+        });
 
         // TODO this needs to compare function return types for readonly -> mutable
         // This is an unsafe assignment if...
