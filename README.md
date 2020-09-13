@@ -27,6 +27,12 @@ npm install eslint-plugin-total-functions --save-dev
 
 ## Setup
 
+### Option 1
+
+Use [eslint-config-typed-fp](https://github.com/danielnixon/eslint-config-typed-fp) which includes this plugin among others.
+
+### Option 2
+
 1. Turn on TypeScript's [strict mode](https://www.typescriptlang.org/tsconfig#strict).
 2. Set up [ESLint + TypeScript](https://github.com/typescript-eslint/typescript-eslint/blob/master/docs/getting-started/linting/README.md).
 3. Turn on [eslint-plugin-functional](https://github.com/jonaskello/eslint-plugin-functional) (recommended). Its rules related to mutation and OO are more important than this plugin's rules and they'll help keep your types honest.
