@@ -687,9 +687,9 @@
   integrity sha512-3c+yGKvVP5Y9TYBEibGNR+kLtijnj7mYrXRg+WpFb2X9xm04g/DXYkfg4hmzJQosc9snFNUPkbYIhu+KAm6jJw==
 
 "@types/node@*":
-  version "14.10.1"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-14.10.1.tgz#cc323bad8e8a533d4822f45ce4e5326f36e42177"
-  integrity sha512-aYNbO+FZ/3KGeQCEkNhHFRIzBOUgc7QvcVNKXbfnhDkSfwUv91JsQQa10rDgKSTSLkXZ1UIyPe4FJJNVgw1xWQ==
+  version "14.10.2"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-14.10.2.tgz#9b47a2c8e4dabd4db73b57e750b24af689600514"
+  integrity sha512-IzMhbDYCpv26pC2wboJ4MMOa9GKtjplXfcAqrMeNJpUUwpM/2ATt2w1JPUXwS6spu856TvKZL2AOmeU2rAxskw==
 
 "@types/normalize-package-data@^2.4.0":
   version "2.4.0"
@@ -718,7 +718,7 @@
   dependencies:
     "@types/yargs-parser" "*"
 
-"@typescript-eslint/eslint-plugin@^4.0.1", "@typescript-eslint/eslint-plugin@^4.1.1":
+"@typescript-eslint/eslint-plugin@^4.1.1":
   version "4.1.1"
   resolved "https://registry.yarnpkg.com/@typescript-eslint/eslint-plugin/-/eslint-plugin-4.1.1.tgz#78d5b18e259b13c2f4ec41dd9105af269a161a75"
   integrity sha512-Hoxyt99EA9LMmqo/5PuWWPeWeB3mKyvibfJ1Hy5SfiUpjE8Nqp+5QNd9fOkzL66+fqvIWSIE+Ett16LGMzCGnQ==
@@ -754,7 +754,7 @@
     eslint-scope "^5.0.0"
     eslint-utils "^2.0.0"
 
-"@typescript-eslint/parser@^4.0.1", "@typescript-eslint/parser@^4.1.1":
+"@typescript-eslint/parser@^4.1.1":
   version "4.1.1"
   resolved "https://registry.yarnpkg.com/@typescript-eslint/parser/-/parser-4.1.1.tgz#324b4b35e314075adbc92bd8330cf3ef0c88cf3e"
   integrity sha512-NLIhmicpKGfJbdXyQBz9j48PA6hq6e+SDOoXy7Ak6bq1ebGqbgG+fR1UIDAuay6OjQdot69c/URu2uLlsP8GQQ==
@@ -1698,14 +1698,14 @@ eslint-plugin-sonarjs@^0.5.0:
   resolved "https://registry.yarnpkg.com/eslint-plugin-sonarjs/-/eslint-plugin-sonarjs-0.5.0.tgz#ce17b2daba65a874c2862213a9e38e8986ad7d7d"
   integrity sha512-XW5MnzlRjhXpIdbULC/qAdJYHWw3rRLws/DyawdlPU/IdVr9AmRK1r2LaCvabwKOAW2XYYSo3kDX58E4MrB7PQ==
 
-eslint-plugin-total-functions@^3.1.0:
-  version "3.1.0"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-total-functions/-/eslint-plugin-total-functions-3.1.0.tgz#194cd0927791c5737b4831470ebbc6a99a14e86f"
-  integrity sha512-70GQ3kh3lybwFr9+HFGQxdOZYYA9Ha6rjxUkF8hZXIVcX71a5m4gm3gZC8CFZnXPP3ZJWMAs2g04GRgu7fDFPA==
+eslint-plugin-total-functions@^3.3.0:
+  version "3.3.0"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-total-functions/-/eslint-plugin-total-functions-3.3.0.tgz#bdf859b87539a4441a4255679652401103fef20b"
+  integrity sha512-ujtc1qPR9hIR33ntpjEJStMQJ3EgYIlejPixmqVnx3Qkkq0A1qG8s+LQAoQegsmEYhFpRRpKN5yT8le3sVH4Ww==
   dependencies:
-    "@typescript-eslint/eslint-plugin" "^4.0.1"
-    "@typescript-eslint/experimental-utils" "^4.0.1"
-    "@typescript-eslint/parser" "^4.0.1"
+    "@typescript-eslint/eslint-plugin" "^4.1.1"
+    "@typescript-eslint/experimental-utils" "^4.1.1"
+    "@typescript-eslint/parser" "^4.1.1"
     total-functions "^3.0.0"
     tsutils "^3.17.1"
 
@@ -3747,10 +3747,10 @@ prettier-linter-helpers@^1.0.0:
   dependencies:
     fast-diff "^1.1.2"
 
-prettier@^2.1.1:
-  version "2.1.1"
-  resolved "https://registry.yarnpkg.com/prettier/-/prettier-2.1.1.tgz#d9485dd5e499daa6cb547023b87a6cf51bee37d6"
-  integrity sha512-9bY+5ZWCfqj3ghYBLxApy2zf6m+NJo5GzmLTpr9FsApsfjriNnS2dahWReHMi7qNPhhHl9SYHJs2cHZLgexNIw==
+prettier@^2.1.2:
+  version "2.1.2"
+  resolved "https://registry.yarnpkg.com/prettier/-/prettier-2.1.2.tgz#3050700dae2e4c8b67c4c3f666cdb8af405e1ce5"
+  integrity sha512-16c7K+x4qVlJg9rEbXl7HEGmQyZlG4R9AgP+oHKRMsMsuk8s+ATStlf1NpDqyBI1HpVyfjLOeMhH2LvuNvV5Vg==
 
 pretty-format@^25.2.1, pretty-format@^25.5.0:
   version "25.5.0"
