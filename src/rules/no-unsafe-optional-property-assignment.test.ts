@@ -41,5 +41,20 @@ ruleTester.run("no-unsafe-optional-property-assignment", rule, {
         },
       ],
     },
+    {
+      filename: "file.ts",
+      code: `
+        type Foo = { readonly foo: string };
+        type Bar = Foo & { readonly bar?: () => unknown };
+        const getFoo = (): Foo => ({ foo: "foo" });
+        const bar: Bar = getFoo();
+      `,
+      errors: [
+        {
+          messageId: "errorStringVariableDeclaration",
+          type: AST_NODE_TYPES.VariableDeclaration,
+        },
+      ],
+    },
   ],
 });
