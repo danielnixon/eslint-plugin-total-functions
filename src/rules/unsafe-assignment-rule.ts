@@ -8,7 +8,7 @@ import {
 } from "@typescript-eslint/experimental-utils";
 import { get } from "total-functions";
 import { Type, Symbol, IndexKind, Node } from "typescript";
-import { assignableObjectPairs, TypeChecker } from "./common";
+import { assignableObjectPairs, TypeChecker, TypePairArray } from "./common";
 
 export type MessageId =
   | "errorStringCallExpression"
@@ -17,11 +17,6 @@ export type MessageId =
   | "errorStringArrowFunctionExpression"
   | "errorStringTSAsExpression"
   | "errorStringTSTypeAssertion";
-
-export type TypePairArray = ReadonlyArray<{
-  readonly destinationType: Type;
-  readonly sourceType: Type;
-}>;
 
 export type Context = Readonly<RuleContext<MessageId, readonly []>>;
 

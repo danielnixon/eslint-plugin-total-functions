@@ -1,9 +1,14 @@
-import { isObjectType, unionTypeParts } from "tsutils";
+import { intersectionTypeParts, isObjectType, unionTypeParts } from "tsutils";
 import { Type, TypeChecker as RawTypeChecker } from "typescript";
 
 export type TypeChecker = RawTypeChecker & {
   readonly isTypeAssignableTo?: (type1: Type, type2: Type) => boolean;
 };
+
+export type TypePairArray = ReadonlyArray<{
+  readonly destinationType: Type;
+  readonly sourceType: Type;
+}>;
 
 /**
  * Throws away non-object types (string, number, boolean, etc) because we don't check those for readonly -> mutable assignment
@@ -13,10 +18,7 @@ export const assignableObjectPairs = (
   rawDestinationType: Type,
   rawSourceType: Type,
   checker: TypeChecker
-): ReadonlyArray<{
-  readonly destinationType: Type;
-  readonly sourceType: Type;
-}> => {
+): TypePairArray => {
   const isAssignableTo = checker.isTypeAssignableTo;
   // eslint-disable-next-line functional/no-conditional-statement
   if (isAssignableTo === undefined) {
@@ -25,11 +27,11 @@ export const assignableObjectPairs = (
 
   const destinationTypeParts: readonly Type[] = unionTypeParts(
     rawDestinationType
-  ).filter((t) => isObjectType(t));
+  ).filter((t) => intersectionTypeParts(t).every((itp) => isObjectType(itp)));
 
   const sourceTypeParts: readonly Type[] = unionTypeParts(
     rawSourceType
-  ).filter((t) => isObjectType(t));
+  ).filter((t) => intersectionTypeParts(t).every((itp) => isObjectType(itp)));
 
   return sourceTypeParts.flatMap((sourceTypePart) =>
     destinationTypeParts
