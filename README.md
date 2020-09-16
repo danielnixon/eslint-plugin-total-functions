@@ -164,7 +164,7 @@ The world is a very strange place when [strict mode](https://www.typescriptlang.
 
 ### total-functions/no-unsafe-optional-property-assignment
 
-Optional properties (those with a `?` after their name) interact badly with TypeScript's structural type system which can lead to unsoundness. Example:
+Optional properties (those with a `?` after their name) interact badly with TypeScript's structural type system in a way that can lead to unsoundness. Example:
 
 ```ts
 type Foo = { readonly foo: string };
