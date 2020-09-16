@@ -162,6 +162,27 @@ See also:
 
 The world is a very strange place when [strict mode](https://www.typescriptlang.org/tsconfig#strict) is disabled. This rule enforces strict mode.
 
+### total-functions/no-unsafe-optional-property-assignment
+
+Optional properties (those with a `?` after their name) interact badly with TypeScript's structural type system which can lead to unsoundness. Example:
+
+```ts
+type Foo = { readonly foo: string };
+type Bar = Foo & { readonly bar?: () => unknown };
+
+const thing = { foo: "foo", bar: "bar" };
+const foo: Foo = thing;
+const bar: Bar = foo;
+
+if (bar.bar !== undefined) {
+    bar.bar(); // explodes at runtime
+}
+```
+
+This rule bans assignment from one type to another, if:
+1. the destination type has an optional property, and
+2. the source type has no matching property (either optional or otherwise).
+
 # See Also
 * [TypeScript for Functional Programmers](https://www.typescriptlang.org/docs/handbook/typescript-in-5-minutes-func.html)
 * https://github.com/danielnixon/eslint-config-typed-fp
