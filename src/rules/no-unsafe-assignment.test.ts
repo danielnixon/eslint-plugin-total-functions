@@ -545,7 +545,7 @@ ruleTester.run("no-unsafe-assignment", rule, {
       `,
       errors: [
         {
-          messageId: "errorStringCallExpressionReadonlyToMutable",
+          messageId: "errorStringCallExpression",
           type: AST_NODE_TYPES.Identifier,
         },
       ],
@@ -565,7 +565,7 @@ ruleTester.run("no-unsafe-assignment", rule, {
       `,
       errors: [
         {
-          messageId: "errorStringCallExpressionReadonlyToMutable",
+          messageId: "errorStringCallExpression",
           type: AST_NODE_TYPES.Identifier,
         },
       ],
@@ -585,7 +585,7 @@ ruleTester.run("no-unsafe-assignment", rule, {
       `,
       errors: [
         {
-          messageId: "errorStringCallExpressionReadonlyToMutable",
+          messageId: "errorStringCallExpression",
           type: AST_NODE_TYPES.Identifier,
         },
       ],
@@ -608,7 +608,7 @@ ruleTester.run("no-unsafe-assignment", rule, {
       `,
       errors: [
         {
-          messageId: "errorStringCallExpressionReadonlyToMutable",
+          messageId: "errorStringCallExpression",
           type: AST_NODE_TYPES.Identifier,
         },
       ],
@@ -627,7 +627,7 @@ ruleTester.run("no-unsafe-assignment", rule, {
       `,
       errors: [
         {
-          messageId: "errorStringCallExpressionReadonlyToMutable",
+          messageId: "errorStringCallExpression",
           type: AST_NODE_TYPES.Identifier,
         },
       ],
@@ -648,7 +648,7 @@ ruleTester.run("no-unsafe-assignment", rule, {
       `,
       errors: [
         {
-          messageId: "errorStringCallExpressionReadonlyToMutable",
+          messageId: "errorStringCallExpression",
           type: AST_NODE_TYPES.ObjectExpression,
         },
       ],
@@ -671,7 +671,7 @@ ruleTester.run("no-unsafe-assignment", rule, {
       `,
       errors: [
         {
-          messageId: "errorStringCallExpressionReadonlyToMutable",
+          messageId: "errorStringCallExpression",
           type: AST_NODE_TYPES.Identifier,
         },
       ],
@@ -692,7 +692,7 @@ ruleTester.run("no-unsafe-assignment", rule, {
       `,
       errors: [
         {
-          messageId: "errorStringCallExpressionReadonlyToMutable",
+          messageId: "errorStringCallExpression",
           type: AST_NODE_TYPES.Identifier,
         },
       ],
@@ -712,7 +712,7 @@ ruleTester.run("no-unsafe-assignment", rule, {
       `,
       errors: [
         {
-          messageId: "errorStringCallExpressionReadonlyToMutable",
+          messageId: "errorStringCallExpression",
           type: AST_NODE_TYPES.Identifier,
         },
       ],
@@ -733,7 +733,7 @@ ruleTester.run("no-unsafe-assignment", rule, {
       `,
       errors: [
         {
-          messageId: "errorStringAssignmentExpressionReadonlyToMutable",
+          messageId: "errorStringAssignmentExpression",
           type: AST_NODE_TYPES.AssignmentExpression,
         },
       ],
@@ -751,7 +751,7 @@ ruleTester.run("no-unsafe-assignment", rule, {
       `,
       errors: [
         {
-          messageId: "errorStringAssignmentExpressionReadonlyToMutable",
+          messageId: "errorStringAssignmentExpression",
           type: AST_NODE_TYPES.AssignmentExpression,
         },
       ],
@@ -771,7 +771,7 @@ ruleTester.run("no-unsafe-assignment", rule, {
       `,
       errors: [
         {
-          messageId: "errorStringVariableDeclarationReadonlyToMutable",
+          messageId: "errorStringVariableDeclaration",
           type: AST_NODE_TYPES.VariableDeclaration,
         },
       ],
@@ -793,7 +793,7 @@ ruleTester.run("no-unsafe-assignment", rule, {
       `,
       errors: [
         {
-          messageId: "errorStringVariableDeclarationReadonlyToMutable",
+          messageId: "errorStringVariableDeclaration",
           type: AST_NODE_TYPES.VariableDeclaration,
         },
       ],
@@ -809,12 +809,12 @@ ruleTester.run("no-unsafe-assignment", rule, {
       `,
       errors: [
         {
-          messageId: "errorStringVariableDeclarationReadonlyToMutable",
+          messageId: "errorStringVariableDeclaration",
           type: AST_NODE_TYPES.VariableDeclaration,
         },
       ],
     },
-    // readonly (index signature) -> mutable (index signature) (recursive types)
+    // readonly (string index signature) -> mutable (string index signature) (recursive types)
     {
       filename: "file.ts",
       code: `
@@ -829,7 +829,27 @@ ruleTester.run("no-unsafe-assignment", rule, {
       `,
       errors: [
         {
-          messageId: "errorStringVariableDeclarationReadonlyToMutable",
+          messageId: "errorStringVariableDeclaration",
+          type: AST_NODE_TYPES.VariableDeclaration,
+        },
+      ],
+    },
+    // readonly (number index signature) -> mutable (number index signature) (recursive types)
+    {
+      filename: "file.ts",
+      code: `
+        type MutableA = {
+          [P in number]: MutableA;
+        };
+        type ReadonlyA = {
+          readonly [P in number]: ReadonlyA;
+        };
+        const readonlyA: ReadonlyA = {};
+        const mutableA: MutableA = readonlyA;
+      `,
+      errors: [
+        {
+          messageId: "errorStringVariableDeclaration",
           type: AST_NODE_TYPES.VariableDeclaration,
         },
       ],
@@ -846,7 +866,7 @@ ruleTester.run("no-unsafe-assignment", rule, {
       `,
       errors: [
         {
-          messageId: "errorStringVariableDeclarationReadonlyToMutable",
+          messageId: "errorStringVariableDeclaration",
           type: AST_NODE_TYPES.VariableDeclaration,
         },
       ],
@@ -865,7 +885,7 @@ ruleTester.run("no-unsafe-assignment", rule, {
       `,
       errors: [
         {
-          messageId: "errorStringArrowFunctionExpressionReadonlyToMutable",
+          messageId: "errorStringArrowFunctionExpression",
           type: AST_NODE_TYPES.Identifier,
         },
       ],
@@ -884,7 +904,7 @@ ruleTester.run("no-unsafe-assignment", rule, {
       `,
       errors: [
         {
-          messageId: "errorStringTSAsExpressionReadonlyToMutable",
+          messageId: "errorStringTSAsExpression",
           type: AST_NODE_TYPES.TSAsExpression,
         },
       ],
@@ -900,7 +920,7 @@ ruleTester.run("no-unsafe-assignment", rule, {
       `,
       errors: [
         {
-          messageId: "errorStringTSTypeAssertionReadonlyToMutable",
+          messageId: "errorStringTSTypeAssertion",
           type: AST_NODE_TYPES.TSTypeAssertion,
         },
       ],
@@ -922,7 +942,7 @@ ruleTester.run("no-unsafe-assignment", rule, {
       `,
       errors: [
         {
-          messageId: "errorStringArrowFunctionExpressionReadonlyToMutable",
+          messageId: "errorStringArrowFunctionExpression",
           type: AST_NODE_TYPES.ReturnStatement,
         },
       ],
@@ -940,7 +960,7 @@ ruleTester.run("no-unsafe-assignment", rule, {
       `,
       errors: [
         {
-          messageId: "errorStringArrowFunctionExpressionReadonlyToMutable",
+          messageId: "errorStringArrowFunctionExpression",
           type: AST_NODE_TYPES.ReturnStatement,
         },
       ],

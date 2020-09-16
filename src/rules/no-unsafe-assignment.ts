@@ -9,12 +9,12 @@ import { Type, Symbol, IndexKind, Node } from "typescript";
 import { assignableObjectPairs, TypeChecker } from "./common";
 
 type MessageId =
-  | "errorStringCallExpressionReadonlyToMutable"
-  | "errorStringAssignmentExpressionReadonlyToMutable"
-  | "errorStringVariableDeclarationReadonlyToMutable"
-  | "errorStringArrowFunctionExpressionReadonlyToMutable"
-  | "errorStringTSAsExpressionReadonlyToMutable"
-  | "errorStringTSTypeAssertionReadonlyToMutable";
+  | "errorStringCallExpression"
+  | "errorStringAssignmentExpression"
+  | "errorStringVariableDeclaration"
+  | "errorStringArrowFunctionExpression"
+  | "errorStringTSAsExpression"
+  | "errorStringTSTypeAssertion";
 
 type TypePairArray = ReadonlyArray<{
   readonly destinationType: Type;
@@ -34,17 +34,17 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
       url: "https://github.com/danielnixon/eslint-plugin-total-functions",
     },
     messages: {
-      errorStringCallExpressionReadonlyToMutable:
+      errorStringCallExpression:
         "Passing a readonly type to a function that expects a mutable type can lead to unexpected mutation in the readonly value.",
-      errorStringAssignmentExpressionReadonlyToMutable:
+      errorStringAssignmentExpression:
         "Assigning a readonly type to a mutable type can lead to unexpected mutation in the readonly value.",
-      errorStringVariableDeclarationReadonlyToMutable:
+      errorStringVariableDeclaration:
         "Using a readonly type to initialize a mutable type can lead to unexpected mutation in the readonly value.",
-      errorStringArrowFunctionExpressionReadonlyToMutable:
+      errorStringArrowFunctionExpression:
         "Returning a readonly type from a function that returns a mutable type can lead to unexpected mutation in the readonly value.",
-      errorStringTSAsExpressionReadonlyToMutable:
+      errorStringTSAsExpression:
         "Asserting a readonly type to a mutable type can lead to unexpected mutation in the readonly value.",
-      errorStringTSTypeAssertionReadonlyToMutable:
+      errorStringTSTypeAssertion:
         "Asserting a readonly type to a mutable type can lead to unexpected mutation in the readonly value.",
     },
     schema: [],
@@ -53,51 +53,8 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
     const parserServices = ESLintUtils.getParserServices(context);
     const checker: TypeChecker = parserServices.program.getTypeChecker();
 
-    const isUnsafeStringIndexAssignment = (
-      destinationNode: Node,
-      sourceNode: Node,
-      destinationType: Type,
-      sourceType: Type,
-      seenTypes: TypePairArray
-    ): boolean => {
-      const destinationIndexInfo = checker.getIndexInfoOfType(
-        destinationType,
-        IndexKind.String
-      );
-      const destinationTypeHasReadonlyIndexSignature =
-        destinationIndexInfo !== undefined
-          ? destinationIndexInfo.isReadonly
-          : false;
-      const sourceIndexInfo = checker.getIndexInfoOfType(
-        sourceType,
-        IndexKind.String
-      );
-      const sourceTypeHasReadonlyIndexSignature =
-        sourceIndexInfo !== undefined ? sourceIndexInfo.isReadonly : false;
-
-      const destinationStringIndexType = destinationType.getStringIndexType();
-      const sourceStringIndexType = sourceType.getStringIndexType();
-
-      // This is unsafe if...
-      return (
-        // we're assigning from a readonly index signature to a mutable one, or
-        (sourceTypeHasReadonlyIndexSignature &&
-          !destinationTypeHasReadonlyIndexSignature) ||
-        // we're assigning from a readonly index type to a mutable one.
-        (destinationStringIndexType !== undefined &&
-          sourceStringIndexType !== undefined &&
-          isUnsafeAssignment(
-            destinationNode,
-            sourceNode,
-            destinationStringIndexType,
-            sourceStringIndexType,
-            checker,
-            seenTypes
-          ))
-      );
-    };
-
-    const isUnsafeNumberIndexAssignment = (
+    const isUnsafeIndexAssignment = (
+      indexKind: IndexKind,
       destinationNode: Node,
       sourceNode: Node,
       destinationType: Type,
@@ -105,22 +62,43 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
       checker: TypeChecker,
       seenTypes: TypePairArray
     ): boolean => {
-      const destinationNumberIndexType = destinationType.getNumberIndexType();
-      const sourceNumberIndexType = sourceType.getNumberIndexType();
+      const destinationIndexInfo = checker.getIndexInfoOfType(
+        destinationType,
+        indexKind
+      );
+      const destinationTypeHasReadonlyIndexSignature =
+        destinationIndexInfo !== undefined
+          ? destinationIndexInfo.isReadonly
+          : false;
+      const sourceIndexInfo = checker.getIndexInfoOfType(sourceType, indexKind);
+      const sourceTypeHasReadonlyIndexSignature =
+        sourceIndexInfo !== undefined ? sourceIndexInfo.isReadonly : false;
+
+      const destinationIndexType =
+        indexKind === IndexKind.Number
+          ? destinationType.getNumberIndexType()
+          : destinationType.getStringIndexType();
+      const sourceIndexType =
+        indexKind === IndexKind.Number
+          ? sourceType.getNumberIndexType()
+          : sourceType.getStringIndexType();
 
       // This is unsafe if...
       return (
+        // we're assigning from a readonly index signature to a mutable one, or
+        (sourceTypeHasReadonlyIndexSignature &&
+          !destinationTypeHasReadonlyIndexSignature) ||
         // we're assigning from a readonly index type to a mutable one.
-        destinationNumberIndexType !== undefined &&
-        sourceNumberIndexType !== undefined &&
-        isUnsafeAssignment(
-          destinationNode,
-          sourceNode,
-          destinationNumberIndexType,
-          sourceNumberIndexType,
-          checker,
-          seenTypes
-        )
+        (destinationIndexType !== undefined &&
+          sourceIndexType !== undefined &&
+          isUnsafeAssignment(
+            destinationNode,
+            sourceNode,
+            destinationIndexType,
+            sourceIndexType,
+            checker,
+            seenTypes
+          ))
       );
     };
 
@@ -237,15 +215,18 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
           destinationType !== sourceType &&
           // and we're either:
           // assigning from a type with readonly string index type to one with a mutable string index type, or
-          (isUnsafeStringIndexAssignment(
+          (isUnsafeIndexAssignment(
+            IndexKind.String,
             destinationNode,
             sourceNode,
             destinationType,
             sourceType,
+            checker,
             nextSeenTypes
           ) ||
             // assigning from a type with readonly number index type to one with a mutable number index type, or
-            isUnsafeNumberIndexAssignment(
+            isUnsafeIndexAssignment(
+              IndexKind.Number,
               destinationNode,
               sourceNode,
               destinationType,
@@ -297,7 +278,7 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
           // eslint-disable-next-line functional/no-expression-statement
           context.report({
             node: node,
-            messageId: "errorStringTSTypeAssertionReadonlyToMutable",
+            messageId: "errorStringTSTypeAssertion",
           });
         }
       },
@@ -331,7 +312,7 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
           // eslint-disable-next-line functional/no-expression-statement
           context.report({
             node: node,
-            messageId: "errorStringTSAsExpressionReadonlyToMutable",
+            messageId: "errorStringTSAsExpression",
           });
         }
       },
@@ -344,13 +325,13 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
             declaration.id.type === AST_NODE_TYPES.Identifier &&
             declaration.id.typeAnnotation === undefined
           ) {
-            // If there is no type annotation then there's no risk of assigning mutable to readonly.
+            // If there is no type annotation then there's no risk of unsafe assignment.
             return;
           }
 
           // eslint-disable-next-line functional/no-conditional-statement
           if (declaration.init === null) {
-            // If there is no initial value then there's no risk of assigning mutable to readonly.
+            // If there is no type annotation then there's no risk of unsafe assignment.
             return;
           }
 
@@ -377,7 +358,7 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
             // eslint-disable-next-line functional/no-expression-statement
             context.report({
               node: node,
-              messageId: "errorStringVariableDeclarationReadonlyToMutable",
+              messageId: "errorStringVariableDeclaration",
             });
           }
         });
@@ -405,7 +386,7 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
           // eslint-disable-next-line functional/no-expression-statement
           context.report({
             node: node,
-            messageId: "errorStringAssignmentExpressionReadonlyToMutable",
+            messageId: "errorStringAssignmentExpression",
           });
         }
       },
@@ -435,7 +416,7 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
           // eslint-disable-next-line functional/no-expression-statement
           context.report({
             node: node,
-            messageId: "errorStringArrowFunctionExpressionReadonlyToMutable",
+            messageId: "errorStringArrowFunctionExpression",
           });
         }
       },
@@ -466,7 +447,7 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
           // eslint-disable-next-line functional/no-expression-statement
           context.report({
             node: node.body,
-            messageId: "errorStringArrowFunctionExpressionReadonlyToMutable",
+            messageId: "errorStringArrowFunctionExpression",
           });
         }
       },
@@ -493,7 +474,7 @@ const noUnsafeAssignment: RuleModule<MessageId, readonly []> = {
             // eslint-disable-next-line functional/no-expression-statement
             context.report({
               node: get(node.arguments, i) ?? node,
-              messageId: "errorStringCallExpressionReadonlyToMutable",
+              messageId: "errorStringCallExpression",
             });
           }
         });
