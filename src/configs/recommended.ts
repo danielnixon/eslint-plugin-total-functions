@@ -5,7 +5,7 @@ export = {
     "total-functions/no-unsafe-destructuring": "error",
     "total-functions/no-unsafe-type-assertion": "error",
     "total-functions/no-unsafe-assignment": "error",
-    "total-functions/no-unsafe-optional-property-assignment": "error",
+    // "total-functions/no-unsafe-optional-property-assignment": "error",
     "total-functions/require-strict-mode": "error",
   },
 };
