@@ -60,13 +60,14 @@ Alternatively you can configure individual rules separately (see below).
 
 ## Rules
 
-| Rule                      | Recommended  | All          | Fixer? |
-| :------------------------ | :----------: | -----------: | -----: |
-|  no-unsafe-subscript      | ✅           | ✅           |        |
-|  no-unsafe-destructuring  | ✅           | ✅           |        |
-|  no-unsafe-type-assertion | ✅           | ✅           |        |
-|  no-unsafe-assignment     | ✅           | ✅           |        |
-|  require-strict-mode      | ✅           | ✅           |        |
+| Rule                                    | Recommended  | All   | Fixer? |
+| :-------------------------------------: | :----------: | :---: | :----: |
+|  no-unsafe-subscript                    | ✅           | ✅    |        |
+|  no-unsafe-destructuring                | ✅           | ✅    |        |
+|  no-unsafe-type-assertion               | ✅           | ✅    |        |
+|  no-unsafe-assignment                   | ✅           | ✅    |        |
+|  require-strict-mode                    | ✅           | ✅    |        |
+|  no-unsafe-optional-property-assignment |              | ✅    |        |
 
 ### total-functions/no-unsafe-subscript
 
