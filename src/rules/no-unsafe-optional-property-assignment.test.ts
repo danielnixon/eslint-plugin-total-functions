@@ -46,8 +46,9 @@ ruleTester.run("no-unsafe-optional-property-assignment", rule, {
       code: `
         type Foo = { readonly foo: string };
         type Bar = Foo & { readonly bar?: () => unknown };
-        const getFoo = (): Foo => ({ foo: "foo" });
-        const bar: Bar = getFoo();
+        const thing = { foo: "foo", bar: "bar" };
+        const foo: Foo = thing;
+        const bar: Bar = foo;
       `,
       errors: [
         {
