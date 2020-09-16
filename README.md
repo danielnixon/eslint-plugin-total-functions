@@ -67,7 +67,7 @@ Alternatively you can configure individual rules separately (see below).
 |  no-unsafe-type-assertion               | ✅           | ✅    |        |
 |  no-unsafe-assignment                   | ✅           | ✅    |        |
 |  require-strict-mode                    | ✅           | ✅    |        |
-|  no-unsafe-optional-property-assignment |              | ✅    |        |
+|  no-unsafe-optional-property-assignment | [Not yet](https://github.com/danielnixon/eslint-plugin-total-functions/issues/83) | ✅    |        |
 
 ### total-functions/no-unsafe-subscript
 
