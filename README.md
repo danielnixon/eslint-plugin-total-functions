@@ -179,9 +179,13 @@ if (bar.bar !== undefined) {
 }
 ```
 
+I find this scenario particularly vexing because it doesn't require type assertions, or plain JS with incorrect \*.d.ts typings, or anything 'loose' like that. You can pull it off with otherwise nicely typed, functional TypeScript (strict mode enabled, no interfaces, no classes, everything readonly, everything const, no type assertions, no plain JS, etc).
+
 This rule bans assignment from one type to another, if:
 1. the destination type has an optional property, and
 2. the source type has no matching property (either optional or otherwise).
+
+This rule is excluded from the `recommended` config until [#83](https://github.com/danielnixon/eslint-plugin-total-functions/issues/83) lands.
 
 # See Also
 * [TypeScript for Functional Programmers](https://www.typescriptlang.org/docs/handbook/typescript-in-5-minutes-func.html)
