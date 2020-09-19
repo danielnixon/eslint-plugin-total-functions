@@ -38,7 +38,32 @@ nonStrictRuleTester.run("require-strict-mode", rule, {
       code: "const foo = 'foo';",
       errors: [
         {
-          messageId: "errorStringGeneric",
+          messageId: "errorStringStrictMode",
+          type: AST_NODE_TYPES.Program,
+        },
+      ],
+    },
+  ],
+});
+
+const nonNoUncheckedIndexedAccessRuleTester = new RuleTester({
+  parserOptions: {
+    sourceType: "module",
+    project: "./tsconfig.tests.non-noUncheckedIndexedAccess.json",
+  },
+  parser: require.resolve("@typescript-eslint/parser"),
+});
+
+// eslint-disable-next-line functional/no-expression-statement
+nonNoUncheckedIndexedAccessRuleTester.run("require-strict-mode", rule, {
+  valid: [],
+  invalid: [
+    {
+      filename: "file.ts",
+      code: "const foo = 'foo';",
+      errors: [
+        {
+          messageId: "errorStringNoUncheckedIndexedAccess",
           type: AST_NODE_TYPES.Program,
         },
       ],
