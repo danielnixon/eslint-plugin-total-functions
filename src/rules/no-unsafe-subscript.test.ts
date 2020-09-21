@@ -5,7 +5,7 @@ import { AST_NODE_TYPES } from "@typescript-eslint/experimental-utils/dist/ts-es
 const ruleTester = new RuleTester({
   parserOptions: {
     sourceType: "module",
-    project: "./tsconfig.tests.json",
+    project: "./tsconfig.tests.non-noUncheckedIndexedAccess.json",
   },
   parser: require.resolve("@typescript-eslint/parser"),
 });
@@ -185,7 +185,6 @@ ruleTester.run("no-unsafe-subscript", rule, {
   ],
   invalid: [
     // Partial tuple property access with non-literal (but const) key (within range of tuple portion).
-    // TODO this should be valid?
     {
       filename: "file.ts",
       code:
@@ -397,4 +396,23 @@ ruleTester.run("no-unsafe-subscript", rule, {
       ],
     },
   ],
+});
+
+const noUncheckedIndexedAccessRuleTester = new RuleTester({
+  parserOptions: {
+    sourceType: "module",
+    project: "./tsconfig.tests.json",
+  },
+  parser: require.resolve("@typescript-eslint/parser"),
+});
+
+// eslint-disable-next-line functional/no-expression-statement
+noUncheckedIndexedAccessRuleTester.run("no-unsafe-subscript", rule, {
+  valid: [
+    {
+      filename: "file.ts",
+      code: "const arr = [0, 1, 2] as number[]; const foo = arr[0];",
+    },
+  ],
+  invalid: [],
 });

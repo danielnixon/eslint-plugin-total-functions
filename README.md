@@ -15,6 +15,13 @@
 
 An ESLint plugin to enforce the use of total functions (and prevent the use of [partial functions](https://wiki.haskell.org/Partial_functions)) in TypeScript. If you like your types to tell the truth, this is the ESLint plugin for you.
 
+## Version Matrix
+
+| TypeScript       | ESLint  | eslint-plugin-total-functions |
+| :--------------: | :-----: |  :--------------------------: |
+|  4.1.0-beta      | 7.9.0   | 4.0.0                         |
+|  4.0.2           | 7.9.0   | 3.3.0                         |
+
 ## Installation
 
 ```sh
@@ -33,7 +40,7 @@ Use [eslint-config-typed-fp](https://github.com/danielnixon/eslint-config-typed-
 
 ### Option 2
 
-1. Turn on TypeScript's [strict mode](https://www.typescriptlang.org/tsconfig#strict).
+1. Turn on TypeScript's [strict mode](https://www.typescriptlang.org/tsconfig#strict) and [noUncheckedIndexedAccess](https://devblogs.microsoft.com/typescript/announcing-typescript-4-1-beta/#no-unchecked-indexed-access) option.
 2. Set up [ESLint + TypeScript](https://github.com/typescript-eslint/typescript-eslint/blob/master/docs/getting-started/linting/README.md).
 3. Turn on [eslint-plugin-functional](https://github.com/jonaskello/eslint-plugin-functional) (recommended). Its rules related to mutation and OO are more important than this plugin's rules and they'll help keep your types honest.
 4. Update your `.eslintrc.js`:
@@ -62,8 +69,8 @@ Alternatively you can configure individual rules separately (see below).
 
 | Rule                                    | Recommended  | All   | Fixer? |
 | :-------------------------------------: | :----------: | :---: | :----: |
-|  no-unsafe-subscript                    | ✅           | ✅    |        |
-|  no-unsafe-destructuring                | ✅           | ✅    |        |
+|  no-unsafe-subscript                    | Deprecated   | ✅    |        |
+|  no-unsafe-destructuring                | Deprecated   | ✅    |        |
 |  no-unsafe-type-assertion               | ✅           | ✅    |        |
 |  no-unsafe-assignment                   | ✅           | ✅    |        |
 |  require-strict-mode                    | ✅           | ✅    |        |
@@ -71,7 +78,7 @@ Alternatively you can configure individual rules separately (see below).
 
 ### total-functions/no-unsafe-subscript
 
-Bans unsafe array and object member access, for example:
+Prior to TypeScript 4.1's [noUncheckedIndexedAccess](https://devblogs.microsoft.com/typescript/announcing-typescript-4-1-beta/#no-unchecked-indexed-access) option, member access for arrays and records was not type safe. For example:
 
 ```typescript
 const a: string[] = [];
@@ -90,17 +97,13 @@ const s = str[0]; // s has type string, not string | undefined
 s.toUpperCase(); // This explodes at runtime
 ```
 
-See [TypeScript issue #13778](https://github.com/Microsoft/TypeScript/issues/13778) for the corresponding issue and [total-functions](https://github.com/danielnixon/total-functions#get-type-safe-array-index-operator) for a safe (total) alternative.
-
-Tuples and non-record objects (no index signature) are allowed. Records are allowed if their value type includes `undefined`.
-
-There are other ways to avoid this issue, such as [fp-ts's lookup](https://gcanti.github.io/fp-ts/modules/Array.ts.html#lookup), but the `get` function from total-functions is smart enough to exclude `undefined` when dealing with tuples and objects.
+This rule bans unsafe member access. Only use this rule if you are stuck on Typescript < 4.1. This rule is deprecated and excluded from the `recommended` config. It may be removed in the future.
 
 For examples of member access that this rule considers valid and invalid, see [no-unsafe-subscript.test.ts](https://github.com/danielnixon/eslint-plugin-total-functions/blob/master/src/rules/no-unsafe-subscript.test.ts).
 
 ### total-functions/no-unsafe-destructuring
 
-Bans unsafe array and object destructuring, for example:
+Prior to TypeScript 4.1's [noUncheckedIndexedAccess](https://devblogs.microsoft.com/typescript/announcing-typescript-4-1-beta/#no-unchecked-indexed-access) option, destructuring arrays and records was not type safe. For example:
 
 ```typescript
 const array: readonly string[] = [];
@@ -116,7 +119,7 @@ const [bar] = str; // bar has type string, not string | undefined
 bar.toUpperCase(); // This explodes at runtime
 ```
 
-Destructuring tuples is allowed, as long as you're within the length of the tuple.
+This rule bans unsafe destructuring. Only use this rule if you are stuck on Typescript < 4.1. This rule is deprecated and excluded from the `recommended` config. It may be removed in the future.
 
 For examples of destructuring that this rule considers valid and invalid, see [no-unsafe-destructuring.test.ts](https://github.com/danielnixon/eslint-plugin-total-functions/blob/master/src/rules/no-unsafe-destructuring.test.ts).
 
@@ -160,7 +163,7 @@ See also:
 
 ### total-functions/require-strict-mode
 
-The world is a very strange place when [strict mode](https://www.typescriptlang.org/tsconfig#strict) is disabled. This rule enforces strict mode.
+The world is a very strange place when [strict mode](https://www.typescriptlang.org/tsconfig#strict) is disabled. This rule enforces strict mode and [noUncheckedIndexedAccess](https://devblogs.microsoft.com/typescript/announcing-typescript-4-1-beta/#no-unchecked-indexed-access) mode (which is sadly not included under the strict umbrella).
 
 ### total-functions/no-unsafe-optional-property-assignment
 

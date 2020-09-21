@@ -4,7 +4,10 @@ import { ESLintUtils } from "@typescript-eslint/experimental-utils";
 /**
  * An ESLint rule to enforce TypeScript strict mode.
  */
-const requireStrictMode: RuleModule<"errorStringGeneric", readonly []> = {
+const requireStrictMode: RuleModule<
+  "errorStringStrictMode" | "errorStringNoUncheckedIndexedAccess",
+  readonly []
+> = {
   meta: {
     type: "problem",
     docs: {
@@ -14,21 +17,33 @@ const requireStrictMode: RuleModule<"errorStringGeneric", readonly []> = {
       url: "https://github.com/danielnixon/eslint-plugin-total-functions",
     },
     messages: {
-      errorStringGeneric: "TypeScript's strict mode is required.",
+      errorStringStrictMode: "TypeScript's strict mode is required.",
+      errorStringNoUncheckedIndexedAccess:
+        "TypeScript's noUncheckedIndexedAccess mode is required.",
     },
     schema: [],
   },
   create: (context) => {
     const parserServices = ESLintUtils.getParserServices(context);
+    const options = parserServices.program.getCompilerOptions();
 
     return {
       Program: (node) => {
         // eslint-disable-next-line functional/no-conditional-statement
-        if (parserServices.program.getCompilerOptions().strict !== true) {
+        if (options.strict !== true) {
           // eslint-disable-next-line functional/no-expression-statement
           context.report({
             node: node,
-            messageId: "errorStringGeneric",
+            messageId: "errorStringStrictMode",
+          });
+        }
+
+        // eslint-disable-next-line functional/no-conditional-statement
+        if (options.noUncheckedIndexedAccess !== true) {
+          // eslint-disable-next-line functional/no-expression-statement
+          context.report({
+            node: node,
+            messageId: "errorStringNoUncheckedIndexedAccess",
           });
         }
       },
