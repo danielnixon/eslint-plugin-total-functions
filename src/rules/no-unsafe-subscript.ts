@@ -26,9 +26,19 @@ const noUnsafeSubscript: RuleModule<"errorStringGeneric", readonly []> = {
     },
     schema: [],
   },
+  // eslint-disable-next-line sonarjs/cognitive-complexity
   create: (context) => {
-    // eslint-disable-next-line total-functions/no-unsafe-assignment
     const parserServices = ESLintUtils.getParserServices(context);
+
+    // eslint-disable-next-line functional/no-conditional-statement
+    if (
+      parserServices.program.getCompilerOptions().noUncheckedIndexedAccess ===
+      true
+    ) {
+      // We don't need this rule if noUncheckedIndexedAccess is on.
+      return {};
+    }
+
     const checker = parserServices.program.getTypeChecker();
 
     const reportUnsafeSubscriptAccess = (
