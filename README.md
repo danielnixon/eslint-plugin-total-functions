@@ -90,7 +90,7 @@ const s = str[0]; // s has type string, not string | undefined
 s.toUpperCase(); // This explodes at runtime
 ```
 
-This rule bans unsafe member access. Only use this rule if you are stuck on Typescript < 4.1.
+This rule bans unsafe member access. Only use this rule if you are stuck on Typescript < 4.1. This rule is deprecated and excluded from the `recommended` config. It may be removed in the future.
 
 For examples of member access that this rule considers valid and invalid, see [no-unsafe-subscript.test.ts](https://github.com/danielnixon/eslint-plugin-total-functions/blob/master/src/rules/no-unsafe-subscript.test.ts).
 
@@ -112,7 +112,7 @@ const [bar] = str; // bar has type string, not string | undefined
 bar.toUpperCase(); // This explodes at runtime
 ```
 
-This rule bans unsafe destructuring. Only use this rule if you are stuck on Typescript < 4.1.
+This rule bans unsafe destructuring. Only use this rule if you are stuck on Typescript < 4.1. This rule is deprecated and excluded from the `recommended` config. It may be removed in the future.
 
 For examples of destructuring that this rule considers valid and invalid, see [no-unsafe-destructuring.test.ts](https://github.com/danielnixon/eslint-plugin-total-functions/blob/master/src/rules/no-unsafe-destructuring.test.ts).
 
