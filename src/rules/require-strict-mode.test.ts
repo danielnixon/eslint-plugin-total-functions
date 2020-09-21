@@ -2,32 +2,31 @@ import rule from "./require-strict-mode";
 import { RuleTester } from "@typescript-eslint/experimental-utils/dist/ts-eslint";
 import { AST_NODE_TYPES } from "@typescript-eslint/experimental-utils";
 
-const strictRuleTester = new RuleTester({
-  parserOptions: {
-    sourceType: "module",
-    project: "./tsconfig.tests.json",
-  },
-  parser: require.resolve("@typescript-eslint/parser"),
-});
+const ruleTesterForTSConfig = (config: string): RuleTester =>
+  new RuleTester({
+    parserOptions: {
+      sourceType: "module",
+      project: config,
+    },
+    parser: require.resolve("@typescript-eslint/parser"),
+  });
 
-// eslint-disable-next-line functional/no-expression-statement
+const strictRuleTester = ruleTesterForTSConfig("./tsconfig.tests.json");
+
+// eslint-disable-next-line functional/no-expression-statement, sonarjs/no-duplicate-string
 strictRuleTester.run("require-strict-mode", rule, {
   valid: [
     {
       filename: "file.ts",
-      code: "const foo = 'foo';",
+      code: "",
     },
   ],
   invalid: [],
 });
 
-const nonStrictRuleTester = new RuleTester({
-  parserOptions: {
-    sourceType: "module",
-    project: "./tsconfig.tests.non-strict.json",
-  },
-  parser: require.resolve("@typescript-eslint/parser"),
-});
+const nonStrictRuleTester = ruleTesterForTSConfig(
+  "./tsconfig.tests.non-strict.json"
+);
 
 // eslint-disable-next-line functional/no-expression-statement
 nonStrictRuleTester.run("require-strict-mode", rule, {
@@ -35,7 +34,7 @@ nonStrictRuleTester.run("require-strict-mode", rule, {
   invalid: [
     {
       filename: "file.ts",
-      code: "const foo = 'foo';",
+      code: "",
       errors: [
         {
           messageId: "errorStringStrictMode",
@@ -46,13 +45,9 @@ nonStrictRuleTester.run("require-strict-mode", rule, {
   ],
 });
 
-const nonNoUncheckedIndexedAccessRuleTester = new RuleTester({
-  parserOptions: {
-    sourceType: "module",
-    project: "./tsconfig.tests.non-noUncheckedIndexedAccess.json",
-  },
-  parser: require.resolve("@typescript-eslint/parser"),
-});
+const nonNoUncheckedIndexedAccessRuleTester = ruleTesterForTSConfig(
+  "./tsconfig.tests.non-noUncheckedIndexedAccess.json"
+);
 
 // eslint-disable-next-line functional/no-expression-statement
 nonNoUncheckedIndexedAccessRuleTester.run("require-strict-mode", rule, {
@@ -60,7 +55,7 @@ nonNoUncheckedIndexedAccessRuleTester.run("require-strict-mode", rule, {
   invalid: [
     {
       filename: "file.ts",
-      code: "const foo = 'foo';",
+      code: "",
       errors: [
         {
           messageId: "errorStringNoUncheckedIndexedAccess",
