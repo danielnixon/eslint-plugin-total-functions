@@ -1,4 +1,4 @@
-import rule from "./no-unsafe-assignment";
+import rule from "./no-unsafe-readonly-mutable-assignment";
 import { RuleTester } from "@typescript-eslint/experimental-utils/dist/ts-eslint";
 import { AST_NODE_TYPES } from "@typescript-eslint/experimental-utils/dist/ts-estree";
 
@@ -11,7 +11,7 @@ const ruleTester = new RuleTester({
 });
 
 // eslint-disable-next-line functional/no-expression-statement
-ruleTester.run("no-unsafe-assignment", rule, {
+ruleTester.run("no-unsafe-readonly-mutable-assignment", rule, {
   valid: [
     /**
      * Call expressions

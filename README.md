@@ -69,12 +69,80 @@ Alternatively you can configure individual rules separately (see below).
 
 | Rule                                    | Recommended  | All   | Fixer? |
 | :-------------------------------------: | :----------: | :---: | :----: |
+|  require-strict-mode                    | ✅           | ✅    |        |
+|  no-unsafe-type-assertion               | ✅           | ✅    |        |
+|  no-unsafe-readonly-mutable-assignment  | ✅           | ✅    |        |
+|  no-unsafe-optional-property-assignment | [Not yet](https://github.com/danielnixon/eslint-plugin-total-functions/issues/83) | ✅    |        |
 |  no-unsafe-subscript                    | Deprecated   | ✅    |        |
 |  no-unsafe-destructuring                | Deprecated   | ✅    |        |
-|  no-unsafe-type-assertion               | ✅           | ✅    |        |
-|  no-unsafe-assignment                   | ✅           | ✅    |        |
-|  require-strict-mode                    | ✅           | ✅    |        |
-|  no-unsafe-optional-property-assignment | [Not yet](https://github.com/danielnixon/eslint-plugin-total-functions/issues/83) | ✅    |        |
+
+### total-functions/require-strict-mode
+
+The world is a very strange place when [strict mode](https://www.typescriptlang.org/tsconfig#strict) is disabled. This rule enforces strict mode and [noUncheckedIndexedAccess](https://devblogs.microsoft.com/typescript/announcing-typescript-4-1-beta/#no-unchecked-indexed-access) mode (which is sadly not included under the strict umbrella).
+
+### total-functions/no-unsafe-type-assertion
+
+Bans unsafe type assertions, for example:
+
+```typescript
+type Foo = { readonly bar: number };
+const foo = {} as Foo; // This compiles
+foo.bar.toString(); // This explodes at runtime
+```
+
+This is similar to the [consistent-type-assertions](https://github.com/typescript-eslint/typescript-eslint/blob/master/packages/eslint-plugin/docs/rules/consistent-type-assertions.md) rule from [typescript-eslint](https://github.com/typescript-eslint/typescript-eslint/tree/master/packages/eslint-plugin), however:
+
+1. this rule is _weaker_ than `consistent-type-assertions` with its `assertionStyle` option set to `never` -- this rule will permit type assertions that it considers safe as opposed to blanket banning all type assertions, and
+2. this rule is _stronger_ than `consistent-type-assertions` with its `objectLiteralTypeAssertions` option set to `never`, for example:
+
+```typescript
+type Foo = { readonly bar: number };
+const foo = {};
+const foo2 = foo as Foo; // Flagged by this rule, but not by consistent-type-assertions (unless you set assertionStyle to never)
+foo2.bar.toString(); // This explodes at runtime
+```
+
+For examples of type assertions that this rule considers valid and invalid, see [no-unsafe-type-assertion.test.ts](https://github.com/danielnixon/eslint-plugin-total-functions/blob/master/src/rules/no-unsafe-type-assertion.test.ts).
+
+See [TypeScript issue #7481](https://github.com/microsoft/TypeScript/issues/7481) for a request to fix this at the language level.
+
+### total-functions/no-unsafe-readonly-mutable-assignment
+
+Bans unsafe assignment of readonly values to mutable values (which can lead to surprising mutation in the readonly value). This includes passing readonly values as arguments to functions that expect mutable parameters.
+
+For examples of assignment that this rule considers valid and invalid, see [no-unsafe-assignment.test.ts](https://github.com/danielnixon/eslint-plugin-total-functions/blob/master/src/rules/no-unsafe-assignment.test.ts).
+
+See [TypeScript issue #13347](https://github.com/microsoft/TypeScript/issues/13347) for a request to fix this at the language level.
+
+See also:
+* https://github.com/danielnixon/eslint-plugin-total-functions/issues/21
+* https://github.com/jonaskello/eslint-plugin-functional/issues/113
+
+### total-functions/no-unsafe-optional-property-assignment
+
+Optional properties (those with a `?` after their name) interact badly with TypeScript's structural type system in a way that can lead to unsoundness. Example:
+
+```ts
+type Foo = { readonly foo: string };
+type Bar = Foo & { readonly bar?: () => unknown };
+
+const thing = { foo: "foo", bar: "bar" };
+const foo: Foo = thing;
+const bar: Bar = foo;
+
+if (bar.bar !== undefined) {
+    bar.bar(); // explodes at runtime
+}
+```
+
+I find this scenario particularly vexing because it doesn't require type assertions, or plain JS with incorrect \*.d.ts typings, or anything 'loose' like that. You can pull it off with otherwise nicely typed, functional TypeScript (strict mode enabled, no interfaces, no classes, everything readonly, everything const, no type assertions, no plain JS, etc).
+
+This rule bans assignment from one type to another, if:
+1. the destination type has an optional property, and
+2. the source type has no matching property (either optional or otherwise).
+
+This rule is excluded from the `recommended` config until [#83](https://github.com/danielnixon/eslint-plugin-total-functions/issues/83) lands.
+
 
 ### total-functions/no-unsafe-subscript
 
@@ -122,73 +190,6 @@ bar.toUpperCase(); // This explodes at runtime
 This rule bans unsafe destructuring. Only use this rule if you are stuck on Typescript < 4.1. This rule is deprecated and excluded from the `recommended` config. It may be removed in the future.
 
 For examples of destructuring that this rule considers valid and invalid, see [no-unsafe-destructuring.test.ts](https://github.com/danielnixon/eslint-plugin-total-functions/blob/master/src/rules/no-unsafe-destructuring.test.ts).
-
-### total-functions/no-unsafe-type-assertion
-
-Bans unsafe type assertions, for example:
-
-```typescript
-type Foo = { readonly bar: number };
-const foo = {} as Foo; // This compiles
-foo.bar.toString(); // This explodes at runtime
-```
-
-This is similar to the [consistent-type-assertions](https://github.com/typescript-eslint/typescript-eslint/blob/master/packages/eslint-plugin/docs/rules/consistent-type-assertions.md) rule from [typescript-eslint](https://github.com/typescript-eslint/typescript-eslint/tree/master/packages/eslint-plugin), however:
-
-1. this rule is _weaker_ than `consistent-type-assertions` with its `assertionStyle` option set to `never` -- this rule will permit type assertions that it considers safe as opposed to blanket banning all type assertions, and
-2. this rule is _stronger_ than `consistent-type-assertions` with its `objectLiteralTypeAssertions` option set to `never`, for example:
-
-```typescript
-type Foo = { readonly bar: number };
-const foo = {};
-const foo2 = foo as Foo; // Flagged by this rule, but not by consistent-type-assertions (unless you set assertionStyle to never)
-foo2.bar.toString(); // This explodes at runtime
-```
-
-For examples of type assertions that this rule considers valid and invalid, see [no-unsafe-type-assertion.test.ts](https://github.com/danielnixon/eslint-plugin-total-functions/blob/master/src/rules/no-unsafe-type-assertion.test.ts).
-
-See [TypeScript issue #7481](https://github.com/microsoft/TypeScript/issues/7481) for a request to fix this at the language level.
-
-### total-functions/no-unsafe-assignment
-
-Bans unsafe assignment of readonly values to mutable values (which can lead to surprising mutation in the readonly value). This includes passing readonly values as arguments to functions that expect mutable parameters.
-
-For examples of assignment that this rule considers valid and invalid, see [no-unsafe-assignment.test.ts](https://github.com/danielnixon/eslint-plugin-total-functions/blob/master/src/rules/no-unsafe-assignment.test.ts).
-
-See [TypeScript issue #13347](https://github.com/microsoft/TypeScript/issues/13347) for a request to fix this at the language level.
-
-See also:
-* https://github.com/danielnixon/eslint-plugin-total-functions/issues/21
-* https://github.com/jonaskello/eslint-plugin-functional/issues/113
-
-### total-functions/require-strict-mode
-
-The world is a very strange place when [strict mode](https://www.typescriptlang.org/tsconfig#strict) is disabled. This rule enforces strict mode and [noUncheckedIndexedAccess](https://devblogs.microsoft.com/typescript/announcing-typescript-4-1-beta/#no-unchecked-indexed-access) mode (which is sadly not included under the strict umbrella).
-
-### total-functions/no-unsafe-optional-property-assignment
-
-Optional properties (those with a `?` after their name) interact badly with TypeScript's structural type system in a way that can lead to unsoundness. Example:
-
-```ts
-type Foo = { readonly foo: string };
-type Bar = Foo & { readonly bar?: () => unknown };
-
-const thing = { foo: "foo", bar: "bar" };
-const foo: Foo = thing;
-const bar: Bar = foo;
-
-if (bar.bar !== undefined) {
-    bar.bar(); // explodes at runtime
-}
-```
-
-I find this scenario particularly vexing because it doesn't require type assertions, or plain JS with incorrect \*.d.ts typings, or anything 'loose' like that. You can pull it off with otherwise nicely typed, functional TypeScript (strict mode enabled, no interfaces, no classes, everything readonly, everything const, no type assertions, no plain JS, etc).
-
-This rule bans assignment from one type to another, if:
-1. the destination type has an optional property, and
-2. the source type has no matching property (either optional or otherwise).
-
-This rule is excluded from the `recommended` config until [#83](https://github.com/danielnixon/eslint-plugin-total-functions/issues/83) lands.
 
 # See Also
 * [TypeScript for Functional Programmers](https://www.typescriptlang.org/docs/handbook/typescript-in-5-minutes-func.html)
