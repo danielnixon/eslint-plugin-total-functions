@@ -178,35 +178,6 @@ ruleTester.run("no-unsafe-readonly-mutable-assignment", rule, {
         foo(mut);
       `,
     },
-    // mutable -> mutable (type changes) (caveat mutator)
-    // TODO this is unsafe but you're already using a mutable type so it's not a priority for this rule to flag
-    {
-      filename: "file.ts",
-      code: `
-        type MutableA = { a: string };
-        type MutableB = { a: string | null };
-        const foo = (mut: MutableB): void => {
-          mut.a = null; // whoops
-        };
-        const mut: MutableA = { a: "" };
-        foo(mut);
-      `,
-    },
-    // mutable -> readonly (caveat mutator)
-    // TODO this could be unsafe (depending on what `func` does with `param` and what assumptions it makes about its readonlyness)
-    // but you're already using a mutable type so it's not a priority for this rule to flag
-    {
-      filename: "file.ts",
-      code: `
-        type MutableA = { a: string };
-        type ReadonlyA = Readonly<MutableA>;
-        const func = (param: ReadonlyA): void => {
-          return undefined;
-        };
-        const mutableA: MutableA = { a: "" };
-        func(mutableA);
-      `,
-    },
     // multiple type signatures (readonly -> readonly)
     {
       filename: "file.ts",
@@ -499,20 +470,6 @@ ruleTester.run("no-unsafe-readonly-mutable-assignment", rule, {
 
         function foo(): ReadonlyA {
           const ma: ReadonlyA = { a: "" };
-          return ma;
-        }
-      `,
-    },
-    // mutable -> readonly (function return) (caveat mutator)
-    // TODO this is unsafe but you're already using a mutable type so it's not a priority for this rule to flag
-    {
-      filename: "file.ts",
-      code: `
-        type MutableA = { a: string };
-        type ReadonlyA = { readonly a: string };
-
-        function foo(): ReadonlyA {
-          const ma: MutableA = { a: "" };
           return ma;
         }
       `,

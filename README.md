@@ -72,6 +72,7 @@ Alternatively you can configure individual rules separately (see below).
 |  require-strict-mode                    | ✅           | ✅    |        |
 |  no-unsafe-type-assertion               | ✅           | ✅    |        |
 |  no-unsafe-readonly-mutable-assignment  | ✅           | ✅    |        |
+|  no-unsafe-mutable-readonly-assignment  |              | ✅    |        |
 |  no-unsafe-optional-property-assignment | [Not yet](https://github.com/danielnixon/eslint-plugin-total-functions/issues/83) | ✅    |        |
 |  no-unsafe-subscript                    | Deprecated   | ✅    |        |
 |  no-unsafe-destructuring                | Deprecated   | ✅    |        |
@@ -110,13 +111,35 @@ See [TypeScript issue #7481](https://github.com/microsoft/TypeScript/issues/7481
 
 Bans unsafe assignment of readonly values to mutable values (which can lead to surprising mutation in the readonly value). This includes passing readonly values as arguments to functions that expect mutable parameters.
 
-For examples of assignment that this rule considers valid and invalid, see [no-unsafe-assignment.test.ts](https://github.com/danielnixon/eslint-plugin-total-functions/blob/master/src/rules/no-unsafe-assignment.test.ts).
+For examples of assignment that this rule considers valid and invalid, see [no-unsafe-readonly-mutable-assignment.test.ts](https://github.com/danielnixon/eslint-plugin-total-functions/blob/master/src/rules/no-unsafe-readonly-mutable-assignment.test.ts).
 
 See [TypeScript issue #13347](https://github.com/microsoft/TypeScript/issues/13347) for a request to fix this at the language level.
 
 See also:
 * https://github.com/danielnixon/eslint-plugin-total-functions/issues/21
 * https://github.com/jonaskello/eslint-plugin-functional/issues/113
+
+### total-functions/no-unsafe-mutable-readonly-assignment
+
+The inverse counterpart to no-unsafe-readonly-mutable-assignment. This rule bans unsafe assignment of mutable values to readonly values (which just like the inverse can lead to surprising mutation in the readonly value).
+
+This rule is often noisy in practice so, unlike no-unsafe-readonly-mutable-assignment, is excluded from the `recommended` config.
+
+Note that the following is considered an assignment from mutable to readonly:
+
+```ts
+  type ReadonlyA = { readonly a: string };
+  const readonlyA: ReadonlyA = { a: "" };
+```
+
+The solution is to append `as const` to the RHS:
+
+```ts
+  type ReadonlyA = { readonly a: string };
+  const readonlyA: ReadonlyA = { a: "" } as const;
+```
+
+For examples of assignment that this rule considers valid and invalid, see [no-unsafe-mutable-readonly-assignment.test.ts](https://github.com/danielnixon/eslint-plugin-total-functions/blob/master/src/rules/no-unsafe-mutable-readonly-assignment.test.ts).
 
 ### total-functions/no-unsafe-optional-property-assignment
 
