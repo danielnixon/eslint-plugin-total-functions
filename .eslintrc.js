@@ -17,5 +17,7 @@ module.exports = {
     es6: true
   },
   plugins: ["jest", "sonarjs", "functional", "@typescript-eslint", "prettier", "total-functions"],
-  rules: {}
+  rules: {
+    "total-functions/no-unsafe-mutable-readonly-assignment": "error"
+  }
 };

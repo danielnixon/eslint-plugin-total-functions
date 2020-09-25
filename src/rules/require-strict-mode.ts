@@ -35,7 +35,7 @@ const requireStrictMode: RuleModule<
           context.report({
             node: node,
             messageId: "errorStringStrictMode",
-          });
+          } as const);
         }
 
         // eslint-disable-next-line functional/no-conditional-statement
@@ -44,7 +44,7 @@ const requireStrictMode: RuleModule<
           context.report({
             node: node,
             messageId: "errorStringNoUncheckedIndexedAccess",
-          });
+          } as const);
         }
       },
     };

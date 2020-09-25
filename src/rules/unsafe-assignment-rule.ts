@@ -146,6 +146,8 @@ export const createNoUnsafeAssignmentRule = (
         return false;
       }
 
+      // TODO https://github.com/danielnixon/eslint-plugin-total-functions/issues/100
+      // eslint-disable-next-line total-functions/no-unsafe-mutable-readonly-assignment
       const nextSeenTypes: TypePairArray = seenTypes.concat({
         destinationType,
         sourceType,
@@ -177,6 +179,8 @@ export const createNoUnsafeAssignmentRule = (
     );
 
     return typePairs.some(({ sourceType, destinationType }) => {
+      // TODO https://github.com/danielnixon/eslint-plugin-total-functions/issues/100
+      // eslint-disable-next-line total-functions/no-unsafe-mutable-readonly-assignment
       const nextSeenTypes: TypePairArray = seenTypes.concat({
         destinationType,
         sourceType,
@@ -260,7 +264,7 @@ export const createNoUnsafeAssignmentRule = (
         context.report({
           node: node,
           messageId: "errorStringTSTypeAssertion",
-        });
+        } as const);
       }
     },
     // eslint-disable-next-line functional/no-return-void
@@ -294,7 +298,7 @@ export const createNoUnsafeAssignmentRule = (
         context.report({
           node: node,
           messageId: "errorStringTSAsExpression",
-        });
+        } as const);
       }
     },
     // eslint-disable-next-line functional/no-return-void
@@ -340,7 +344,7 @@ export const createNoUnsafeAssignmentRule = (
           context.report({
             node: node,
             messageId: "errorStringVariableDeclaration",
-          });
+          } as const);
         }
       });
     },
@@ -366,7 +370,7 @@ export const createNoUnsafeAssignmentRule = (
         context.report({
           node: node,
           messageId: "errorStringAssignmentExpression",
-        });
+        } as const);
       }
     },
     // eslint-disable-next-line functional/no-return-void
@@ -396,7 +400,7 @@ export const createNoUnsafeAssignmentRule = (
         context.report({
           node: node,
           messageId: "errorStringArrowFunctionExpression",
-        });
+        } as const);
       }
     },
     // TODO: YieldExpression?
@@ -427,7 +431,7 @@ export const createNoUnsafeAssignmentRule = (
         context.report({
           node: node.body,
           messageId: "errorStringArrowFunctionExpression",
-        });
+        } as const);
       }
     },
     // eslint-disable-next-line functional/no-return-void
@@ -454,7 +458,7 @@ export const createNoUnsafeAssignmentRule = (
           context.report({
             node: get(node.arguments, i) ?? node,
             messageId: "errorStringCallExpression",
-          });
+          } as const);
         }
       });
     },

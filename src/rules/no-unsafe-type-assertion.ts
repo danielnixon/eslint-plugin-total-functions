@@ -63,7 +63,7 @@ const noUnsafeTypeAssertion: RuleModule<"errorStringGeneric", readonly []> = {
         context.report({
           node: node,
           messageId: "errorStringGeneric",
-        });
+        } as const);
       }
     };
 

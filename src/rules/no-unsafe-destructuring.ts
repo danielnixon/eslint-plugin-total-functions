@@ -76,7 +76,7 @@ const noUnsafeDestructuring: RuleModule<"errorStringGeneric", readonly []> = {
         context.report({
           node: node,
           messageId: "errorStringGeneric",
-        });
+        } as const);
       },
       // eslint-disable-next-line functional/no-return-void
       ObjectPattern: (node): void => {
@@ -121,7 +121,7 @@ const noUnsafeDestructuring: RuleModule<"errorStringGeneric", readonly []> = {
         context.report({
           node: node,
           messageId: "errorStringGeneric",
-        });
+        } as const);
       },
     };
   },

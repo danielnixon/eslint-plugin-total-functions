@@ -149,7 +149,7 @@ const noUnsafeSubscript: RuleModule<"errorStringGeneric", readonly []> = {
       context.report({
         node: node,
         messageId: "errorStringGeneric",
-      });
+      } as const);
     };
 
     return {
