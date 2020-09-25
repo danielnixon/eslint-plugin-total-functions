@@ -1,5 +1,5 @@
 import { RuleModule } from "@typescript-eslint/experimental-utils/dist/ts-eslint";
-import { isPropertyReadonlyInType } from "tsutils";
+import { isPropertyReadonlyInType, isTupleType } from "tsutils";
 import { Type, Symbol, IndexKind } from "typescript";
 import { TypeChecker } from "./common";
 import {
@@ -58,6 +58,15 @@ const unsafePropertyAssignmentFunc: UnsafePropertyAssignmentFunc = (
     sourceProperty.getEscapedName(),
     checker
   );
+
+  // The length property of tuples is technically mutable (wtf) so we special-case this in as never unsafe because you can only set it to a single number literal value.
+  // Observe:
+  //   const foo = [] as const;
+  //   foo.length = 0;
+  // eslint-disable-next-line functional/no-conditional-statement
+  if (isTupleType(sourceType) && sourceProperty.escapedName === "length") {
+    return false;
+  }
 
   return !sourcePropIsReadonly && destinationPropIsReadonly;
 };

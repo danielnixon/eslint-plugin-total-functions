@@ -186,16 +186,16 @@ ruleTester.run("no-unsafe-mutable-readonly-assignment", rule, {
         func(readonlyA);
       `,
     },
-    // TODO
     // readonly array concat.
-    // {
-    //   filename: "file.ts",
-    //   code: `
-    //     const arr: ReadonlyArray<never> = [] as const;
-    //     const foo = arr.concat(arr, arr);
-    //   `,
-    // },
-    // mutable array concat.
+    {
+      filename: "file.ts",
+      code: `
+        const arr: ReadonlyArray<never> = [] as const;
+        const foo = arr.concat(arr, arr);
+      `,
+    },
+    // TODO
+    // // mutable array concat.
     // {
     //   filename: "file.ts",
     //   code: `
@@ -203,7 +203,7 @@ ruleTester.run("no-unsafe-mutable-readonly-assignment", rule, {
     //     const foo = arr.concat(arr, arr);
     //   `,
     // },
-    // Mixed mutable and readonly array concat.
+    // // Mixed mutable and readonly array concat.
     // {
     //   filename: "file.ts",
     //   code: `
@@ -243,17 +243,16 @@ ruleTester.run("no-unsafe-mutable-readonly-assignment", rule, {
         mutate((): ReadonlyA => ro);
       `,
     },
-    // TODO `[] as const` is currently flagged by this rule.
-    // // readonly array of readonly object -> readonly array of readonly object
-    // {
-    //   filename: "file.ts",
-    //   code: `
-    //     type Obj = { readonly foo: string };
-    //     const foo = (a: ReadonlyArray<Obj>): number => a.length;
-    //     const arr: ReadonlyArray<Obj> = [] as const;
-    //     foo(arr);
-    //   `,
-    // },
+    // readonly array of readonly object -> readonly array of readonly object
+    {
+      filename: "file.ts",
+      code: `
+        type Obj = { readonly foo: string };
+        const foo = (a: ReadonlyArray<Obj>): number => a.length;
+        const arr: ReadonlyArray<Obj> = [] as const;
+        foo(arr);
+      `,
+    },
     /**
      * Assignment expressions
      */
