@@ -6,7 +6,6 @@ import {
   ESLintUtils,
   AST_NODE_TYPES,
 } from "@typescript-eslint/experimental-utils";
-import { get } from "total-functions";
 import { Type, Symbol, IndexKind, Node } from "typescript";
 import { assignableObjectPairs, TypeChecker, TypePairArray } from "./common";
 
@@ -456,7 +455,7 @@ export const createNoUnsafeAssignmentRule = (
         ) {
           // eslint-disable-next-line functional/no-expression-statement
           context.report({
-            node: get(node.arguments, i) ?? node,
+            node: node.arguments[i] ?? node,
             messageId: "errorStringCallExpression",
           } as const);
         }
