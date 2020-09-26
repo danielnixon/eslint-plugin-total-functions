@@ -171,6 +171,19 @@ export const createNoUnsafeAssignmentRule = (
     checker: TypeChecker,
     seenTypes: TypePairArray
   ): boolean => {
+    // eslint-disable-next-line functional/no-conditional-statement
+    if (
+      checker.isArrayType !== undefined &&
+      checker.isArrayType(destinationType) &&
+      checker.isArrayType(sourceType)
+    ) {
+      // Avoid checking every property for unsafe assignment if the source and destination are arrays.
+      // If one of these is readonly and the other mutable, it will be caught by `isUnsafeIndexAssignment`.
+      // TODO what about types that include arrays as union or intersection members?
+      // TODO what about tuples?
+      return false;
+    }
+
     return destinationType.getProperties().some((destinationProperty) => {
       const sourceProperty = sourceType.getProperty(destinationProperty.name);
 
