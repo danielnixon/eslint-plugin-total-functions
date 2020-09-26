@@ -50,6 +50,8 @@ const assignableTypePairs = (
   rawDestinationType: Type,
   rawSourceType: Type,
   checker: TypeChecker
+  // TODO remove this eslint-disable
+  // eslint-disable-next-line total-functions/no-unsafe-mutable-readonly-assignment
 ): TypePairArray => {
   const isAssignableTo = checker.isTypeAssignableTo;
   // eslint-disable-next-line functional/no-conditional-statement
