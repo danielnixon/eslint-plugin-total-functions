@@ -218,6 +218,12 @@ export const createNoUnsafeAssignmentRule = (
     checker: TypeChecker,
     seenTypes: TypePairArray = []
   ): boolean => {
+    // eslint-disable-next-line functional/no-conditional-statement
+    if (rawDestinationType === rawSourceType) {
+      // Never unsafe if the types are equal.
+      return false;
+    }
+
     const typePairs = assignableTypePairs(
       rawDestinationType,
       rawSourceType,
@@ -240,8 +246,10 @@ export const createNoUnsafeAssignmentRule = (
       )
     );
 
-    const isUnsafeFunctionAssignment = functionTypePairs.some(
-      ({ sourceType, destinationType }) => {
+    const isUnsafeFunctionAssignment = (
+      functionTypePairs: TypePairArray
+    ): boolean =>
+      functionTypePairs.some(({ sourceType, destinationType }) => {
         // TODO https://github.com/danielnixon/eslint-plugin-total-functions/issues/100
         // eslint-disable-next-line total-functions/no-unsafe-mutable-readonly-assignment
         const nextSeenTypes: TypePairArray = seenTypes.concat({
@@ -300,11 +308,12 @@ export const createNoUnsafeAssignmentRule = (
             nextSeenTypes
           )
         );
-      }
-    );
+      });
 
-    const inUnsafeObjectAssignment = objectTypePairs.some(
-      ({ sourceType, destinationType }) => {
+    const inUnsafeObjectAssignment = (
+      objectTypePairs: TypePairArray
+    ): boolean =>
+      objectTypePairs.some(({ sourceType, destinationType }) => {
         // TODO https://github.com/danielnixon/eslint-plugin-total-functions/issues/100
         // eslint-disable-next-line total-functions/no-unsafe-mutable-readonly-assignment
         const nextSeenTypes: TypePairArray = seenTypes.concat({
@@ -355,10 +364,12 @@ export const createNoUnsafeAssignmentRule = (
               nextSeenTypes
             ))
         );
-      }
-    );
+      });
 
-    return inUnsafeObjectAssignment || isUnsafeFunctionAssignment;
+    return (
+      inUnsafeObjectAssignment(objectTypePairs) ||
+      isUnsafeFunctionAssignment(functionTypePairs)
+    );
   };
 
   return {
