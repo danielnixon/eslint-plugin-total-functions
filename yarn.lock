@@ -1698,15 +1698,14 @@ eslint-plugin-sonarjs@^0.5.0:
   resolved "https://registry.yarnpkg.com/eslint-plugin-sonarjs/-/eslint-plugin-sonarjs-0.5.0.tgz#ce17b2daba65a874c2862213a9e38e8986ad7d7d"
   integrity sha512-XW5MnzlRjhXpIdbULC/qAdJYHWw3rRLws/DyawdlPU/IdVr9AmRK1r2LaCvabwKOAW2XYYSo3kDX58E4MrB7PQ==
 
-eslint-plugin-total-functions@^4.1.1:
-  version "4.1.1"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-total-functions/-/eslint-plugin-total-functions-4.1.1.tgz#40317990b0095884b3909dffdaf47494a6e320d2"
-  integrity sha512-kQNNxyQcUVR5tpMXdmjlKBan9TaGqyesD7U/l7UZcpmwrfdk6lgQjiBdLRROD/jiotmOPEd8D9XJABg6s9pBdQ==
+eslint-plugin-total-functions@^4.2.0:
+  version "4.2.0"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-total-functions/-/eslint-plugin-total-functions-4.2.0.tgz#591a91a8ac2a8ac78f826e50537fcb2b5f74c1da"
+  integrity sha512-qqD2YID9s+YBsNmshSO6uinWPq0CHYaA01BqtrQbK+wtmhBCMBdqW26BIQUcLFAwjn0g9HOB4edLCjT96bjz5w==
   dependencies:
     "@typescript-eslint/eslint-plugin" "^4.1.1"
     "@typescript-eslint/experimental-utils" "^4.1.1"
     "@typescript-eslint/parser" "^4.1.1"
-    total-functions "^3.0.0"
     tsutils "^3.17.1"
 
 eslint-scope@^5.0.0, eslint-scope@^5.1.0:
@@ -4504,11 +4503,6 @@ to-regex@^3.0.1, to-regex@^3.0.2:
     extend-shallow "^3.0.2"
     regex-not "^1.0.2"
     safe-regex "^1.1.0"
-
-total-functions@^3.0.0:
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/total-functions/-/total-functions-3.0.0.tgz#cf32d787e839cd5eb0439550d9451a3d17105bad"
-  integrity sha512-qi/5OALj6eiZpXJ45P9dSRf0uDnDErgEKqHAFWGZlY7BRZdR69WLJv61UYb9JeospAwyQpIVJ6S+yelNajXAxA==
 
 tough-cookie@^2.3.3, tough-cookie@~2.5.0:
   version "2.5.0"

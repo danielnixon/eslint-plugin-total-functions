@@ -278,13 +278,25 @@ export const createNoUnsafeAssignmentRule = (
         const sourceReturnType = sourceCallSignature.getReturnType();
         const destinationReturnType = destinationCallSignature.getReturnType();
 
-        return isUnsafeAssignment(
-          destinationNode,
-          sourceNode,
-          destinationReturnType,
-          sourceReturnType,
-          checker,
-          nextSeenTypes
+        // This is an unsafe assignment if...
+        return (
+          // we're not in an infinitely recursive type,
+          seenTypes.every(
+            (t) =>
+              t.destinationType !== destinationType &&
+              t.sourceType !== sourceType
+          ) &&
+          // and the types we're assigning from and to are different,
+          destinationType !== sourceType &&
+          // and the return types of the functions are unsafe assignment.
+          isUnsafeAssignment(
+            destinationNode,
+            sourceNode,
+            destinationReturnType,
+            sourceReturnType,
+            checker,
+            nextSeenTypes
+          )
         );
       }
     );
@@ -298,7 +310,6 @@ export const createNoUnsafeAssignmentRule = (
           sourceType,
         });
 
-        // TODO this needs to compare function return types
         // This is an unsafe assignment if...
         return (
           // we're not in an infinitely recursive type,
