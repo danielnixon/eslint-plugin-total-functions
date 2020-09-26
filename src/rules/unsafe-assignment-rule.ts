@@ -7,7 +7,13 @@ import {
   AST_NODE_TYPES,
 } from "@typescript-eslint/experimental-utils";
 import { Type, Symbol, IndexKind, Node } from "typescript";
-import { assignableObjectPairs, TypeChecker, TypePairArray } from "./common";
+import { TypeChecker, TypePairArray } from "./common";
+import {
+  getCallSignaturesOfType,
+  intersectionTypeParts,
+  isObjectType,
+  unionTypeParts,
+} from "tsutils";
 
 export type MessageId =
   | "errorStringCallExpression"
@@ -35,6 +41,45 @@ export type UnsafePropertyAssignmentFunc = (
   sourceType: Type,
   checker: TypeChecker
 ) => boolean;
+
+/**
+ * Breaks the supplied types into their union type parts and returns an
+ * array of pairs of constituent types that are assignable.
+ */
+const assignableTypePairs = (
+  rawDestinationType: Type,
+  rawSourceType: Type,
+  checker: TypeChecker
+): TypePairArray => {
+  const isAssignableTo = checker.isTypeAssignableTo;
+  // eslint-disable-next-line functional/no-conditional-statement
+  if (isAssignableTo === undefined) {
+    return [] as const;
+  }
+
+  // TODO https://github.com/danielnixon/eslint-plugin-total-functions/issues/100
+  // eslint-disable-next-line total-functions/no-unsafe-mutable-readonly-assignment
+  const destinationTypeParts: readonly Type[] = unionTypeParts(
+    rawDestinationType
+  );
+
+  // TODO https://github.com/danielnixon/eslint-plugin-total-functions/issues/100
+  // eslint-disable-next-line total-functions/no-unsafe-mutable-readonly-assignment
+  const sourceTypeParts: readonly Type[] = unionTypeParts(rawSourceType);
+
+  // TODO https://github.com/danielnixon/eslint-plugin-total-functions/issues/100
+  // eslint-disable-next-line total-functions/no-unsafe-mutable-readonly-assignment
+  return sourceTypeParts.flatMap((sourceTypePart) =>
+    destinationTypeParts
+      .filter((destinationTypePart) =>
+        isAssignableTo(sourceTypePart, destinationTypePart)
+      )
+      .map((destinationTypePart) => ({
+        sourceType: sourceTypePart,
+        destinationType: destinationTypePart,
+      }))
+  );
+};
 
 export const createNoUnsafeAssignmentRule = (
   unsafePropertyAssignmentFunc: UnsafePropertyAssignmentFunc,
@@ -171,46 +216,105 @@ export const createNoUnsafeAssignmentRule = (
     checker: TypeChecker,
     seenTypes: TypePairArray = []
   ): boolean => {
-    const typePairs = assignableObjectPairs(
+    const typePairs = assignableTypePairs(
       rawDestinationType,
       rawSourceType,
       checker
     );
 
-    return typePairs.some(({ sourceType, destinationType }) => {
-      // TODO https://github.com/danielnixon/eslint-plugin-total-functions/issues/100
-      // eslint-disable-next-line total-functions/no-unsafe-mutable-readonly-assignment
-      const nextSeenTypes: TypePairArray = seenTypes.concat({
-        destinationType,
-        sourceType,
-      });
+    // eslint-disable-next-line total-functions/no-unsafe-mutable-readonly-assignment
+    const objectTypePairs: TypePairArray = typePairs.filter((tp) =>
+      // TODO should this `every` be a `some`?
+      intersectionTypeParts(tp.destinationType).every((itp) =>
+        isObjectType(itp)
+      )
+    );
 
-      // TODO this needs to compare function return types
-      // This is an unsafe assignment if...
-      return (
-        // we're not in an infinitely recursive type,
-        seenTypes.every(
-          (t) =>
-            t.destinationType !== destinationType && t.sourceType !== sourceType
-        ) &&
-        // and the types we're assigning from and to are different,
-        // TODO this seems to be required to prevent a hang in https://github.com/oaf-project/oaf-react-router
-        // Need to work out why and formulate a test to reproduce
-        destinationType !== sourceType &&
-        // and we're either:
-        // unsafe string index assignment, or
-        (isUnsafeIndexAssignment(
-          IndexKind.String,
-          destinationNode,
-          sourceNode,
+    // eslint-disable-next-line total-functions/no-unsafe-mutable-readonly-assignment
+    const functionTypePairs: TypePairArray = typePairs.filter((tp) =>
+      // TODO should this `every` be a `some`?
+      intersectionTypeParts(tp.destinationType).every(
+        (itp) => getCallSignaturesOfType(itp).length > 0
+      )
+    );
+
+    const isUnsafeFunctionAssignment = functionTypePairs.some(
+      ({ sourceType, destinationType }) => {
+        // TODO https://github.com/danielnixon/eslint-plugin-total-functions/issues/100
+        // eslint-disable-next-line total-functions/no-unsafe-mutable-readonly-assignment
+        const nextSeenTypes: TypePairArray = seenTypes.concat({
           destinationType,
           sourceType,
+        });
+
+        const sourceCallSignatures = getCallSignaturesOfType(sourceType);
+        const destinationCallSignatures = getCallSignaturesOfType(
+          destinationType
+        );
+
+        // eslint-disable-next-line functional/no-conditional-statement
+        if (
+          destinationCallSignatures.length > 1 ||
+          sourceCallSignatures.length > 1
+        ) {
+          // TODO: work out how to handle multiple call signatures.
+          return false;
+        }
+
+        const sourceCallSignature = sourceCallSignatures[0];
+        const destinationCallSignature = destinationCallSignatures[0];
+
+        // eslint-disable-next-line functional/no-conditional-statement
+        if (
+          sourceCallSignature === undefined ||
+          destinationCallSignature === undefined
+        ) {
+          return false;
+        }
+
+        // TODO this should also check parameter types, not just return types.
+        // (but for argument types we should reverse source and destination to reflect contravariance).
+
+        const sourceReturnType = sourceCallSignature.getReturnType();
+        const destinationReturnType = destinationCallSignature.getReturnType();
+
+        return isUnsafeAssignment(
+          destinationNode,
+          sourceNode,
+          destinationReturnType,
+          sourceReturnType,
           checker,
           nextSeenTypes
-        ) ||
-          // unsafe number index assignment, or
-          isUnsafeIndexAssignment(
-            IndexKind.Number,
+        );
+      }
+    );
+
+    const inUnsafeObjectAssignment = objectTypePairs.some(
+      ({ sourceType, destinationType }) => {
+        // TODO https://github.com/danielnixon/eslint-plugin-total-functions/issues/100
+        // eslint-disable-next-line total-functions/no-unsafe-mutable-readonly-assignment
+        const nextSeenTypes: TypePairArray = seenTypes.concat({
+          destinationType,
+          sourceType,
+        });
+
+        // TODO this needs to compare function return types
+        // This is an unsafe assignment if...
+        return (
+          // we're not in an infinitely recursive type,
+          seenTypes.every(
+            (t) =>
+              t.destinationType !== destinationType &&
+              t.sourceType !== sourceType
+          ) &&
+          // and the types we're assigning from and to are different,
+          // TODO this seems to be required to prevent a hang in https://github.com/oaf-project/oaf-react-router
+          // Need to work out why and formulate a test to reproduce
+          destinationType !== sourceType &&
+          // and we're either:
+          // unsafe string index assignment, or
+          (isUnsafeIndexAssignment(
+            IndexKind.String,
             destinationNode,
             sourceNode,
             destinationType,
@@ -218,17 +322,30 @@ export const createNoUnsafeAssignmentRule = (
             checker,
             nextSeenTypes
           ) ||
-          // unsafe property assignment.
-          isUnsafePropertyAssignment(
-            destinationNode,
-            sourceNode,
-            destinationType,
-            sourceType,
-            checker,
-            nextSeenTypes
-          ))
-      );
-    });
+            // unsafe number index assignment, or
+            isUnsafeIndexAssignment(
+              IndexKind.Number,
+              destinationNode,
+              sourceNode,
+              destinationType,
+              sourceType,
+              checker,
+              nextSeenTypes
+            ) ||
+            // unsafe property assignment.
+            isUnsafePropertyAssignment(
+              destinationNode,
+              sourceNode,
+              destinationType,
+              sourceType,
+              checker,
+              nextSeenTypes
+            ))
+        );
+      }
+    );
+
+    return inUnsafeObjectAssignment || isUnsafeFunctionAssignment;
   };
 
   return {

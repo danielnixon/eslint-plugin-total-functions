@@ -253,23 +253,6 @@ ruleTester.run("no-unsafe-readonly-mutable-assignment", rule, {
         func(foo);
       `,
     },
-    // readonly function return type -> mutable function return type.
-    // TODO this should be invalid.
-    {
-      filename: "file.ts",
-      code: `
-        type MutableA = { a: string };
-        type ReadonlyA = { readonly a: string };
-        const mutate = (mut: () => MutableA): void => {
-          const mutable = mut();
-          mutable.a = "whoops";
-        };
-        
-        const ro: ReadonlyA = { a: "" };
-        
-        mutate((): ReadonlyA => ro);
-      `,
-    },
     // Recursive type (linting must terminate)
     {
       filename: "file.ts",
@@ -673,6 +656,28 @@ ruleTester.run("no-unsafe-readonly-mutable-assignment", rule, {
         {
           messageId: "errorStringCallExpression",
           type: AST_NODE_TYPES.Identifier,
+        },
+      ],
+    },
+    // readonly function return type -> mutable function return type.
+    {
+      filename: "file.ts",
+      code: `
+        type MutableA = { a: string };
+        type ReadonlyA = { readonly a: string };
+        const mutate = (mut: () => MutableA): void => {
+          const mutable = mut();
+          mutable.a = "whoops";
+        };
+
+        const ro: ReadonlyA = { a: "" };
+
+        mutate((): ReadonlyA => ro);
+      `,
+      errors: [
+        {
+          messageId: "errorStringCallExpression",
+          type: AST_NODE_TYPES.ArrowFunctionExpression,
         },
       ],
     },
