@@ -283,6 +283,45 @@ ruleTester.run("no-unsafe-readonly-mutable-assignment", rule, {
         foo(arr);
       `,
     },
+    // readonly function parameter -> mutable function parameter
+    // (contravariant position so not flagged by this rule)
+    {
+      filename: "file.ts",
+      code: `
+        type MutableA = { a: string };
+        type ReadonlyA = { readonly a: string };
+
+        const takesMutable = (f: (roa: MutableA) => void): void => undefined;
+
+        takesMutable((roa: ReadonlyA): void => undefined);
+      `,
+    },
+    // readonly function parameter -> mutable function parameter (rest param)
+    // (contravariant position so not flagged by this rule)
+    {
+      filename: "file.ts",
+      code: `
+        type MutableA = { a: string };
+        type ReadonlyA = { readonly a: string };
+
+        const takesMutable = (f: (...roa: readonly MutableA[]) => void): void => undefined;
+
+        takesMutable((...roa: readonly MutableA[]): void => undefined);
+      `,
+    },
+    // readonly function parameter -> readonly function parameter (rest param array is mutable -> readonly)
+    // TODO should we flag this?
+    {
+      filename: "file.ts",
+      code: `
+        type MutableA = { a: string };
+        type ReadonlyA = { readonly a: string };
+
+        const takesReadonly = (f: (...roa: readonly ReadonlyA[]) => void): void => undefined;
+
+        takesReadonly((...roa: MutableA[]): void => undefined);
+      `,
+    },
     /**
      * Assignment expressions
      */
@@ -601,7 +640,7 @@ ruleTester.run("no-unsafe-readonly-mutable-assignment", rule, {
       code: `
         type MutableA = { a: string };
         type ReadonlyA = { readonly a: string };
-        
+
         const foo = (...as: readonly MutableA[]): void => {
           return;
         };
@@ -673,6 +712,44 @@ ruleTester.run("no-unsafe-readonly-mutable-assignment", rule, {
         const ro: ReadonlyA = { a: "" };
 
         mutate((): ReadonlyA => ro);
+      `,
+      errors: [
+        {
+          messageId: "errorStringCallExpression",
+          type: AST_NODE_TYPES.ArrowFunctionExpression,
+        },
+      ],
+    },
+    // mutable function parameter -> readonly function parameter
+    // (contravariant position)
+    {
+      filename: "file.ts",
+      code: `
+        type MutableA = { a: string };
+        type ReadonlyA = { readonly a: string };
+
+        const takesReadonly = (f: (roa: ReadonlyA) => void): void => undefined;
+
+        takesReadonly((ma: MutableA): void => undefined);
+      `,
+      errors: [
+        {
+          messageId: "errorStringCallExpression",
+          type: AST_NODE_TYPES.ArrowFunctionExpression,
+        },
+      ],
+    },
+    // mutable function parameter -> readonly function parameter (rest param)
+    // (contravariant position)
+    {
+      filename: "file.ts",
+      code: `
+        type MutableA = { a: string };
+        type ReadonlyA = { readonly a: string };
+
+        const takesReadonly = (f: (...roa: readonly ReadonlyA[]) => void): void => undefined;
+
+        takesReadonly((...ma: readonly MutableA[]): void => undefined);
       `,
       errors: [
         {

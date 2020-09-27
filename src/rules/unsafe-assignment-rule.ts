@@ -243,6 +243,7 @@ export const createNoUnsafeAssignmentRule = (
       checker
     );
 
+    // TODO https://github.com/danielnixon/eslint-plugin-total-functions/issues/100
     // eslint-disable-next-line total-functions/no-unsafe-mutable-readonly-assignment
     const objectTypePairs: TypePairArray = typePairs.filter((tp) =>
       // TODO should this `every` be a `some`?
@@ -251,6 +252,7 @@ export const createNoUnsafeAssignmentRule = (
       )
     );
 
+    // TODO https://github.com/danielnixon/eslint-plugin-total-functions/issues/100
     // eslint-disable-next-line total-functions/no-unsafe-mutable-readonly-assignment
     const functionTypePairs: TypePairArray = typePairs.filter((tp) =>
       // TODO should this `every` be a `some`?
@@ -281,6 +283,7 @@ export const createNoUnsafeAssignmentRule = (
           sourceCallSignatures.length > 1
         ) {
           // TODO: work out how to handle multiple call signatures.
+          // checker.getResolvedSignature() ?
           return false;
         }
 
@@ -295,8 +298,40 @@ export const createNoUnsafeAssignmentRule = (
           return false;
         }
 
-        // TODO this should also check parameter types, not just return types.
-        // (but for argument types we should reverse source and destination to reflect contravariance).
+        // eslint-disable-next-line functional/functional-parameters
+        const isUnsafeParameterAssignment = (): boolean => {
+          return destinationCallSignature
+            .getParameters()
+            .some((destinationParameterSymbol, index) => {
+              const destinationParameterType = checker.getTypeOfSymbolAtLocation(
+                destinationParameterSymbol,
+                destinationNode
+              );
+              const sourceParameterSymbol = sourceCallSignature.getParameters()[
+                index
+              ];
+
+              // eslint-disable-next-line functional/no-conditional-statement
+              if (sourceParameterSymbol === undefined) {
+                return false;
+              }
+
+              const sourceParameterType = checker.getTypeOfSymbolAtLocation(
+                sourceParameterSymbol,
+                sourceNode
+              );
+
+              // Source and destination swapped here - function parameters are contravariant.
+              return isUnsafeAssignment(
+                sourceNode,
+                destinationNode,
+                sourceParameterType,
+                destinationParameterType,
+                checker,
+                nextSeenTypes
+              );
+            });
+        };
 
         const sourceReturnType = sourceCallSignature.getReturnType();
         const destinationReturnType = destinationCallSignature.getReturnType();
@@ -311,15 +346,17 @@ export const createNoUnsafeAssignmentRule = (
           ) &&
           // and the types we're assigning from and to are different,
           destinationType !== sourceType &&
-          // and the return types of the functions are unsafe assignment.
-          isUnsafeAssignment(
+          // and the return types of the functions are unsafe assignment,
+          (isUnsafeAssignment(
             destinationNode,
             sourceNode,
             destinationReturnType,
             sourceReturnType,
             checker,
             nextSeenTypes
-          )
+          ) ||
+            // or the parameter types of the functions are unsafe assignment.
+            isUnsafeParameterAssignment())
         );
       });
 
