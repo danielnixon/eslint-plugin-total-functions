@@ -115,10 +115,6 @@ For examples of assignment that this rule considers valid and invalid, see [no-u
 
 See [TypeScript issue #13347](https://github.com/microsoft/TypeScript/issues/13347) for a request to fix this at the language level.
 
-See also:
-* https://github.com/danielnixon/eslint-plugin-total-functions/issues/21
-* https://github.com/jonaskello/eslint-plugin-functional/issues/113
-
 ### total-functions/no-unsafe-mutable-readonly-assignment
 
 The inverse counterpart to no-unsafe-readonly-mutable-assignment. This rule bans unsafe assignment of mutable values to readonly values (which just like the inverse can lead to surprising mutation in the readonly value).
