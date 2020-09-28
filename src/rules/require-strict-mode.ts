@@ -5,7 +5,12 @@ import { ESLintUtils } from "@typescript-eslint/experimental-utils";
  * An ESLint rule to enforce TypeScript strict mode.
  */
 const requireStrictMode: RuleModule<
-  "errorStringStrictMode" | "errorStringNoUncheckedIndexedAccess",
+  | "strict"
+  | "noUncheckedIndexedAccess"
+  | "strictFunctionTypes"
+  | "strictBindCallApply"
+  | "strictNullChecks"
+  | "strictPropertyInitialization",
   readonly []
 > = {
   meta: {
@@ -17,9 +22,16 @@ const requireStrictMode: RuleModule<
       url: "https://github.com/danielnixon/eslint-plugin-total-functions",
     },
     messages: {
-      errorStringStrictMode: "TypeScript's strict mode is required.",
-      errorStringNoUncheckedIndexedAccess:
+      strict: "TypeScript's strict mode is required.",
+      noUncheckedIndexedAccess:
         "TypeScript's noUncheckedIndexedAccess mode is required.",
+      strictFunctionTypes:
+        "Do not disable the strictFunctionTypes compiler option.",
+      strictBindCallApply:
+        "Do not disable the strictBindCallApply compiler option.",
+      strictNullChecks: "Do not disable the strictNullChecks compiler option.",
+      strictPropertyInitialization:
+        "Do not disable the strictPropertyInitialization compiler option.",
     },
     schema: [],
   },
@@ -29,23 +41,37 @@ const requireStrictMode: RuleModule<
 
     return {
       Program: (node) => {
-        // eslint-disable-next-line functional/no-conditional-statement
-        if (options.strict !== true) {
-          // eslint-disable-next-line functional/no-expression-statement
-          context.report({
-            node: node,
-            messageId: "errorStringStrictMode",
-          } as const);
-        }
+        const mustBeEnabled = ["strict", "noUncheckedIndexedAccess"] as const;
+        const mustNotBeDisabled = [
+          "strictFunctionTypes",
+          "strictBindCallApply",
+          "strictNullChecks",
+          "strictPropertyInitialization",
+        ] as const;
 
-        // eslint-disable-next-line functional/no-conditional-statement
-        if (options.noUncheckedIndexedAccess !== true) {
-          // eslint-disable-next-line functional/no-expression-statement
-          context.report({
-            node: node,
-            messageId: "errorStringNoUncheckedIndexedAccess",
-          } as const);
-        }
+        // eslint-disable-next-line functional/no-expression-statement
+        mustBeEnabled.forEach((option) => {
+          // eslint-disable-next-line functional/no-conditional-statement
+          if (options[option] !== true) {
+            // eslint-disable-next-line functional/no-expression-statement
+            context.report({
+              node: node,
+              messageId: option,
+            } as const);
+          }
+        });
+
+        // eslint-disable-next-line functional/no-expression-statement
+        mustNotBeDisabled.forEach((option) => {
+          // eslint-disable-next-line functional/no-conditional-statement
+          if (options[option] === false) {
+            // eslint-disable-next-line functional/no-expression-statement
+            context.report({
+              node: node,
+              messageId: option,
+            } as const);
+          }
+        });
       },
     };
   },

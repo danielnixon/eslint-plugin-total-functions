@@ -39,7 +39,7 @@ nonStrictRuleTester.run("require-strict-mode", rule, {
       code: "",
       errors: [
         {
-          messageId: "errorStringStrictMode",
+          messageId: "strict",
           type: AST_NODE_TYPES.Program,
         },
       ],
@@ -60,7 +60,28 @@ nonNoUncheckedIndexedAccessRuleTester.run("require-strict-mode", rule, {
       code: "",
       errors: [
         {
-          messageId: "errorStringNoUncheckedIndexedAccess",
+          messageId: "noUncheckedIndexedAccess",
+          type: AST_NODE_TYPES.Program,
+        },
+      ],
+    },
+  ],
+});
+
+const strictFunctionTypesRuleTester = ruleTesterForTSConfig(
+  "./tsconfig.tests.non-strictFunctionTypes.json"
+);
+
+// eslint-disable-next-line functional/no-expression-statement
+strictFunctionTypesRuleTester.run("require-strict-mode", rule, {
+  valid: [],
+  invalid: [
+    {
+      filename: "file.ts",
+      code: "",
+      errors: [
+        {
+          messageId: "strictFunctionTypes",
           type: AST_NODE_TYPES.Program,
         },
       ],
