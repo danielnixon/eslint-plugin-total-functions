@@ -4671,9 +4671,9 @@ typedarray-to-buffer@^3.1.5:
     is-typedarray "^1.0.0"
 
 typescript@^4.1.0-beta:
-  version "4.1.0-beta"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.1.0-beta.tgz#e4d054035d253b7a37bdc077dd71706508573e69"
-  integrity sha512-b/LAttdVl3G6FEmnMkDsK0xvfvaftXpSKrjXn+OVCRqrwz5WD/6QJOiN+dTorqDY+hkaH+r2gP5wI1jBDmdQ7A==
+  version "4.1.0-dev.20200929"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.1.0-dev.20200929.tgz#ef79fa48efef1cf27d8edfc28cfb6547ec322e41"
+  integrity sha512-l+2kxpqE9hRCOJJvH0SxiO40nN8YR8qTp0pDCZ49QQ/O+gcjQX4Wmbov0KHV/hBAw3vNC93ZI23XrLA/qgbYfQ==
 
 underscore@1.8.3:
   version "1.8.3"
