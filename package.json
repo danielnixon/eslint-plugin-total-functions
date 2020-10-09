@@ -24,6 +24,8 @@
     "eslint-plugin-sonarjs": "^0.5.0",
     "eslint-plugin-total-functions": "^4.4.0",
     "jest": "^26.4.2",
+    "patch-package": "^6.2.2",
+    "postinstall-postinstall": "^2.1.0",
     "prettier": "^2.1.2",
     "ts-jest": "^26.4.0",
     "type-coverage": "^2.13.3",
@@ -44,7 +46,8 @@
     "lint": "eslint src --ext .ts,.tsx",
     "format": "prettier --write 'src/**/*.{ts,tsx}'",
     "test": "jest",
-    "release": "yarn build && yarn lint && yarn type-coverage && yarn publish"
+    "release": "yarn build && yarn lint && yarn type-coverage && yarn publish",
+    "postinstall": "patch-package"
   },
   "typeCoverage": {
     "atLeast": 100,
