@@ -7,10 +7,10 @@
   "author": "Daniel Nixon <dan.nixon@gmail.com>",
   "license": "MIT",
   "devDependencies": {
-    "@stryker-mutator/core": "^3.3.1",
-    "@stryker-mutator/jest-runner": "^3.3.1",
-    "@stryker-mutator/typescript": "^3.3.1",
-    "@types/eslint": "^7.2.2",
+    "@stryker-mutator/core": "^4.0.0",
+    "@stryker-mutator/jest-runner": "^4.0.0",
+    "@stryker-mutator/typescript-checker": "^4.0.0",
+    "@types/eslint": "^7.2.4",
     "@types/jest": "^26.0.13",
     "@typescript-eslint/eslint-plugin": "^4.1.1",
     "@typescript-eslint/parser": "^4.1.1",
@@ -18,7 +18,7 @@
     "eslint": "^7.10.0",
     "eslint-config-prettier": "^6.12.0",
     "eslint-config-typed-fp": "^1.2.0",
-    "eslint-plugin-functional": "^3.0.2",
+    "eslint-plugin-functional": "^3.1.0",
     "eslint-plugin-jest": "^24.0.2",
     "eslint-plugin-prettier": "^3.1.4",
     "eslint-plugin-sonarjs": "^0.5.0",
@@ -26,7 +26,7 @@
     "jest": "^26.4.2",
     "prettier": "^2.1.2",
     "ts-jest": "^26.4.0",
-    "type-coverage": "^2.13.0",
+    "type-coverage": "^2.13.3",
     "typescript": "^4.1.0-beta"
   },
   "dependencies": {
