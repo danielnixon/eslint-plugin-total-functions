@@ -6,6 +6,7 @@ script:
   - yarn lint
   - yarn type-coverage
   - yarn test
-#  - yarn stryker run
+  # TODO https://github.com/danielnixon/eslint-plugin-total-functions/issues/85
+  # - yarn mutation-test
 after_success:
   - yarn codecov
