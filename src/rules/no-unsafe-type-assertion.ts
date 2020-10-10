@@ -1,7 +1,6 @@
 import { RuleModule } from "@typescript-eslint/experimental-utils/dist/ts-eslint";
 import { ESLintUtils, TSESTree } from "@typescript-eslint/experimental-utils";
 import ts from "typescript";
-import { TypeChecker } from "./common";
 import { isTypeFlagSet } from "tsutils";
 
 /**
@@ -23,8 +22,7 @@ const noUnsafeTypeAssertion: RuleModule<"errorStringGeneric", readonly []> = {
   },
   create: (context) => {
     const parserServices = ESLintUtils.getParserServices(context);
-    // TODO https://github.com/danielnixon/eslint-plugin-total-functions/issues/39
-    const checker: TypeChecker = parserServices.program.getTypeChecker();
+    const checker = parserServices.program.getTypeChecker();
 
     const isUnsafe = (
       rawDestinationType: ts.Type,
@@ -39,10 +37,7 @@ const noUnsafeTypeAssertion: RuleModule<"errorStringGeneric", readonly []> = {
         return true;
       }
 
-      return (
-        checker.isTypeAssignableTo !== undefined &&
-        !checker.isTypeAssignableTo(rawSourceType, rawDestinationType)
-      );
+      return !checker.isTypeAssignableTo(rawSourceType, rawDestinationType);
     };
 
     const reportUnsafe = (

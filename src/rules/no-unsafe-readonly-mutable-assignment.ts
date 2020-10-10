@@ -1,7 +1,6 @@
 import { RuleModule } from "@typescript-eslint/experimental-utils/dist/ts-eslint";
 import { isPropertyReadonlyInType } from "tsutils";
-import { Type, Symbol, IndexKind } from "typescript";
-import { TypeChecker } from "./common";
+import { Type, Symbol, IndexKind, TypeChecker } from "typescript";
 import {
   createNoUnsafeAssignmentRule,
   MessageId,

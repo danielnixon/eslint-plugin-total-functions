@@ -6,14 +6,18 @@ import {
   ESLintUtils,
   AST_NODE_TYPES,
 } from "@typescript-eslint/experimental-utils";
-import { Type, Symbol, IndexKind, Node } from "typescript";
-import { TypeChecker, TypePairArray } from "./common";
+import { Type, Symbol, IndexKind, Node, TypeChecker } from "typescript";
 import {
   getCallSignaturesOfType,
   intersectionTypeParts,
   isObjectType,
   unionTypeParts,
 } from "tsutils";
+
+export type TypePairArray = ReadonlyArray<{
+  readonly destinationType: Type;
+  readonly sourceType: Type;
+}>;
 
 export type MessageId =
   | "errorStringCallExpression"
@@ -53,12 +57,6 @@ const assignableTypePairs = (
   // TODO remove this eslint-disable
   // eslint-disable-next-line total-functions/no-unsafe-mutable-readonly-assignment
 ): TypePairArray => {
-  const isAssignableTo = checker.isTypeAssignableTo;
-  // eslint-disable-next-line functional/no-conditional-statement
-  if (isAssignableTo === undefined) {
-    return [] as const;
-  }
-
   // TODO https://github.com/danielnixon/eslint-plugin-total-functions/issues/100
   // eslint-disable-next-line total-functions/no-unsafe-mutable-readonly-assignment
   const destinationTypeParts: readonly Type[] = unionTypeParts(
@@ -74,7 +72,7 @@ const assignableTypePairs = (
   return sourceTypeParts.flatMap((sourceTypePart) =>
     destinationTypeParts
       .filter((destinationTypePart) =>
-        isAssignableTo(sourceTypePart, destinationTypePart)
+        checker.isTypeAssignableTo(sourceTypePart, destinationTypePart)
       )
       .map((destinationTypePart) => ({
         sourceType: sourceTypePart,
@@ -89,7 +87,7 @@ export const createNoUnsafeAssignmentRule = (
   // eslint-disable-next-line sonarjs/cognitive-complexity
 ) => (context: Context): RuleListener => {
   const parserServices = ESLintUtils.getParserServices(context);
-  const checker: TypeChecker = parserServices.program.getTypeChecker();
+  const checker = parserServices.program.getTypeChecker();
 
   const isUnsafeIndexAssignment = (
     indexKind: IndexKind,
@@ -172,10 +170,7 @@ export const createNoUnsafeAssignmentRule = (
     seenTypes: TypePairArray
   ): boolean => {
     // eslint-disable-next-line functional/no-conditional-statement
-    if (
-      checker.isArrayType !== undefined &&
-      checker.isArrayType(destinationType)
-    ) {
+    if (checker.isArrayType(destinationType)) {
       // Avoid checking every property for unsafe assignment if the source and destination are arrays.
       //
       // Additionally, the length property of tuples is technically mutable (wtf) so we ignore arrays for this reason too.
