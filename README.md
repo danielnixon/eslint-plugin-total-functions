@@ -19,7 +19,7 @@ An ESLint plugin to enforce the use of total functions (and prevent the use of [
 
 | TypeScript       | ESLint  | eslint-plugin-total-functions |
 | :--------------: | :-----: |  :--------------------------: |
-|  4.1.0-beta      | 7.11.0  | 4.4.4                         |
+|  4.1.0-beta      | 7.11.0  | 4.5.0
 |  4.0.2           | 7.9.0   | 3.3.0                         |
 
 ## Installation
