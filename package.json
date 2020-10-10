@@ -25,7 +25,6 @@
     "eslint-plugin-total-functions": "^4.4.2",
     "jest": "^26.4.2",
     "patch-package": "^6.2.2",
-    "postinstall-postinstall": "^2.1.0",
     "prettier": "^2.1.2",
     "ts-jest": "^26.4.0",
     "type-coverage": "^2.13.3",
@@ -39,8 +38,6 @@
   },
   "peerDependencies": {
     "eslint": "^7.9.0",
-    "patch-package": "^6.2.2",
-    "postinstall-postinstall": "^2.1.0",
     "typescript": "^4.1.0-beta"
   },
   "scripts": {
@@ -49,7 +46,7 @@
     "format": "prettier --write 'src/**/*.{ts,tsx}'",
     "test": "jest",
     "release": "yarn build && yarn lint && yarn type-coverage && yarn publish",
-    "postinstall": "./node_modules/.bin/patch-package"
+    "mutation-test": "./node_modules/.bin/patch-package && stryker run"
   },
   "typeCoverage": {
     "atLeast": 100,
