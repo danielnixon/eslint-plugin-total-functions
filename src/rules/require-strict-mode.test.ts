@@ -1,5 +1,3 @@
-// TODO https://github.com/typescript-eslint/typescript-eslint/pull/2601
-/* eslint-disable total-functions/no-unsafe-mutable-readonly-assignment */
 import rule from "./require-strict-mode";
 import { RuleTester } from "@typescript-eslint/experimental-utils/dist/ts-eslint";
 import { AST_NODE_TYPES } from "@typescript-eslint/experimental-utils";
@@ -24,7 +22,7 @@ strictRuleTester.run("require-strict-mode", rule, {
     },
   ],
   invalid: [],
-});
+} as const);
 
 const nonStrictRuleTester = ruleTesterForTSConfig(
   "./tsconfig.tests.non-strict.json"
@@ -45,7 +43,7 @@ nonStrictRuleTester.run("require-strict-mode", rule, {
       ],
     },
   ],
-});
+} as const);
 
 const nonNoUncheckedIndexedAccessRuleTester = ruleTesterForTSConfig(
   "./tsconfig.tests.non-noUncheckedIndexedAccess.json"
@@ -66,7 +64,7 @@ nonNoUncheckedIndexedAccessRuleTester.run("require-strict-mode", rule, {
       ],
     },
   ],
-});
+} as const);
 
 const strictFunctionTypesRuleTester = ruleTesterForTSConfig(
   "./tsconfig.tests.non-strictFunctionTypes.json"
@@ -87,4 +85,4 @@ strictFunctionTypesRuleTester.run("require-strict-mode", rule, {
       ],
     },
   ],
-});
+} as const);

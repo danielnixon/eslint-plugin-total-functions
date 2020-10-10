@@ -1,5 +1,3 @@
-// TODO https://github.com/typescript-eslint/typescript-eslint/pull/2601
-/* eslint-disable total-functions/no-unsafe-mutable-readonly-assignment */
 import rule from "./no-unsafe-subscript";
 import { RuleTester } from "@typescript-eslint/experimental-utils/dist/ts-eslint";
 import { AST_NODE_TYPES } from "@typescript-eslint/experimental-utils/dist/ts-estree";
@@ -398,7 +396,7 @@ ruleTester.run("no-unsafe-subscript", rule, {
       ],
     },
   ],
-});
+} as const);
 
 const noUncheckedIndexedAccessRuleTester = new RuleTester({
   parserOptions: {
@@ -417,4 +415,4 @@ noUncheckedIndexedAccessRuleTester.run("no-unsafe-subscript", rule, {
     },
   ],
   invalid: [],
-});
+} as const);
