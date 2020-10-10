@@ -400,6 +400,25 @@ ruleTester.run("no-unsafe-mutable-readonly-assignment", rule, {
         foo(mut);
       `,
     },
+    // tuple -> readonly array (nested objected property)
+    {
+      filename: "file.ts",
+      code: `
+        type Foo = {
+          readonly foo: ReadonlyArray<{
+            readonly a: string;
+            readonly b: string;
+          }>;
+        };
+
+        const f: Foo = {
+          foo: [{
+            a: "",
+            b: "",
+          }],
+        } as const;
+      `,
+    },
   ],
   invalid: [
     // initalization using mutable (literal) -> readonly
