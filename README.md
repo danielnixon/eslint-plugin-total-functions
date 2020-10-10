@@ -25,11 +25,10 @@ An ESLint plugin to enforce the use of total functions (and prevent the use of [
 ## Installation
 
 ```sh
-# yarn
-yarn add --dev eslint-plugin-total-functions
-
-# npm
-npm install eslint-plugin-total-functions --save-dev
+yarn add --dev eslint-plugin-total-functions \
+  @typescript-eslint/parser \
+  eslint \
+  typescript@beta
 ```
 
 ## Setup
