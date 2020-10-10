@@ -47,7 +47,7 @@
     "format": "prettier --write 'src/**/*.{ts,tsx}'",
     "test": "jest",
     "release": "yarn build && yarn lint && yarn type-coverage && yarn publish",
-    "postinstall": "patch-package"
+    "postinstall": "./node_modules/.bin/patch-package"
   },
   "typeCoverage": {
     "atLeast": 100,
