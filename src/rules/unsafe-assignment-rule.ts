@@ -252,25 +252,11 @@ export const createNoUnsafeAssignmentRule = (
     // TODO https://github.com/danielnixon/eslint-plugin-total-functions/issues/100
     // eslint-disable-next-line total-functions/no-unsafe-mutable-readonly-assignment
     const objectTypePairs: TypePairArray = typePairs.filter((tp) =>
-      // TODO should this `every` be a `some`?
-      intersectionTypeParts(tp.destinationType).every((itp) =>
-        isObjectType(itp)
-      )
+      intersectionTypeParts(tp.destinationType).some(isObjectType)
     );
 
-    // TODO https://github.com/danielnixon/eslint-plugin-total-functions/issues/100
-    // eslint-disable-next-line total-functions/no-unsafe-mutable-readonly-assignment
-    const functionTypePairs: TypePairArray = typePairs.filter((tp) =>
-      // TODO should this `every` be a `some`?
-      intersectionTypeParts(tp.destinationType).every(
-        (itp) => getCallSignaturesOfType(itp).length > 0
-      )
-    );
-
-    const isUnsafeFunctionAssignment = (
-      functionTypePairs: TypePairArray
-    ): boolean =>
-      functionTypePairs.some(({ sourceType, destinationType }) => {
+    const isUnsafeFunctionAssignment = (typePairs: TypePairArray): boolean =>
+      typePairs.some(({ sourceType, destinationType }) => {
         // TODO https://github.com/danielnixon/eslint-plugin-total-functions/issues/100
         // eslint-disable-next-line total-functions/no-unsafe-mutable-readonly-assignment
         const nextSeenTypes: TypePairArray = seenTypes.concat({
@@ -424,7 +410,7 @@ export const createNoUnsafeAssignmentRule = (
 
     return (
       inUnsafeObjectAssignment(objectTypePairs) ||
-      isUnsafeFunctionAssignment(functionTypePairs)
+      isUnsafeFunctionAssignment(typePairs)
     );
   };
 

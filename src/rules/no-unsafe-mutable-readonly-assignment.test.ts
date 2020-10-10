@@ -527,5 +527,40 @@ ruleTester.run("no-unsafe-mutable-readonly-assignment", rule, {
         },
       ],
     },
+    // mutable function return -> readonly function return (as part of intersection with object).
+    {
+      filename: "file.ts",
+      code: `
+        type RandomObject = { readonly b?: string };
+        type MutableA = RandomObject & (() => { a: string });
+        type ReadonlyA = RandomObject & (() => { readonly a: string });
+
+        const ma: MutableA = () => ({ a: "" });
+        const ra: ReadonlyA = ma;
+      `,
+      errors: [
+        {
+          messageId: "errorStringVariableDeclaration",
+          type: AST_NODE_TYPES.VariableDeclaration,
+        },
+      ],
+    },
+    // mutable object prop -> readonly object prop (as part of intersection with non-object).
+    {
+      filename: "file.ts",
+      code: `
+        type MutableA = { a?: string } & number;
+        type ReadonlyA = { readonly a?: string } & number;
+
+        const ma: MutableA = 42;
+        const ra: ReadonlyA = ma;      
+      `,
+      errors: [
+        {
+          messageId: "errorStringVariableDeclaration",
+          type: AST_NODE_TYPES.VariableDeclaration,
+        },
+      ],
+    },
   ],
 } as const);
