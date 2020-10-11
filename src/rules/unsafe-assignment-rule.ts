@@ -6,7 +6,14 @@ import {
   ESLintUtils,
   AST_NODE_TYPES,
 } from "@typescript-eslint/experimental-utils";
-import { Type, Symbol, IndexKind, Node, TypeChecker } from "typescript";
+import {
+  Type,
+  Symbol,
+  IndexKind,
+  Node,
+  TypeChecker,
+  Signature,
+} from "typescript";
 import {
   getCallSignaturesOfType,
   intersectionTypeParts,
@@ -17,6 +24,11 @@ import {
 export type TypePairArray = ReadonlyArray<{
   readonly destinationType: Type;
   readonly sourceType: Type;
+}>;
+
+export type SignaturePairArray = ReadonlyArray<{
+  readonly destinationSignature: Signature;
+  readonly sourceSignature: Signature;
 }>;
 
 export type MessageId =
@@ -45,6 +57,69 @@ export type UnsafePropertyAssignmentFunc = (
   sourceType: Type,
   checker: TypeChecker
 ) => boolean;
+
+const isSignatureAssignable = (
+  destinationNode: Node,
+  sourceNode: Node,
+  destinationSignature: Signature,
+  sourceSignature: Signature,
+  checker: TypeChecker
+): boolean => {
+  const returnTypeIsAssignable = checker.isTypeAssignableTo(
+    sourceSignature.getReturnType(),
+    destinationSignature.getReturnType()
+  );
+
+  const allParametersAreAssignable = destinationSignature.parameters.every(
+    (destinationParameter, index) => {
+      const sourceParameter = sourceSignature.parameters[index];
+      // eslint-disable-next-line functional/no-conditional-statement
+      if (sourceParameter === undefined) {
+        return false;
+      }
+
+      // source and destination parameter reversed here due to contravariance.
+      return checker.isTypeAssignableTo(
+        checker.getTypeOfSymbolAtLocation(
+          destinationParameter,
+          destinationNode
+        ),
+        checker.getTypeOfSymbolAtLocation(sourceParameter, sourceNode)
+      );
+    }
+  );
+
+  return returnTypeIsAssignable && allParametersAreAssignable;
+};
+
+const assignableSignaturePairs = (
+  destinationNode: Node,
+  sourceNode: Node,
+  destinationSignatures: readonly Signature[],
+  sourceSignatures: readonly Signature[],
+  checker: TypeChecker
+  // TODO https://github.com/danielnixon/eslint-plugin-total-functions/issues/100
+  // eslint-disable-next-line total-functions/no-unsafe-mutable-readonly-assignment
+): SignaturePairArray => {
+  // TODO https://github.com/danielnixon/eslint-plugin-total-functions/issues/100
+  // eslint-disable-next-line total-functions/no-unsafe-mutable-readonly-assignment
+  return sourceSignatures.flatMap((sourceSignature) =>
+    destinationSignatures
+      .filter((destinationSignature) =>
+        isSignatureAssignable(
+          destinationNode,
+          sourceNode,
+          sourceSignature,
+          destinationSignature,
+          checker
+        )
+      )
+      .map((destinationSignature) => ({
+        sourceSignature,
+        destinationSignature,
+      }))
+  );
+};
 
 /**
  * Breaks the supplied types into their union type parts and returns an
@@ -264,86 +339,77 @@ export const createNoUnsafeAssignmentRule = (
           destinationType
         );
 
-        // eslint-disable-next-line functional/no-conditional-statement
-        if (
-          destinationCallSignatures.length > 1 ||
-          sourceCallSignatures.length > 1
-        ) {
-          // TODO: work out how to handle multiple call signatures.
-          // checker.getResolvedSignature() ?
-          return false;
-        }
+        const signaturePairs = assignableSignaturePairs(
+          destinationNode,
+          sourceNode,
+          destinationCallSignatures,
+          sourceCallSignatures,
+          checker
+        );
 
-        const sourceCallSignature = sourceCallSignatures[0];
-        const destinationCallSignature = destinationCallSignatures[0];
+        return signaturePairs.some(
+          ({ destinationSignature, sourceSignature }) => {
+            // eslint-disable-next-line functional/functional-parameters
+            const isUnsafeParameterAssignment = (): boolean => {
+              return destinationSignature
+                .getParameters()
+                .some((destinationParameterSymbol, index) => {
+                  const destinationParameterType = checker.getTypeOfSymbolAtLocation(
+                    destinationParameterSymbol,
+                    destinationNode
+                  );
+                  const sourceParameterSymbol = sourceSignature.getParameters()[
+                    index
+                  ];
 
-        // eslint-disable-next-line functional/no-conditional-statement
-        if (
-          sourceCallSignature === undefined ||
-          destinationCallSignature === undefined
-        ) {
-          return false;
-        }
+                  // eslint-disable-next-line functional/no-conditional-statement
+                  if (sourceParameterSymbol === undefined) {
+                    return false;
+                  }
 
-        // eslint-disable-next-line functional/functional-parameters
-        const isUnsafeParameterAssignment = (): boolean => {
-          return destinationCallSignature
-            .getParameters()
-            .some((destinationParameterSymbol, index) => {
-              const destinationParameterType = checker.getTypeOfSymbolAtLocation(
-                destinationParameterSymbol,
-                destinationNode
-              );
-              const sourceParameterSymbol = sourceCallSignature.getParameters()[
-                index
-              ];
+                  const sourceParameterType = checker.getTypeOfSymbolAtLocation(
+                    sourceParameterSymbol,
+                    sourceNode
+                  );
 
-              // eslint-disable-next-line functional/no-conditional-statement
-              if (sourceParameterSymbol === undefined) {
-                return false;
-              }
+                  // Source and destination swapped here - function parameters are contravariant.
+                  return isUnsafeAssignment(
+                    sourceNode,
+                    destinationNode,
+                    sourceParameterType,
+                    destinationParameterType,
+                    checker,
+                    nextSeenTypes
+                  );
+                });
+            };
 
-              const sourceParameterType = checker.getTypeOfSymbolAtLocation(
-                sourceParameterSymbol,
-                sourceNode
-              );
+            const sourceReturnType = sourceSignature.getReturnType();
+            const destinationReturnType = destinationSignature.getReturnType();
 
-              // Source and destination swapped here - function parameters are contravariant.
-              return isUnsafeAssignment(
-                sourceNode,
+            // This is an unsafe assignment if...
+            return (
+              // we're not in an infinitely recursive type,
+              seenTypes.every(
+                (t) =>
+                  t.destinationType !== destinationType &&
+                  t.sourceType !== sourceType
+              ) &&
+              // and the types we're assigning from and to are different,
+              destinationType !== sourceType &&
+              // and the return types of the functions are unsafe assignment,
+              (isUnsafeAssignment(
                 destinationNode,
-                sourceParameterType,
-                destinationParameterType,
+                sourceNode,
+                destinationReturnType,
+                sourceReturnType,
                 checker,
                 nextSeenTypes
-              );
-            });
-        };
-
-        const sourceReturnType = sourceCallSignature.getReturnType();
-        const destinationReturnType = destinationCallSignature.getReturnType();
-
-        // This is an unsafe assignment if...
-        return (
-          // we're not in an infinitely recursive type,
-          seenTypes.every(
-            (t) =>
-              t.destinationType !== destinationType &&
-              t.sourceType !== sourceType
-          ) &&
-          // and the types we're assigning from and to are different,
-          destinationType !== sourceType &&
-          // and the return types of the functions are unsafe assignment,
-          (isUnsafeAssignment(
-            destinationNode,
-            sourceNode,
-            destinationReturnType,
-            sourceReturnType,
-            checker,
-            nextSeenTypes
-          ) ||
-            // or the parameter types of the functions are unsafe assignment.
-            isUnsafeParameterAssignment())
+              ) ||
+                // or the parameter types of the functions are unsafe assignment.
+                isUnsafeParameterAssignment())
+            );
+          }
         );
       });
 

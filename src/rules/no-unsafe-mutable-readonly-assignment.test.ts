@@ -417,26 +417,37 @@ ruleTester.run("no-unsafe-mutable-readonly-assignment", rule, {
         } as const;
       `,
     },
-    // mutable function return -> readonly function return (multiple call signatures).
-    // TODO this should be invalid.
+    // mutable function return -> mutable function return (multiple call signatures).
     {
       filename: "file.ts",
       code: `
         type MutableA = { a: string };
-        type ReadonlyA = { readonly a: string };
 
         interface MutableFunc {
           (b: number): MutableA;
           (b: string): MutableA;
         }
 
+        const mf: MutableFunc = (b: number | string): MutableA => {
+          return { a: "" };
+        };
+
+        const rf: MutableFunc = mf;
+      `,
+    },
+    // readonly function return -> readonly function return (multiple call signatures).
+    {
+      filename: "file.ts",
+      code: `
+        type ReadonlyA = { readonly a: string };
+
         interface ReadonlyFunc {
           (b: number): ReadonlyA;
           (b: string): ReadonlyA;
         }
 
-        const mf: MutableFunc = (b: number | string): MutableA => {
-          return { a: "" };
+        const mf: ReadonlyFunc = (b: number | string): ReadonlyA => {
+          return { a: "" } as const;
         };
 
         const rf: ReadonlyFunc = mf;
@@ -619,6 +630,36 @@ ruleTester.run("no-unsafe-mutable-readonly-assignment", rule, {
         {
           messageId: "errorStringArrowFunctionExpression",
           type: AST_NODE_TYPES.ReturnStatement,
+        },
+      ],
+    },
+    // mutable function return -> readonly function return (multiple call signatures).
+    {
+      filename: "file.ts",
+      code: `
+        type MutableA = { a: string };
+        type ReadonlyA = { readonly a: string };
+
+        interface MutableFunc {
+          (b: number): MutableA;
+          (b: string): MutableA;
+        }
+
+        interface ReadonlyFunc {
+          (b: number): ReadonlyA;
+          (b: string): ReadonlyA;
+        }
+
+        const mf: MutableFunc = (b: number | string): MutableA => {
+          return { a: "" };
+        };
+
+        const rf: ReadonlyFunc = mf;
+      `,
+      errors: [
+        {
+          messageId: "errorStringVariableDeclaration",
+          type: AST_NODE_TYPES.VariableDeclaration,
         },
       ],
     },
