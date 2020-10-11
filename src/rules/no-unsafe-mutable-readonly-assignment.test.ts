@@ -194,7 +194,7 @@ ruleTester.run("no-unsafe-mutable-readonly-assignment", rule, {
         const foo = arr.concat(arr, arr);
       `,
     },
-    // TODO
+    // TODO: https://github.com/danielnixon/eslint-plugin-total-functions/issues/132
     // // mutable array concat.
     // {
     //   filename: "file.ts",
@@ -224,23 +224,6 @@ ruleTester.run("no-unsafe-mutable-readonly-assignment", rule, {
         };
         const foo: MutableA | ReadonlyB = Date.now() > 0 ? { a: "" } : { b: "" } as const;
         func(foo);
-      `,
-    },
-    // readonly function return type -> mutable function return type.
-    // TODO this should be invalid.
-    {
-      filename: "file.ts",
-      code: `
-        type MutableA = { a: string };
-        type ReadonlyA = { readonly a: string };
-        const mutate = (mut: () => MutableA): void => {
-          const mutable = mut();
-          mutable.a = "whoops";
-        };
-        
-        const ro: ReadonlyA = { a: "" } as const;
-        
-        mutate((): ReadonlyA => ro);
       `,
     },
     // readonly array of readonly object -> readonly array of readonly object

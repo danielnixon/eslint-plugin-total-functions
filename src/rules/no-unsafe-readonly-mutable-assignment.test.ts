@@ -707,7 +707,7 @@ ruleTester.run("no-unsafe-readonly-mutable-assignment", rule, {
           mutable.a = "whoops";
         };
 
-        const ro: ReadonlyA = { a: "" };
+        const ro: ReadonlyA = { a: "" } as const;
 
         mutate((): ReadonlyA => ro);
       `,
