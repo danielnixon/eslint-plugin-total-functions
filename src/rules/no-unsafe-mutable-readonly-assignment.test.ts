@@ -417,6 +417,31 @@ ruleTester.run("no-unsafe-mutable-readonly-assignment", rule, {
         } as const;
       `,
     },
+    // mutable function return -> readonly function return (multiple call signatures).
+    // TODO this should be invalid.
+    {
+      filename: "file.ts",
+      code: `
+        type MutableA = { a: string };
+        type ReadonlyA = { readonly a: string };
+
+        interface MutableFunc {
+          (b: number): MutableA;
+          (b: string): MutableA;
+        }
+
+        interface ReadonlyFunc {
+          (b: number): ReadonlyA;
+          (b: string): ReadonlyA;
+        }
+
+        const mf: MutableFunc = (b: number | string): MutableA => {
+          return { a: "" };
+        };
+
+        const rf: ReadonlyFunc = mf;
+      `,
+    },
   ],
   invalid: [
     // initalization using mutable (literal) -> readonly
