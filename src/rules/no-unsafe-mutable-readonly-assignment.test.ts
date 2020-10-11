@@ -442,6 +442,26 @@ ruleTester.run("no-unsafe-mutable-readonly-assignment", rule, {
         const rf: ReadonlyFunc = mf;
       `,
     },
+    // Return empty tuple from function that is declared to return some readonly array type.
+    {
+      filename: "file.ts",
+      code: `
+        type Foo = ReadonlyArray<{ readonly a: string }>;
+        const foo = (): Foo => {
+          return [] as const;
+        };
+      `,
+    },
+    // Return empty tuple from function that is declared to return empty tuple.
+    {
+      filename: "file.ts",
+      code: `
+        type Foo = readonly [];
+        const foo = (): Foo => {
+          return [] as const;
+        };
+      `,
+    },
   ],
   invalid: [
     // initalization using mutable (literal) -> readonly
@@ -584,6 +604,21 @@ ruleTester.run("no-unsafe-mutable-readonly-assignment", rule, {
         {
           messageId: "errorStringVariableDeclaration",
           type: AST_NODE_TYPES.VariableDeclaration,
+        },
+      ],
+    },
+    // Return empty mutable array from function that is declared to return empty tuple.
+    {
+      filename: "file.ts",
+      code: `
+        const foo = (): readonly [] => {
+          return [];
+        };
+      `,
+      errors: [
+        {
+          messageId: "errorStringArrowFunctionExpression",
+          type: AST_NODE_TYPES.ReturnStatement,
         },
       ],
     },

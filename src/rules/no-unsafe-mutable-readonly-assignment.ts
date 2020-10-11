@@ -18,13 +18,21 @@ const unsafeIndexAssignmentFunc: UnsafeIndexAssignmentFunc = (
     destinationType,
     indexKind
   );
-  const destinationTypeHasReadonlyIndexSignature =
-    destinationIndexInfo !== undefined
-      ? destinationIndexInfo.isReadonly
-      : false;
   const sourceIndexInfo = checker.getIndexInfoOfType(sourceType, indexKind);
-  const sourceTypeHasReadonlyIndexSignature =
-    sourceIndexInfo !== undefined ? sourceIndexInfo.isReadonly : false;
+
+  // eslint-disable-next-line functional/no-conditional-statement
+  if (destinationIndexInfo === undefined) {
+    return false;
+  }
+
+  // eslint-disable-next-line functional/no-conditional-statement
+  if (sourceIndexInfo === undefined) {
+    return false;
+  }
+
+  const destinationTypeHasReadonlyIndexSignature =
+    destinationIndexInfo.isReadonly;
+  const sourceTypeHasReadonlyIndexSignature = sourceIndexInfo.isReadonly;
 
   return (
     !sourceTypeHasReadonlyIndexSignature &&
