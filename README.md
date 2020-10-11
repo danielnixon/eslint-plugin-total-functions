@@ -31,6 +31,8 @@ yarn add --dev eslint-plugin-total-functions \
   typescript@beta
 ```
 
+We've jumped on TypeScript 4.1 early because [noUncheckedIndexedAccess](https://devblogs.microsoft.com/typescript/announcing-typescript-4-1-beta/#no-unchecked-indexed-access) is too good to wait for. For this reason you'll have to install `typescript@beta` until [mid-November](https://github.com/microsoft/TypeScript/issues/40124).
+
 ## Setup
 
 ### Option 1
