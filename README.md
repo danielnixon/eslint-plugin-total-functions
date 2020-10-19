@@ -1,6 +1,5 @@
 # TypeScript Total Functions - ESLint Plugin
 
-[![Build Status](https://travis-ci.org/danielnixon/eslint-plugin-total-functions.svg?branch=master)](https://travis-ci.org/danielnixon/eslint-plugin-total-functions)
 [![Type Coverage](https://img.shields.io/badge/dynamic/json.svg?label=type-coverage&prefix=%E2%89%A5&suffix=%&query=$.typeCoverage.atLeast&uri=https%3A%2F%2Fraw.githubusercontent.com%2Fdanielnixon%2Feslint-plugin-total-functions%2Fmaster%2Fpackage.json)](https://github.com/plantain-00/type-coverage)
 [![Test Coverage](https://codecov.io/gh/danielnixon/eslint-plugin-total-functions/branch/master/graph/badge.svg)](https://codecov.io/gh/danielnixon/eslint-plugin-total-functions)
 [![Mutation testing badge](https://img.shields.io/endpoint?style=flat&url=https%3A%2F%2Fbadge-api.stryker-mutator.io%2Fgithub.com%2Fdanielnixon%2Feslint-plugin-total-functions%2Fmaster)](https://dashboard.stryker-mutator.io/reports/github.com/danielnixon/eslint-plugin-total-functions/master)
