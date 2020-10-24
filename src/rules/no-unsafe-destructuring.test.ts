@@ -202,24 +202,25 @@ ruleTester.run("no-unsafe-destructuring", rule, {
   ],
 } as const);
 
-const noUncheckedIndexedAccessRuleTester = new RuleTester({
-  parserOptions: {
-    sourceType: "module",
-    project: "./tsconfig.tests.json",
-  },
-  parser: require.resolve("@typescript-eslint/parser"),
-});
+// TODO re-enable
+// const noUncheckedIndexedAccessRuleTester = new RuleTester({
+//   parserOptions: {
+//     sourceType: "module",
+//     project: "./tsconfig.tests.json",
+//   },
+//   parser: require.resolve("@typescript-eslint/parser"),
+// });
 
-// eslint-disable-next-line functional/no-expression-statement
-noUncheckedIndexedAccessRuleTester.run("no-unsafe-subscript", rule, {
-  valid: [
-    {
-      filename: "file.ts",
-      code: `
-        const arr: any = [];
-        const [foo] = arr;
-        `,
-    },
-  ],
-  invalid: [],
-} as const);
+// // eslint-disable-next-line functional/no-expression-statement
+// noUncheckedIndexedAccessRuleTester.run("no-unsafe-subscript", rule, {
+//   valid: [
+//     {
+//       filename: "file.ts",
+//       code: `
+//         const arr: any = [];
+//         const [foo] = arr;
+//         `,
+//     },
+//   ],
+//   invalid: [],
+// } as const);
