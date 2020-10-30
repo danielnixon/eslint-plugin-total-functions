@@ -679,12 +679,12 @@
     semver "~6.3.0"
 
 "@stryker-mutator/typescript-checker@^4.0.0":
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/@stryker-mutator/typescript-checker/-/typescript-checker-4.0.0.tgz#3bed1e6c17cbd16a27e708e72c03bd85ad7a68d0"
-  integrity sha512-LYj46z1adbCVFabEvOZ4OenY8R+ithnoLbSkeMtN78AXRXDW1rzE40j9uYb08pb62CmqorL23MIh+GcPENIVvw==
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/@stryker-mutator/typescript-checker/-/typescript-checker-4.1.0.tgz#59982bbf50516913a7c44d9335944c8ebbd4b547"
+  integrity sha512-TtxHQtnIvOR+Pw4Iw2UjLNQAtqBB4tsWMUpJd6mgshgPlnbLSaqQmfZs4B72N6Qw2GpvdxeSyR0vnUbtxSW+3g==
   dependencies:
-    "@stryker-mutator/api" "4.0.0"
-    "@stryker-mutator/util" "4.0.0"
+    "@stryker-mutator/api" "4.1.0"
+    "@stryker-mutator/util" "4.1.0"
     semver "~7.3.2"
 
 "@stryker-mutator/util@4.0.0":
