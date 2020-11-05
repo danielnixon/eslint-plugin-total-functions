@@ -18,7 +18,7 @@ An ESLint plugin to enforce the use of total functions (and prevent the use of [
 
 | TypeScript       | ESLint  | eslint-plugin-total-functions |
 | :--------------: | :-----: |  :--------------------------: |
-|  4.1.0-beta      | 7.11.0  | 4.5.0
+|  4.1.0-rc        | 7.11.0  | 4.5.0
 |  4.0.2           | 7.9.0   | 3.3.0                         |
 
 ## Installation
@@ -27,10 +27,10 @@ An ESLint plugin to enforce the use of total functions (and prevent the use of [
 yarn add --dev eslint-plugin-total-functions \
   @typescript-eslint/parser \
   eslint \
-  typescript@beta
+  typescript@rc
 ```
 
-We've jumped on TypeScript 4.1 early because [noUncheckedIndexedAccess](https://devblogs.microsoft.com/typescript/announcing-typescript-4-1-beta/#no-unchecked-indexed-access) is too good to wait for. For this reason you'll have to install `typescript@beta` until [mid-November](https://github.com/microsoft/TypeScript/issues/40124).
+We've jumped on TypeScript 4.1 early because [noUncheckedIndexedAccess](https://devblogs.microsoft.com/typescript/announcing-typescript-4-1-beta/#no-unchecked-indexed-access) is too good to wait for. For this reason you'll have to install `typescript@rc` until [mid-November](https://github.com/microsoft/TypeScript/issues/40124).
 
 ## Setup
 
