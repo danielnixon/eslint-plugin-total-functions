@@ -697,12 +697,12 @@
     angular-html-parser "~1.7.0"
 
 "@stryker-mutator/jest-runner@^4.0.0":
-  version "4.1.0"
-  resolved "https://registry.yarnpkg.com/@stryker-mutator/jest-runner/-/jest-runner-4.1.0.tgz#b23c5ba6d8345c0cca72b4033493d52ed78d134b"
-  integrity sha512-hAeF7/o4DlvF5SsGEKTbQA77nu1Y041GCE7YkiXkN6uQEmvK9Gy+YoLXpZqIfl5U0WX/xk8P+gwXjt+s+zVKZQ==
+  version "4.1.1"
+  resolved "https://registry.yarnpkg.com/@stryker-mutator/jest-runner/-/jest-runner-4.1.1.tgz#fc3a0de1788cc445b13ba1ce9c4c72e510a54e6c"
+  integrity sha512-BCJWxckeJzgj8vNL+6piSa/XDJsc/rVUgMo+vTatpopH+sGDlL3x1GQHvpHsmmiBxzCPhuyDPc1E8IqXQBaLlQ==
   dependencies:
-    "@stryker-mutator/api" "4.1.0"
-    "@stryker-mutator/util" "4.1.0"
+    "@stryker-mutator/api" "4.1.1"
+    "@stryker-mutator/util" "4.1.1"
     semver "~6.3.0"
 
 "@stryker-mutator/typescript-checker@^4.0.0":
