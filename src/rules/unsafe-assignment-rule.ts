@@ -653,7 +653,9 @@ export const createNoUnsafeAssignmentRule = (
       if (node.returnType === undefined) {
         return;
       }
-      const destinationNode = parserServices.esTreeNodeToTSNodeMap.get(
+      // TODO fix this
+      // eslint-disable-next-line total-functions/no-unsafe-mutable-readonly-assignment
+      const destinationNode: Node = parserServices.esTreeNodeToTSNodeMap.get(
         node.returnType.typeAnnotation
       );
       const destinationType = checker.getTypeAtLocation(destinationNode);
