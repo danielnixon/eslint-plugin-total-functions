@@ -18,6 +18,7 @@ import {
   getCallSignaturesOfType,
   intersectionTypeParts,
   isObjectType,
+  isUnionOrIntersectionType,
   unionTypeParts,
 } from "tsutils";
 
@@ -245,18 +246,23 @@ export const createNoUnsafeAssignmentRule = (
     seenTypes: TypePairArray
   ): boolean => {
     // eslint-disable-next-line functional/no-conditional-statement
-    if (checker.isArrayType(destinationType)) {
-      // Avoid checking every property for unsafe assignment if the source and destination are arrays.
+    if (
+      checker.isArrayType(destinationType) &&
+      !isUnionOrIntersectionType(destinationType) &&
+      !isUnionOrIntersectionType(sourceType)
+    ) {
+      // For performance reasons we avoid checking every array property for unsafe assignment.
+      //
+      // If one of these arrays is readonly and the other mutable, it will be caught by `isUnsafeIndexAssignment`,
+      // so we needn't compare each individual property.
       //
       // Additionally, the length property of tuples is technically mutable (wtf) so we ignore arrays for this reason too.
       // Observe:
       //   const foo = [] as const;
       //   foo.length = 0;
       //
-      // If one of these is readonly and the other mutable, it will be caught by `isUnsafeIndexAssignment`.
-      //
-      // TODO what about types that include arrays as union or intersection members?
       // TODO what about tuples?
+      // TODO should we ignore other built-in types like strings, symbols and numbers for performance too?
       return false;
     }
 
@@ -313,6 +319,13 @@ export const createNoUnsafeAssignmentRule = (
       return false;
     }
 
+    // TODO https://github.com/danielnixon/eslint-plugin-total-functions/issues/100
+    // eslint-disable-next-line total-functions/no-unsafe-mutable-readonly-assignment
+    const nextSeenTypes: TypePairArray = seenTypes.concat({
+      destinationType: rawDestinationType,
+      sourceType: rawSourceType,
+    });
+
     const typePairs = assignableTypePairs(
       rawDestinationType,
       rawSourceType,
@@ -327,13 +340,6 @@ export const createNoUnsafeAssignmentRule = (
 
     const isUnsafeFunctionAssignment = (typePairs: TypePairArray): boolean =>
       typePairs.some(({ sourceType, destinationType }) => {
-        // TODO https://github.com/danielnixon/eslint-plugin-total-functions/issues/100
-        // eslint-disable-next-line total-functions/no-unsafe-mutable-readonly-assignment
-        const nextSeenTypes: TypePairArray = seenTypes.concat({
-          destinationType,
-          sourceType,
-        });
-
         const sourceCallSignatures = getCallSignaturesOfType(sourceType);
         const destinationCallSignatures = getCallSignaturesOfType(
           destinationType
@@ -417,13 +423,6 @@ export const createNoUnsafeAssignmentRule = (
       objectTypePairs: TypePairArray
     ): boolean =>
       objectTypePairs.some(({ sourceType, destinationType }) => {
-        // TODO https://github.com/danielnixon/eslint-plugin-total-functions/issues/100
-        // eslint-disable-next-line total-functions/no-unsafe-mutable-readonly-assignment
-        const nextSeenTypes: TypePairArray = seenTypes.concat({
-          destinationType,
-          sourceType,
-        });
-
         // This is an unsafe assignment if...
         return (
           // we're not in an infinitely recursive type,
