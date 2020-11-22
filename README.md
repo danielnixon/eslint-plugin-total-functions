@@ -38,7 +38,7 @@ Use [eslint-config-typed-fp](https://github.com/danielnixon/eslint-config-typed-
 
 ### Option 2
 
-1. Turn on TypeScript's [strict mode](https://www.typescriptlang.org/tsconfig#strict) and [noUncheckedIndexedAccess](https://devblogs.microsoft.com/typescript/announcing-typescript-4-1-beta/#no-unchecked-indexed-access) option.
+1. Turn on TypeScript's [strict mode](https://www.typescriptlang.org/tsconfig#strict) and [noUncheckedIndexedAccess](https://www.typescriptlang.org/tsconfig#noUncheckedIndexedAccess) option.
 2. Set up [ESLint + TypeScript](https://github.com/typescript-eslint/typescript-eslint/blob/master/docs/getting-started/linting/README.md).
 3. Turn on [eslint-plugin-functional](https://github.com/jonaskello/eslint-plugin-functional) (recommended). Its rules related to mutation and OO are more important than this plugin's rules and they'll help keep your types honest.
 4. Update your `.eslintrc.js`:
@@ -163,7 +163,7 @@ This rule is excluded from the `recommended` config until [#83](https://github.c
 
 ### total-functions/no-unsafe-subscript
 
-Prior to TypeScript 4.1's [noUncheckedIndexedAccess](https://devblogs.microsoft.com/typescript/announcing-typescript-4-1-beta/#no-unchecked-indexed-access) option, member access for arrays and records was not type safe. For example:
+Prior to TypeScript 4.1's [noUncheckedIndexedAccess](https://www.typescriptlang.org/tsconfig#noUncheckedIndexedAccess) option, member access for arrays and records was not type safe. For example:
 
 ```typescript
 const a: string[] = [];
@@ -188,7 +188,7 @@ For examples of member access that this rule considers valid and invalid, see [n
 
 ### total-functions/no-unsafe-destructuring
 
-Prior to TypeScript 4.1's [noUncheckedIndexedAccess](https://devblogs.microsoft.com/typescript/announcing-typescript-4-1-beta/#no-unchecked-indexed-access) option, destructuring arrays and records was not type safe. For example:
+Prior to TypeScript 4.1's [noUncheckedIndexedAccess](https://www.typescriptlang.org/tsconfig#noUncheckedIndexedAccess) option, destructuring arrays and records was not type safe. For example:
 
 ```typescript
 const array: readonly string[] = [];
