@@ -340,6 +340,13 @@ export const createNoUnsafeAssignmentRule = (
 
     const isUnsafeFunctionAssignment = (typePairs: TypePairArray): boolean =>
       typePairs.some(({ sourceType, destinationType }) => {
+        // TODO https://github.com/danielnixon/eslint-plugin-total-functions/issues/100
+        // eslint-disable-next-line total-functions/no-unsafe-mutable-readonly-assignment
+        const nextSeenTypesWithPair: TypePairArray = nextSeenTypes.concat({
+          destinationType,
+          sourceType,
+        });
+
         const sourceCallSignatures = getCallSignaturesOfType(sourceType);
         const destinationCallSignatures = getCallSignaturesOfType(
           destinationType
@@ -385,7 +392,7 @@ export const createNoUnsafeAssignmentRule = (
                     sourceParameterType,
                     destinationParameterType,
                     checker,
-                    nextSeenTypes
+                    nextSeenTypesWithPair
                   );
                 });
             };
@@ -410,7 +417,7 @@ export const createNoUnsafeAssignmentRule = (
                 destinationReturnType,
                 sourceReturnType,
                 checker,
-                nextSeenTypes
+                nextSeenTypesWithPair
               ) ||
                 // or the parameter types of the functions are unsafe assignment.
                 isUnsafeParameterAssignment())
@@ -423,6 +430,13 @@ export const createNoUnsafeAssignmentRule = (
       objectTypePairs: TypePairArray
     ): boolean =>
       objectTypePairs.some(({ sourceType, destinationType }) => {
+        // TODO https://github.com/danielnixon/eslint-plugin-total-functions/issues/100
+        // eslint-disable-next-line total-functions/no-unsafe-mutable-readonly-assignment
+        const nextSeenTypesWithPair: TypePairArray = nextSeenTypes.concat({
+          destinationType,
+          sourceType,
+        });
+
         // This is an unsafe assignment if...
         return (
           // we're not in an infinitely recursive type,
@@ -444,7 +458,7 @@ export const createNoUnsafeAssignmentRule = (
             destinationType,
             sourceType,
             checker,
-            nextSeenTypes
+            nextSeenTypesWithPair
           ) ||
             // unsafe number index assignment, or
             isUnsafeIndexAssignment(
@@ -454,7 +468,7 @@ export const createNoUnsafeAssignmentRule = (
               destinationType,
               sourceType,
               checker,
-              nextSeenTypes
+              nextSeenTypesWithPair
             ) ||
             // unsafe property assignment.
             isUnsafePropertyAssignment(
@@ -463,7 +477,7 @@ export const createNoUnsafeAssignmentRule = (
               destinationType,
               sourceType,
               checker,
-              nextSeenTypes
+              nextSeenTypesWithPair
             ))
         );
       });

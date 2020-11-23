@@ -505,6 +505,60 @@ ruleTester.run("no-unsafe-readonly-mutable-assignment", rule, {
         }
       `,
     },
+    {
+      filename: "file.ts",
+      code: `
+        interface Foo {
+          foo: 'bar'
+        }
+
+        interface Bar {
+          foo: 'bar'
+        }
+
+        const foo: Recursive<Foo> = 42 as any
+        export default foo as Recursive<Bar>
+
+        type Recursive<P> = P | Nested<P>;
+        type Nested<P> = ReadonlyArray<Recursive<P>>;
+      `,
+    },
+    {
+      filename: "file.ts",
+      code: `
+        interface Foo {
+          foo: 'bar'
+        }
+
+        interface Bar {
+          foo: 'bar'
+        }
+
+        const foo: Recursive<Foo> = 42 as any
+        export default foo as Recursive<Bar>
+
+        type Recursive<P> = P | Nested<P>;
+        type Nested<P> = () => Recursive<P>
+      `,
+    },
+    {
+      filename: "file.ts",
+      code: `
+        interface Foo {
+          foo: 'bar'
+        }
+
+        interface Bar {
+          foo: 'bar'
+        }
+
+        const foo: Recursive<Foo> = 42 as any
+        export default foo as Recursive<Bar>
+
+        type Recursive<P> = P | Nested<P>;
+        type Nested<P> = { baz: Recursive<P> }
+      `,
+    },
   ],
   invalid: [
     /**
