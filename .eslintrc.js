@@ -9,7 +9,6 @@ module.exports = {
     "typed-fp",
     "plugin:sonarjs/recommended",
     "plugin:jest/recommended",
-    "prettier/@typescript-eslint",
     "plugin:prettier/recommended"
   ],
   env: {
