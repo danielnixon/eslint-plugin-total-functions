@@ -6,6 +6,7 @@
 [![Known Vulnerabilities](https://snyk.io/test/github/danielnixon/eslint-plugin-total-functions/badge.svg?targetFile=package.json)](https://snyk.io/test/github/danielnixon/eslint-plugin-total-functions?targetFile=package.json)
 [![Total alerts](https://img.shields.io/lgtm/alerts/g/danielnixon/eslint-plugin-total-functions.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/danielnixon/eslint-plugin-total-functions/alerts/)
 [![Language grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/danielnixon/eslint-plugin-total-functions.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/danielnixon/eslint-plugin-total-functions/context:javascript)
+[![deepcode](https://www.deepcode.ai/api/gh/badge?key=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwbGF0Zm9ybTEiOiJnaCIsIm93bmVyMSI6ImRhbmllbG5peG9uIiwicmVwbzEiOiJlc2xpbnQtcGx1Z2luLXRvdGFsLWZ1bmN0aW9ucyIsImluY2x1ZGVMaW50IjpmYWxzZSwiYXV0aG9ySWQiOjI4ODQyLCJpYXQiOjE2MTc1MDY0MTJ9.1uzzrYmNoLJRA55dEE_8mQYO4h2G1VYFiHZqobpVvSQ)](https://www.deepcode.ai/app/gh/danielnixon/eslint-plugin-total-functions/_/dashboard?utm_content=gh%2Fdanielnixon%2Feslint-plugin-total-functions)
 [![npm](https://img.shields.io/npm/v/eslint-plugin-total-functions.svg)](https://www.npmjs.com/package/eslint-plugin-total-functions)
 
 [![dependencies Status](https://david-dm.org/danielnixon/eslint-plugin-total-functions/status.svg)](https://david-dm.org/danielnixon/eslint-plugin-total-functions)
