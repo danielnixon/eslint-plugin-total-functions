@@ -1,0 +1,58 @@
+version: 2
+updates:
+- package-ecosystem: npm
+  directory: "/"
+  schedule:
+    interval: daily
+    time: "19:30"
+  open-pull-requests-limit: 10
+  ignore:
+  - dependency-name: "@typescript-eslint/experimental-utils"
+    versions:
+    - 4.15.1
+    - 4.15.2
+    - 4.16.0
+    - 4.16.1
+    - 4.18.0
+    - 4.20.0
+    - 4.21.0
+    - 4.22.0
+  - dependency-name: "@types/eslint"
+    versions:
+    - 7.2.9
+  - dependency-name: type-coverage
+    versions:
+    - 2.16.0
+    - 2.16.1
+    - 2.16.2
+    - 2.17.1
+  - dependency-name: eslint
+    versions:
+    - 7.23.0
+  - dependency-name: "@types/jest"
+    versions:
+    - 26.0.21
+  - dependency-name: eslint-plugin-jest
+    versions:
+    - 24.1.9
+    - 24.2.0
+  - dependency-name: patch-package
+    versions:
+    - 6.4.2
+    - 6.4.4
+  - dependency-name: "@typescript-eslint/parser"
+    versions:
+    - 4.15.1
+    - 4.16.0
+  - dependency-name: "@typescript-eslint/eslint-plugin"
+    versions:
+    - 4.14.2
+    - 4.15.1
+    - 4.16.0
+  - dependency-name: eslint-config-prettier
+    versions:
+    - 8.0.0
+    - 8.1.0
+  - dependency-name: typescript
+    versions:
+    - 4.1.4
