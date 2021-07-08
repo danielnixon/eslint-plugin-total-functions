@@ -46,7 +46,7 @@
     "format": "prettier --write 'src/**/*.{ts,tsx}'",
     "test": "jest",
     "release": "yarn build && yarn lint && yarn type-coverage && yarn publish",
-    "mutation-test": "patch-package && stryker run"
+    "mutation-test": "stryker run"
   },
   "typeCoverage": {
     "atLeast": 100,
