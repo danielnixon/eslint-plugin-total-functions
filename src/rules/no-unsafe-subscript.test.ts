@@ -26,39 +26,33 @@ ruleTester.run("no-unsafe-subscript", rule, {
     // Const array property access with non-literal (but const) key.
     {
       filename: "file.ts",
-      code:
-        "const arr = [0, 1, 2] as const; const key = 0 as const; const foo = arr[key];",
+      code: "const arr = [0, 1, 2] as const; const key = 0 as const; const foo = arr[key];",
     },
     // Tuple (within range).
     {
       filename: "file.ts",
-      code:
-        "const arr = [0, 1, 2] as [number, number, number]; const foo = arr[0];",
+      code: "const arr = [0, 1, 2] as [number, number, number]; const foo = arr[0];",
     },
     // Tuple (last element within range).
     {
       filename: "file.ts",
-      code:
-        "const arr = [0, 1, 2] as [number, number, number]; const foo = arr[2];",
+      code: "const arr = [0, 1, 2] as [number, number, number]; const foo = arr[2];",
     },
     // Partial tuple (within range of tuple portion).
     {
       filename: "file.ts",
-      code:
-        "const arr = [0, 1, 2] as [number, number, ...number[]]; const foo = arr[0];",
+      code: "const arr = [0, 1, 2] as [number, number, ...number[]]; const foo = arr[0];",
     },
     // Tuple (outside range)
     // Not flagged by this rule because TypeScript itself will complain about it.
     {
       filename: "file.ts",
-      code:
-        "const arr = [0, 1, 2] as [number, number, number]; const foo = arr[3];",
+      code: "const arr = [0, 1, 2] as [number, number, number]; const foo = arr[3];",
     },
     // Array subscript access where array generic type is union including undefined.
     {
       filename: "file.ts",
-      code:
-        "const arr = [0, 1, 2] as Array<number | undefined>; const foo = arr[0];",
+      code: "const arr = [0, 1, 2] as Array<number | undefined>; const foo = arr[0];",
     },
     // Array subscript access where array generic type is undefined.
     {
@@ -107,64 +101,55 @@ ruleTester.run("no-unsafe-subscript", rule, {
     // Allowed because the partiality isn't observable.
     {
       filename: "file.ts",
-      code:
-        "const last: <A>(array: ReadonlyArray<A>) => A | undefined = (a) => a[a.length - 1];",
+      code: "const last: <A>(array: ReadonlyArray<A>) => A | undefined = (a) => a[a.length - 1];",
     },
     // Result returned from arrow function whose return type includes undefined.
     // Allowed because the partiality isn't observable.
     {
       filename: "file.ts",
-      code:
-        "const last: <A>(array: ReadonlyArray<A>) => A | undefined = (a) => { console.log('a'); return a[a.length - 1]; }",
+      code: "const last: <A>(array: ReadonlyArray<A>) => A | undefined = (a) => { console.log('a'); return a[a.length - 1]; }",
     },
     // Result returned from function whose return type includes undefined.
     // Allowed because the partiality isn't observable.
     {
       filename: "file.ts",
-      code:
-        "function last<A>(array: ReadonlyArray<A>): A | undefined { console.log('a'); return array[array.length - 1]; }",
+      code: "function last<A>(array: ReadonlyArray<A>): A | undefined { console.log('a'); return array[array.length - 1]; }",
     },
     // Result returned from function (alternate syntax) whose return type includes undefined.
     // Allowed because the partiality isn't observable.
     {
       filename: "file.ts",
-      code:
-        "const last = function <A>(array: ReadonlyArray<A>): A | undefined { console.log('a'); return array[array.length - 1]; }",
+      code: "const last = function <A>(array: ReadonlyArray<A>): A | undefined { console.log('a'); return array[array.length - 1]; }",
     },
     // Object expression where result of array access is assigned to optional property (type name).
     // Allowed because the partiality isn't observable.
     {
       filename: "file.ts",
-      code:
-        "type Foo = { readonly foo?: number }; const arr = [0]; const foo: Foo = { foo: arr[0] };",
+      code: "type Foo = { readonly foo?: number }; const arr = [0]; const foo: Foo = { foo: arr[0] };",
     },
     // Object expression where result of array access is assigned to optional property (type literal).
     // Allowed because the partiality isn't observable.
     {
       filename: "file.ts",
-      code:
-        "const arr = [0]; const foo: { readonly foo?: number } = { foo: arr[0] };",
+      code: "const arr = [0]; const foo: { readonly foo?: number } = { foo: arr[0] };",
     },
     // Object expression where result of array access is assigned to property that includes undefined (type name).
     // Allowed because the partiality isn't observable.
     {
       filename: "file.ts",
-      code:
-        "type Foo = { readonly foo: number | undefined }; const arr = [0]; const foo: Foo = { foo: arr[0] };",
+      code: "type Foo = { readonly foo: number | undefined }; const arr = [0]; const foo: Foo = { foo: arr[0] };",
     },
     // Object expression where result of array access is assigned to property that includes undefined (type literal).
     // Allowed because the partiality isn't observable.
     {
       filename: "file.ts",
-      code:
-        "const arr = [0]; const foo: { readonly foo: number | undefined } = { foo: arr[0] };",
+      code: "const arr = [0]; const foo: { readonly foo: number | undefined } = { foo: arr[0] };",
     },
     // Object expression with type assertion that includes undefined for the property being assigned to by the array access.
     // Allowed because the partiality isn't observable.
     {
       filename: "file.ts",
-      code:
-        "const arr = [0]; const foo = { foo: arr[0] } as { readonly foo: number | undefined };",
+      code: "const arr = [0]; const foo = { foo: arr[0] } as { readonly foo: number | undefined };",
     },
     // Record (calculated property access) includes undefined in record type
     {
@@ -187,8 +172,7 @@ ruleTester.run("no-unsafe-subscript", rule, {
     // Partial tuple property access with non-literal (but const) key (within range of tuple portion).
     {
       filename: "file.ts",
-      code:
-        "const arr: readonly [0, 1, 2, ...(readonly number[])] = [0, 1, 2]; const key = 1; const foo = arr[key];",
+      code: "const arr: readonly [0, 1, 2, ...(readonly number[])] = [0, 1, 2]; const key = 1; const foo = arr[key];",
       errors: [
         {
           messageId: "errorStringGeneric",
@@ -221,8 +205,7 @@ ruleTester.run("no-unsafe-subscript", rule, {
     // Array subscript access with type annotation (union).
     {
       filename: "file.ts",
-      code:
-        "const arr = [0, 1, 2] as number[]; const foo: number | string = arr[0];",
+      code: "const arr = [0, 1, 2] as number[]; const foo: number | string = arr[0];",
       errors: [
         {
           messageId: "errorStringGeneric",
@@ -233,8 +216,7 @@ ruleTester.run("no-unsafe-subscript", rule, {
     // Partial tuple (first element outside range)
     {
       filename: "file.ts",
-      code:
-        "const arr = [0, 1, 2] as [number, number, ...number[]]; const foo = arr[2];",
+      code: "const arr = [0, 1, 2] as [number, number, ...number[]]; const foo = arr[2];",
       errors: [
         {
           messageId: "errorStringGeneric",
@@ -245,8 +227,7 @@ ruleTester.run("no-unsafe-subscript", rule, {
     // Partial tuple (well outside range)
     {
       filename: "file.ts",
-      code:
-        "const arr = [0, 1, 2] as [number, number, ...number[]]; const foo = arr[42];",
+      code: "const arr = [0, 1, 2] as [number, number, ...number[]]; const foo = arr[42];",
       errors: [
         {
           messageId: "errorStringGeneric",
@@ -296,8 +277,7 @@ ruleTester.run("no-unsafe-subscript", rule, {
     // Array access within an arrow function but not the return value;
     {
       filename: "file.ts",
-      code:
-        "const last: <A>(array: ReadonlyArray<A>) => A | undefined = (a) => { a[a.length - 1]; return undefined; }",
+      code: "const last: <A>(array: ReadonlyArray<A>) => A | undefined = (a) => { a[a.length - 1]; return undefined; }",
       errors: [
         {
           messageId: "errorStringGeneric",
@@ -308,8 +288,7 @@ ruleTester.run("no-unsafe-subscript", rule, {
     // Array access within a function but not the return value;
     {
       filename: "file.ts",
-      code:
-        "function last<A>(array: ReadonlyArray<A>): A | undefined { array[array.length - 1]; return undefined; }",
+      code: "function last<A>(array: ReadonlyArray<A>): A | undefined { array[array.length - 1]; return undefined; }",
       errors: [
         {
           messageId: "errorStringGeneric",
@@ -320,8 +299,7 @@ ruleTester.run("no-unsafe-subscript", rule, {
     // Partial tuple property access with non-literal (but const) key (outside range of tuple portion).
     {
       filename: "file.ts",
-      code:
-        "const arr: readonly [0, 1, 2, ...(readonly number[])] = [0, 1, 2]; const key = 42; const foo = arr[key];",
+      code: "const arr: readonly [0, 1, 2, ...(readonly number[])] = [0, 1, 2]; const key = 42; const foo = arr[key];",
       errors: [
         {
           messageId: "errorStringGeneric",
@@ -373,8 +351,7 @@ ruleTester.run("no-unsafe-subscript", rule, {
     // see https://github.com/danielnixon/eslint-plugin-total-functions/issues/68 for details
     {
       filename: "file.ts",
-      code:
-        "const arr = [0, 1, 2]; let foo: number | undefined = undefined; foo = arr[0];",
+      code: "const arr = [0, 1, 2]; let foo: number | undefined = undefined; foo = arr[0];",
       errors: [
         {
           messageId: "errorStringGeneric",

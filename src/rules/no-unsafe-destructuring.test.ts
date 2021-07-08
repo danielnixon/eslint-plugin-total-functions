@@ -21,26 +21,22 @@ ruleTester.run("no-unsafe-destructuring", rule, {
     // Tuple destructuring (within range).
     {
       filename: "file.ts",
-      code:
-        "const arr = [0, 1, 2] as [number, number, number]; const [foo] = arr;",
+      code: "const arr = [0, 1, 2] as [number, number, number]; const [foo] = arr;",
     },
     // Destructuring a partial tuple (within range).
     {
       filename: "file.ts",
-      code:
-        "const array = [0, 1, 2] as [number, ...number[]]; const [foo] = array;",
+      code: "const array = [0, 1, 2] as [number, ...number[]]; const [foo] = array;",
     },
     // Array destructuring when array type contains undefined.
     {
       filename: "file.ts",
-      code:
-        "const arr = [0, 1, 2] as Array<number | undefined>; const [foo] = arr;",
+      code: "const arr = [0, 1, 2] as Array<number | undefined>; const [foo] = arr;",
     },
     // Destructuring a regular array with type annotation that adds undefined.
     {
       filename: "file.ts",
-      code:
-        "const array = [0]; const [foo]: ReadonlyArray<number | undefined> = array;",
+      code: "const array = [0]; const [foo]: ReadonlyArray<number | undefined> = array;",
     },
     // Object destructuring (all fields exist).
     {
@@ -115,8 +111,7 @@ ruleTester.run("no-unsafe-destructuring", rule, {
     // Destructuring a regular array (outside range).
     {
       filename: "file.ts",
-      code:
-        "const array = [0, 1, 2] as number[]; const [foo, bar, baz, qux] = array;",
+      code: "const array = [0, 1, 2] as number[]; const [foo, bar, baz, qux] = array;",
       errors: [
         {
           messageId: "errorStringGeneric",
@@ -127,8 +122,7 @@ ruleTester.run("no-unsafe-destructuring", rule, {
     // Tuple destructuring (outside range).
     {
       filename: "file.ts",
-      code:
-        "const arr = [0, 1, 2] as [number, number, number]; const [foo, bar, baz, qux] = arr;",
+      code: "const arr = [0, 1, 2] as [number, number, number]; const [foo, bar, baz, qux] = arr;",
       errors: [
         {
           messageId: "errorStringGeneric",
@@ -139,8 +133,7 @@ ruleTester.run("no-unsafe-destructuring", rule, {
     // Destructuring a partial tuple (outside range).
     {
       filename: "file.ts",
-      code:
-        "const array = [0, 1, 2] as [number, ...number[]]; const [foo, bar, baz, qux] = array;",
+      code: "const array = [0, 1, 2] as [number, ...number[]]; const [foo, bar, baz, qux] = array;",
       errors: [
         {
           messageId: "errorStringGeneric",
@@ -162,8 +155,7 @@ ruleTester.run("no-unsafe-destructuring", rule, {
     // Object destructuring (record).
     {
       filename: "file.ts",
-      code:
-        "const obj: Record<string, string> = { a: 'a' }; const { a } = obj;",
+      code: "const obj: Record<string, string> = { a: 'a' }; const { a } = obj;",
       errors: [
         {
           messageId: "errorStringGeneric",
