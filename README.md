@@ -74,8 +74,8 @@ Alternatively you can configure individual rules separately (see below).
 |  no-unsafe-readonly-mutable-assignment  | ✅           | ✅    |        |
 |  no-unsafe-mutable-readonly-assignment  |              | ✅    | [Not yet](https://github.com/danielnixon/eslint-plugin-total-functions/issues/99) |
 |  no-unsafe-optional-property-assignment | [Not yet](https://github.com/danielnixon/eslint-plugin-total-functions/issues/83) | ✅    |       |
-|  no-unsafe-subscript                    | Deprecated   | ✅    |        |
-|  no-unsafe-destructuring                | Deprecated   | ✅    |        |
+|  no-unsafe-subscript                    | Deprecated   | Deprecated    |        |
+|  no-unsafe-destructuring                | Deprecated   | Deprecated    |        |
 
 ### total-functions/require-strict-mode
 
@@ -163,7 +163,7 @@ This rule bans assignment from one type to another, if:
 This rule is excluded from the `recommended` config until [#83](https://github.com/danielnixon/eslint-plugin-total-functions/issues/83) lands.
 
 
-### total-functions/no-unsafe-subscript
+### total-functions/no-unsafe-subscript (deprecated)
 
 Prior to TypeScript 4.1's [noUncheckedIndexedAccess](https://www.typescriptlang.org/tsconfig#noUncheckedIndexedAccess) option, member access for arrays and records was not type safe. For example:
 
@@ -188,7 +188,7 @@ This rule bans unsafe member access. Only use this rule if you are stuck on Type
 
 For examples of member access that this rule considers valid and invalid, see [no-unsafe-subscript.test.ts](https://github.com/danielnixon/eslint-plugin-total-functions/blob/master/src/rules/no-unsafe-subscript.test.ts).
 
-### total-functions/no-unsafe-destructuring
+### total-functions/no-unsafe-destructuring (deprecated)
 
 Prior to TypeScript 4.1's [noUncheckedIndexedAccess](https://www.typescriptlang.org/tsconfig#noUncheckedIndexedAccess) option, destructuring arrays and records was not type safe. For example:
 

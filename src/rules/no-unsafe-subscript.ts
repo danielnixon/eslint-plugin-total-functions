@@ -14,6 +14,7 @@ import ts from "typescript";
 const noUnsafeSubscript: RuleModule<"errorStringGeneric", readonly []> = {
   meta: {
     type: "problem",
+    deprecated: true,
     docs: {
       category: "Possible Errors",
       description:

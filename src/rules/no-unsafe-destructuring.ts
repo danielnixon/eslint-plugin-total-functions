@@ -9,6 +9,7 @@ import ts from "typescript";
 const noUnsafeDestructuring: RuleModule<"errorStringGeneric", readonly []> = {
   meta: {
     type: "problem",
+    deprecated: true,
     docs: {
       category: "Possible Errors",
       description:
