@@ -1610,10 +1610,10 @@ eslint-config-prettier@8.3.0:
   resolved "https://registry.yarnpkg.com/eslint-config-prettier/-/eslint-config-prettier-8.3.0.tgz#f7471b20b6fe8a9a9254cc684454202886a2dd7a"
   integrity sha512-BgZuLUSeKzvlL/VUjx/Yb787VQ26RU3gGjA3iiFvdsp/2bMfVIWUVP7tjxtjS0e+HP409cPlPvNkQloz8C91ew==
 
-eslint-config-typed-fp@1.4.1:
-  version "1.4.1"
-  resolved "https://registry.yarnpkg.com/eslint-config-typed-fp/-/eslint-config-typed-fp-1.4.1.tgz#1348523855db10993e383c321268d65fd14de8bd"
-  integrity sha512-TuEKs5IbgZOARqhhig1JoAr4EEPR3lrCuMAeqqDuwLVCnx0xK3g/fJy6O5ljtN1WqWT9cQpKVuruIy/rSqfnBg==
+eslint-config-typed-fp@1.5.0:
+  version "1.5.0"
+  resolved "https://registry.yarnpkg.com/eslint-config-typed-fp/-/eslint-config-typed-fp-1.5.0.tgz#5f8e7540b742db3e491b75243de25cd0d6c318b7"
+  integrity sha512-ETR7y+BFqyhie8NjX68+Bidx8bbOoXZyultJbboD/IieASLh6l/sWNNM3Mwvi5OJKdqtllfEEqlyq1jG4x8vQQ==
 
 eslint-plugin-functional@3.2.1:
   version "3.2.1"
