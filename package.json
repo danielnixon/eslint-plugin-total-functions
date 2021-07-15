@@ -23,7 +23,7 @@
     "eslint-plugin-prettier": "3.4.0",
     "eslint-plugin-sonarjs": "0.9.1",
     "eslint-plugin-total-functions": "4.7.2",
-    "jest": "^27.0.6",
+    "jest": "27.0.6",
     "patch-package": "6.4.7",
     "prettier": "2.3.2",
     "ts-jest": "27.0.3",
