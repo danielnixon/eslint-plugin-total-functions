@@ -647,6 +647,15 @@
     mutation-testing-report-schema "1.7.4"
     tslib "~2.3.0"
 
+"@stryker-mutator/api@5.2.3":
+  version "5.2.3"
+  resolved "https://registry.yarnpkg.com/@stryker-mutator/api/-/api-5.2.3.tgz#4e411631598cbdf72abccb93bdfd161d7b3ed987"
+  integrity sha512-/3awV6uxaj3/q/EHOqV7325XkuE99cjzcgs7eprks0mpZDA03B13Txos+i/xV1sojP/wVuXNOcT8MC8U+H79kg==
+  dependencies:
+    mutation-testing-metrics "1.7.4"
+    mutation-testing-report-schema "1.7.4"
+    tslib "~2.3.0"
+
 "@stryker-mutator/core@5.2.2":
   version "5.2.2"
   resolved "https://registry.yarnpkg.com/@stryker-mutator/core/-/core-5.2.2.tgz#2581851be791f3a8b534811b54a2b35ca4875f9c"
@@ -707,19 +716,26 @@
     semver "~7.3.5"
     tslib "~2.3.0"
 
-"@stryker-mutator/typescript-checker@5.2.2":
-  version "5.2.2"
-  resolved "https://registry.yarnpkg.com/@stryker-mutator/typescript-checker/-/typescript-checker-5.2.2.tgz#d7036463d3addb87218265259cfa966a825ee59f"
-  integrity sha512-8RRkqh7DoV0vKGiBZJweLm8lSe0Pf2NZFxVPw4+QGaNh5jmhVqMj1HXm9vlsXue+dteEIfZBUeoZcaZ/QFszcw==
+"@stryker-mutator/typescript-checker@5.2.3":
+  version "5.2.3"
+  resolved "https://registry.yarnpkg.com/@stryker-mutator/typescript-checker/-/typescript-checker-5.2.3.tgz#1df3a4ad0d5a544e69591366990b24e61701feed"
+  integrity sha512-RxWMCO6COwiEv3/IhhqkT/hJhS/bckIsrE1jw0OYUcPsFPnOtnaE67DZFrUcp9Q6qF1+Sisz4EE0WBZyOORjZQ==
   dependencies:
-    "@stryker-mutator/api" "5.2.2"
-    "@stryker-mutator/util" "5.2.2"
+    "@stryker-mutator/api" "5.2.3"
+    "@stryker-mutator/util" "5.2.3"
     semver "~7.3.2"
 
 "@stryker-mutator/util@5.2.2":
   version "5.2.2"
   resolved "https://registry.yarnpkg.com/@stryker-mutator/util/-/util-5.2.2.tgz#3211009d32e652c7b9121a06c4ecc013b126956c"
   integrity sha512-6CQIGdP4u88HqpWpiqVn2XdhFU/bQ1Ith+ifxnvmfuL5O/s3Kuib8kHOyQYo743XIR7pBTdFhtw848K5254hxA==
+  dependencies:
+    lodash.flatmap "~4.5.0"
+
+"@stryker-mutator/util@5.2.3":
+  version "5.2.3"
+  resolved "https://registry.yarnpkg.com/@stryker-mutator/util/-/util-5.2.3.tgz#340a0ec05e7ced7df81724ea6ad39471d82acf5d"
+  integrity sha512-WRuHo+yBrMRIxKJtrI0MRXZFl2R5FfieIwWGh19jodityOEZIkylECSp5ogwBor5ZYLwrP9QUg3qV2jz8Pf7ZQ==
   dependencies:
     lodash.flatmap "~4.5.0"
 
