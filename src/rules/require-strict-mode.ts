@@ -44,7 +44,11 @@ const requireStrictMode: RuleModule<
 
     return {
       Program: (node) => {
-        const mustBeEnabled = ["strict", "noUncheckedIndexedAccess", "useUnknownInCatchVariables"] as const;
+        const mustBeEnabled = [
+          "strict",
+          "noUncheckedIndexedAccess",
+          "useUnknownInCatchVariables",
+        ] as const;
         const mustNotBeDisabled = [
           "strictFunctionTypes",
           "strictBindCallApply",
