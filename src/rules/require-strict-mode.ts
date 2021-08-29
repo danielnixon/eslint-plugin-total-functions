@@ -7,6 +7,7 @@ import { ESLintUtils } from "@typescript-eslint/experimental-utils";
 const requireStrictMode: RuleModule<
   | "strict"
   | "noUncheckedIndexedAccess"
+  | "useUnknownInCatchVariables"
   | "strictFunctionTypes"
   | "strictBindCallApply"
   | "strictNullChecks"
@@ -25,6 +26,8 @@ const requireStrictMode: RuleModule<
       strict: "TypeScript's strict mode is required.",
       noUncheckedIndexedAccess:
         "TypeScript's noUncheckedIndexedAccess mode is required.",
+      useUnknownInCatchVariables:
+        "TypeScript's useUnknownInCatchVariables mode is required.",
       strictFunctionTypes:
         "Do not disable the strictFunctionTypes compiler option.",
       strictBindCallApply:
@@ -41,7 +44,7 @@ const requireStrictMode: RuleModule<
 
     return {
       Program: (node) => {
-        const mustBeEnabled = ["strict", "noUncheckedIndexedAccess"] as const;
+        const mustBeEnabled = ["strict", "noUncheckedIndexedAccess", "useUnknownInCatchVariables"] as const;
         const mustNotBeDisabled = [
           "strictFunctionTypes",
           "strictBindCallApply",
