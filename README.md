@@ -19,12 +19,12 @@ An ESLint plugin to enforce the use of total functions (and prevent the use of [
 
 ## Version Matrix
 
-| TypeScript       | ESLint  | eslint-plugin-total-functions |
-| :--------------: | :-----: |  :--------------------------: |
-|  4.4.2           | 7.32.0  | 4.10.0                        |
-|  4.3.5           | 7.30.0  | 4.8.0                         |
-|  4.1.2           | 7.12.0  | 4.7.2                         |
-|  4.0.2           | 7.9.0   | 3.3.0                         |
+| TypeScript       | ESLint  | eslint-plugin-total-functions | Suppported? |
+| :--------------: | :-----: |  :--------------------------: | :---------: |
+|  4.4.2           | 7.32.0  | 4.10.0                        |             |
+|  4.3.5           | 7.30.0  | 4.8.0                         | No          |
+|  4.1.2           | 7.12.0  | 4.7.2                         | No          |
+|  4.0.2           | 7.9.0   | 3.3.0                         | No          |
 
 ## Installation
 
