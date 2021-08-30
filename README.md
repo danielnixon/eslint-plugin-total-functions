@@ -217,7 +217,6 @@ For examples of destructuring that this rule considers valid and invalid, see [n
 * [TypeScript for Functional Programmers](https://www.typescriptlang.org/docs/handbook/typescript-in-5-minutes-func.html)
 * https://github.com/danielnixon/eslint-config-typed-fp
 * https://github.com/danielnixon/readonly-types
-* https://github.com/danielnixon/total-functions
 * https://github.com/jonaskello/eslint-plugin-functional
 * https://github.com/gcanti/fp-ts
 * https://github.com/plantain-00/type-coverage
