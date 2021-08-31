@@ -27,7 +27,7 @@ const requireStrictMode: RuleModule<
       noUncheckedIndexedAccess:
         "TypeScript's noUncheckedIndexedAccess mode is required.",
       useUnknownInCatchVariables:
-        "TypeScript's useUnknownInCatchVariables mode is required.",
+        "Do not disable the useUnknownInCatchVariables compiler option.",
       strictFunctionTypes:
         "Do not disable the strictFunctionTypes compiler option.",
       strictBindCallApply:
@@ -44,16 +44,13 @@ const requireStrictMode: RuleModule<
 
     return {
       Program: (node) => {
-        const mustBeEnabled = [
-          "strict",
-          "noUncheckedIndexedAccess",
-          "useUnknownInCatchVariables",
-        ] as const;
+        const mustBeEnabled = ["strict", "noUncheckedIndexedAccess"] as const;
         const mustNotBeDisabled = [
           "strictFunctionTypes",
           "strictBindCallApply",
           "strictNullChecks",
           "strictPropertyInitialization",
+          "useUnknownInCatchVariables",
         ] as const;
 
         // eslint-disable-next-line functional/no-expression-statement
