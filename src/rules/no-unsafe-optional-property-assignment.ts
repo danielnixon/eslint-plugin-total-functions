@@ -32,6 +32,7 @@ const message =
 /**
  * An ESLint rule to ban unsafe assignment to optional properties.
  */
+// eslint-disable-next-line total-functions/no-unsafe-readonly-mutable-assignment
 const noUnsafeOptionalPropertyAssignment: RuleModule<MessageId, readonly []> = {
   meta: {
     type: "problem",
@@ -54,6 +55,6 @@ const noUnsafeOptionalPropertyAssignment: RuleModule<MessageId, readonly []> = {
     unsafePropertyAssignmentFunc,
     unsafeIndexAssignmentFunc
   ),
-};
+} as const;
 
 export default noUnsafeOptionalPropertyAssignment;

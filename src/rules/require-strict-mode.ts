@@ -4,6 +4,7 @@ import { ESLintUtils } from "@typescript-eslint/experimental-utils";
 /**
  * An ESLint rule to enforce TypeScript strict mode.
  */
+// eslint-disable-next-line total-functions/no-unsafe-readonly-mutable-assignment
 const requireStrictMode: RuleModule<
   | "strict"
   | "noUncheckedIndexedAccess"
@@ -42,6 +43,7 @@ const requireStrictMode: RuleModule<
     const options = parserServices.program.getCompilerOptions();
 
     return {
+      // eslint-disable-next-line functional/no-return-void
       Program: (node) => {
         const mustBeEnabled = ["strict", "noUncheckedIndexedAccess"] as const;
         const mustNotBeDisabled = [
@@ -52,7 +54,7 @@ const requireStrictMode: RuleModule<
           "useUnknownInCatchVariables",
         ] as const;
 
-        // eslint-disable-next-line functional/no-expression-statement
+        // eslint-disable-next-line functional/no-expression-statement, @typescript-eslint/prefer-readonly-parameter-types, functional/no-return-void
         mustBeEnabled.forEach((option) => {
           // eslint-disable-next-line functional/no-conditional-statement
           if (options[option] !== true) {
@@ -64,7 +66,7 @@ const requireStrictMode: RuleModule<
           }
         });
 
-        // eslint-disable-next-line functional/no-expression-statement
+        // eslint-disable-next-line functional/no-expression-statement, @typescript-eslint/prefer-readonly-parameter-types, functional/no-return-void
         mustNotBeDisabled.forEach((option) => {
           // eslint-disable-next-line functional/no-conditional-statement
           if (options[option] === false) {
@@ -78,6 +80,6 @@ const requireStrictMode: RuleModule<
       },
     };
   },
-};
+} as const;
 
 export default requireStrictMode;

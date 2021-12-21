@@ -64,6 +64,7 @@ const unsafePropertyAssignmentFunc: UnsafePropertyAssignmentFunc = (
 /**
  * An ESLint rule to ban unsafe assignment from readonly to mutable types.
  */
+// eslint-disable-next-line total-functions/no-unsafe-readonly-mutable-assignment
 const noUnsafeReadonlyMutableAssignment: RuleModule<MessageId, readonly []> = {
   meta: {
     type: "problem",
@@ -92,6 +93,6 @@ const noUnsafeReadonlyMutableAssignment: RuleModule<MessageId, readonly []> = {
     unsafePropertyAssignmentFunc,
     unsafeIndexAssignmentFunc
   ),
-};
+} as const;
 
 export default noUnsafeReadonlyMutableAssignment;

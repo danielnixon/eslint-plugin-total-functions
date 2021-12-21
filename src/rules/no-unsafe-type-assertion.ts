@@ -6,6 +6,7 @@ import { isTypeFlagSet } from "tsutils";
 /**
  * An ESLint rule to ban unsafe type assertions.
  */
+// eslint-disable-next-line total-functions/no-unsafe-readonly-mutable-assignment
 const noUnsafeTypeAssertion: RuleModule<"errorStringGeneric", readonly []> = {
   meta: {
     type: "problem",
@@ -66,6 +67,6 @@ const noUnsafeTypeAssertion: RuleModule<"errorStringGeneric", readonly []> = {
       TSAsExpression: reportUnsafe,
     };
   },
-};
+} as const;
 
 export default noUnsafeTypeAssertion;

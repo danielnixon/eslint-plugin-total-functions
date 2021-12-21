@@ -561,7 +561,7 @@ export const createNoUnsafeAssignmentRule =
       },
       // eslint-disable-next-line functional/no-return-void
       VariableDeclaration: (node): void => {
-        // eslint-disable-next-line functional/no-expression-statement
+        // eslint-disable-next-line functional/no-expression-statement, @typescript-eslint/prefer-readonly-parameter-types, functional/no-return-void
         node.declarations.forEach((declaration) => {
           // eslint-disable-next-line functional/no-conditional-statement
           if (
@@ -700,7 +700,7 @@ export const createNoUnsafeAssignmentRule =
       CallExpression: (node): void => {
         const tsNode = parserServices.esTreeNodeToTSNodeMap.get(node);
 
-        // eslint-disable-next-line functional/no-expression-statement
+        // eslint-disable-next-line functional/no-expression-statement, @typescript-eslint/prefer-readonly-parameter-types, functional/no-return-void
         tsNode.arguments.forEach((argument, i) => {
           const argumentType = checker.getTypeAtLocation(argument);
           const paramType = checker.getContextualType(argument);
