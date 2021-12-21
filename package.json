@@ -1,6 +1,6 @@
 {
   "name": "eslint-plugin-total-functions",
-  "version": "5.0.0",
+  "version": "5.0.1",
   "description": "An ESLint plugin to enforce the use of TypeScript total functions.",
   "main": "dist",
   "repository": "https://github.com/danielnixon/eslint-plugin-total-functions.git",
