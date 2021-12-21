@@ -76,7 +76,6 @@ const noUnsafeMutableReadonlyAssignment: RuleModule<MessageId, readonly []> = {
   meta: {
     type: "problem",
     docs: {
-      category: "Possible Errors",
       description: "Bans unsafe assignment from mutable to readonly types.",
       recommended: "error",
       url: "https://github.com/danielnixon/eslint-plugin-total-functions",

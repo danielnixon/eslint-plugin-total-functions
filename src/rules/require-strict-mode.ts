@@ -17,7 +17,6 @@ const requireStrictMode: RuleModule<
   meta: {
     type: "problem",
     docs: {
-      category: "Possible Errors",
       description: "Enforces the use of TypeScript's strict mode.",
       recommended: "error",
       url: "https://github.com/danielnixon/eslint-plugin-total-functions",

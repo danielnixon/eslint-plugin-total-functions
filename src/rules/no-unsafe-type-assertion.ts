@@ -10,7 +10,6 @@ const noUnsafeTypeAssertion: RuleModule<"errorStringGeneric", readonly []> = {
   meta: {
     type: "problem",
     docs: {
-      category: "Possible Errors",
       description: "Bans unsafe type assertions.",
       recommended: "error",
       url: "https://github.com/danielnixon/eslint-plugin-total-functions",

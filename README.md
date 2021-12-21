@@ -77,8 +77,6 @@ Alternatively you can configure individual rules separately (see below).
 |  no-unsafe-readonly-mutable-assignment  | ✅           | ✅    |        |
 |  no-unsafe-mutable-readonly-assignment  |              | ✅    | [Not yet](https://github.com/danielnixon/eslint-plugin-total-functions/issues/99) |
 |  no-unsafe-optional-property-assignment | [Not yet](https://github.com/danielnixon/eslint-plugin-total-functions/issues/83) | ✅    |       |
-|  no-unsafe-subscript                    | Deprecated   | Deprecated    |        |
-|  no-unsafe-destructuring                | Deprecated   | Deprecated    |        |
 
 ### total-functions/require-strict-mode
 
@@ -164,54 +162,6 @@ This rule bans assignment from one type to another, if:
 2. the source type has no matching property (either optional or otherwise).
 
 This rule is excluded from the `recommended` config until [#83](https://github.com/danielnixon/eslint-plugin-total-functions/issues/83) lands.
-
-
-### total-functions/no-unsafe-subscript (deprecated)
-
-Prior to TypeScript 4.1's [noUncheckedIndexedAccess](https://www.typescriptlang.org/tsconfig#noUncheckedIndexedAccess) option, member access for arrays and records was not type safe. For example:
-
-```typescript
-const a: string[] = [];
-const b = a[0]; // b has type string, not string | undefined as you might expect
-b.toUpperCase(); // This explodes at runtime
-
-const record: Record<string, string> = { foo: "foo" };
-const bar = record["bar"]; // bar has type string, not string | undefined
-bar.toUpperCase(); // This explodes at runtime
-
-const baz = record.baz; // baz has type string, not string | undefined
-baz.toUpperCase(); // This explodes at runtime
-
-const str = "";
-const s = str[0]; // s has type string, not string | undefined
-s.toUpperCase(); // This explodes at runtime
-```
-
-This rule bans unsafe member access. Only use this rule if you are stuck on Typescript < 4.1. This rule is deprecated and excluded from the `recommended` config. It may be removed in the future.
-
-For examples of member access that this rule considers valid and invalid, see [no-unsafe-subscript.test.ts](https://github.com/danielnixon/eslint-plugin-total-functions/blob/master/src/rules/no-unsafe-subscript.test.ts).
-
-### total-functions/no-unsafe-destructuring (deprecated)
-
-Prior to TypeScript 4.1's [noUncheckedIndexedAccess](https://www.typescriptlang.org/tsconfig#noUncheckedIndexedAccess) option, destructuring arrays and records was not type safe. For example:
-
-```typescript
-const array: readonly string[] = [];
-const [foo] = array; // foo has type string, not string | undefined
-foo.toUpperCase(); // This explodes at runtime
-
-const obj: Record<string, string> = { a: "a" };
-const { b } = obj; // b has type string, not string | undefined
-b.toUpperCase(); // This explodes at runtime
-
-const str = "";
-const [bar] = str; // bar has type string, not string | undefined
-bar.toUpperCase(); // This explodes at runtime
-```
-
-This rule bans unsafe destructuring. Only use this rule if you are stuck on Typescript < 4.1. This rule is deprecated and excluded from the `recommended` config. It may be removed in the future.
-
-For examples of destructuring that this rule considers valid and invalid, see [no-unsafe-destructuring.test.ts](https://github.com/danielnixon/eslint-plugin-total-functions/blob/master/src/rules/no-unsafe-destructuring.test.ts).
 
 # See Also
 * [TypeScript for Functional Programmers](https://www.typescriptlang.org/docs/handbook/typescript-in-5-minutes-func.html)

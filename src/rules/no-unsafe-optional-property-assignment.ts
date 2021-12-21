@@ -36,7 +36,6 @@ const noUnsafeOptionalPropertyAssignment: RuleModule<MessageId, readonly []> = {
   meta: {
     type: "problem",
     docs: {
-      category: "Possible Errors",
       description: "Bans unsafe assignment to optional properties.",
       recommended: "error",
       url: "https://github.com/danielnixon/eslint-plugin-total-functions",
