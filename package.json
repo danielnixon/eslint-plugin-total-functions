@@ -1,6 +1,6 @@
 {
   "name": "eslint-plugin-total-functions",
-  "version": "4.10.1",
+  "version": "5.0.0",
   "description": "An ESLint plugin to enforce the use of TypeScript total functions.",
   "main": "dist",
   "repository": "https://github.com/danielnixon/eslint-plugin-total-functions.git",
@@ -43,7 +43,7 @@
     "lint": "eslint src --ext .ts,.tsx",
     "format": "prettier --write 'src/**/*.{ts,tsx}'",
     "test": "jest",
-    "release": "yarn build && yarn lint && yarn type-coverage && yarn publish",
+    "release": "yarn build && yarn type-coverage && yarn publish",
     "mutation-test": "stryker run"
   },
   "typeCoverage": {
