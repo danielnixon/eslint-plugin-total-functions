@@ -7,9 +7,9 @@
   "author": "Daniel Nixon <dan.nixon@gmail.com>",
   "license": "MIT",
   "devDependencies": {
-    "@stryker-mutator/core": "5.5.1",
-    "@stryker-mutator/jest-runner": "5.5.1",
-    "@stryker-mutator/typescript-checker": "5.5.1",
+    "@stryker-mutator/core": "5.6.0",
+    "@stryker-mutator/jest-runner": "5.6.0",
+    "@stryker-mutator/typescript-checker": "5.6.0",
     "@types/eslint": "8.2.2",
     "@types/jest": "27.4.0",
     "codecov": "3.8.3",
