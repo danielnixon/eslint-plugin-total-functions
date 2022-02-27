@@ -54,7 +54,7 @@ const requireStrictMode: RuleModule<
           "useUnknownInCatchVariables",
         ] as const;
 
-        // eslint-disable-next-line functional/no-expression-statement, @typescript-eslint/prefer-readonly-parameter-types, functional/no-return-void
+        // eslint-disable-next-line functional/no-expression-statement, functional/no-return-void
         mustBeEnabled.forEach((option) => {
           // eslint-disable-next-line functional/no-conditional-statement
           if (options[option] !== true) {
@@ -66,7 +66,7 @@ const requireStrictMode: RuleModule<
           }
         });
 
-        // eslint-disable-next-line functional/no-expression-statement, @typescript-eslint/prefer-readonly-parameter-types, functional/no-return-void
+        // eslint-disable-next-line functional/no-expression-statement, functional/no-return-void
         mustNotBeDisabled.forEach((option) => {
           // eslint-disable-next-line functional/no-conditional-statement
           if (options[option] === false) {

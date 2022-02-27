@@ -13,7 +13,7 @@ const ruleTesterForTSConfig = (config: string): RuleTester =>
 
 const strictRuleTester = ruleTesterForTSConfig("./tsconfig.tests.json");
 
-// eslint-disable-next-line functional/no-expression-statement, sonarjs/no-duplicate-string
+// eslint-disable-next-line functional/no-expression-statement
 strictRuleTester.run("require-strict-mode", rule, {
   valid: [
     {

@@ -99,8 +99,6 @@ const assignableSignaturePairs = (
   destinationSignatures: readonly Signature[],
   sourceSignatures: readonly Signature[],
   checker: TypeChecker
-  // TODO https://github.com/danielnixon/eslint-plugin-total-functions/issues/100
-  // eslint-disable-next-line total-functions/no-unsafe-mutable-readonly-assignment
 ): SignaturePairArray => {
   // TODO https://github.com/danielnixon/eslint-plugin-total-functions/issues/100
   // eslint-disable-next-line total-functions/no-unsafe-mutable-readonly-assignment
@@ -130,8 +128,6 @@ const assignableTypePairs = (
   rawDestinationType: Type,
   rawSourceType: Type,
   checker: TypeChecker
-  // TODO remove this eslint-disable
-  // eslint-disable-next-line total-functions/no-unsafe-mutable-readonly-assignment
 ): TypePairArray => {
   // TODO https://github.com/danielnixon/eslint-plugin-total-functions/issues/100
   // eslint-disable-next-line total-functions/no-unsafe-mutable-readonly-assignment
