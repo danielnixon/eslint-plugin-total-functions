@@ -938,7 +938,7 @@
   dependencies:
     "@types/yargs-parser" "*"
 
-"@typescript-eslint/eslint-plugin@^5.27.1", "@typescript-eslint/eslint-plugin@^5.8.0":
+"@typescript-eslint/eslint-plugin@^5.27.1":
   version "5.27.1"
   resolved "https://registry.yarnpkg.com/@typescript-eslint/eslint-plugin/-/eslint-plugin-5.27.1.tgz#fdf59c905354139046b41b3ed95d1609913d0758"
   integrity sha512-6dM5NKT57ZduNnJfpY81Phe9nc9wolnMCnknb1im6brWi1RYv84nbMS3olJa27B6+irUVV1X/Wb+Am0FjJdGFw==
@@ -953,14 +953,14 @@
     semver "^7.3.7"
     tsutils "^3.21.0"
 
-"@typescript-eslint/experimental-utils@^5.27.1", "@typescript-eslint/experimental-utils@^5.8.0":
+"@typescript-eslint/experimental-utils@^5.27.1":
   version "5.27.1"
   resolved "https://registry.yarnpkg.com/@typescript-eslint/experimental-utils/-/experimental-utils-5.27.1.tgz#c5c5121a75cf875bfae8083c50f5ae7bfde6145a"
   integrity sha512-Vd8uewIixGP93sEnmTRIH6jHZYRQRkGPDPpapACMvitJKX8335VHNyqKTE+mZ+m3E2c5VznTZfSsSsS5IF7vUA==
   dependencies:
     "@typescript-eslint/utils" "5.27.1"
 
-"@typescript-eslint/parser@^5.27.1", "@typescript-eslint/parser@^5.8.0":
+"@typescript-eslint/parser@^5.27.1":
   version "5.27.1"
   resolved "https://registry.yarnpkg.com/@typescript-eslint/parser/-/parser-5.27.1.tgz#3a4dcaa67e45e0427b6ca7bb7165122c8b569639"
   integrity sha512-7Va2ZOkHi5NP+AZwb5ReLgNF6nWLGTeUJfxdkVUAPPSaAdbWNnFZzLZ4EGGmmiCTg+AwlbE1KyUYTBglosSLHQ==
@@ -1617,14 +1617,14 @@ eslint-plugin-sonarjs@0.13.0:
   resolved "https://registry.yarnpkg.com/eslint-plugin-sonarjs/-/eslint-plugin-sonarjs-0.13.0.tgz#c34d140cc90abaaed38f5a5201a2ccdebe398862"
   integrity sha512-t3m7ta0EspzDxSOZh3cEOJIJVZgN/TlJYaBGnQlK6W/PZNbWep8q4RQskkJkA7/zwNpX0BaoEOSUUrqaADVoqA==
 
-eslint-plugin-total-functions@5.0.1:
-  version "5.0.1"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-total-functions/-/eslint-plugin-total-functions-5.0.1.tgz#2b15d219d6f499f6905cad08c6d81c49d7bc277c"
-  integrity sha512-OmLzLwHFj+OY5eW2K1UGgOYqWDbZOjYF2mYL5jJEHserpXgBr4ViMg46sZX/PGBMXp5zSdWyQ6AgyhgrdUA0ig==
+eslint-plugin-total-functions@6.0.0:
+  version "6.0.0"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-total-functions/-/eslint-plugin-total-functions-6.0.0.tgz#d86b43b52c6c8babc0d500a7688b721155b37c03"
+  integrity sha512-ZgNAclR/IZcYFT7xPyvG5Iwf7HFPm1FSSSHGNq0Fs0JgKlQ1+0SWk5WWSDFDON2RUdzezKOGQpfatDt7ud2CPg==
   dependencies:
-    "@typescript-eslint/eslint-plugin" "^5.8.0"
-    "@typescript-eslint/experimental-utils" "^5.8.0"
-    "@typescript-eslint/parser" "^5.8.0"
+    "@typescript-eslint/eslint-plugin" "^5.27.1"
+    "@typescript-eslint/experimental-utils" "^5.27.1"
+    "@typescript-eslint/parser" "^5.27.1"
     tsutils "^3.17.1"
 
 eslint-scope@^5.1.1:
