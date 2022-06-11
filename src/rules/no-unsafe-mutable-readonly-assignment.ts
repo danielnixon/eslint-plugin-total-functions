@@ -1,9 +1,8 @@
-import { RuleModule } from "@typescript-eslint/experimental-utils/dist/ts-eslint";
 import { isPropertyReadonlyInType } from "tsutils";
 import { Type, Symbol, IndexKind, TypeChecker } from "typescript";
+import { createRule } from "./common";
 import {
   createNoUnsafeAssignmentRule,
-  MessageId,
   UnsafeIndexAssignmentFunc,
   UnsafePropertyAssignmentFunc,
 } from "./unsafe-assignment-rule";
@@ -73,13 +72,13 @@ const unsafePropertyAssignmentFunc: UnsafePropertyAssignmentFunc = (
  * An ESLint rule to ban unsafe assignment from mutable to readonly types.
  */
 // eslint-disable-next-line total-functions/no-unsafe-readonly-mutable-assignment
-const noUnsafeMutableReadonlyAssignment: RuleModule<MessageId, readonly []> = {
+const noUnsafeMutableReadonlyAssignment = createRule({
+  name: "no-unsafe-mutable-readonly-assignment",
   meta: {
     type: "problem",
     docs: {
       description: "Bans unsafe assignment from mutable to readonly types.",
       recommended: "error",
-      url: "https://github.com/danielnixon/eslint-plugin-total-functions",
     },
     messages: {
       errorStringCallExpression:
@@ -101,6 +100,7 @@ const noUnsafeMutableReadonlyAssignment: RuleModule<MessageId, readonly []> = {
     unsafePropertyAssignmentFunc,
     unsafeIndexAssignmentFunc
   ),
-} as const;
+  defaultOptions: [],
+} as const);
 
 export default noUnsafeMutableReadonlyAssignment;

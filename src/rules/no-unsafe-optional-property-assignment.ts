@@ -1,9 +1,8 @@
-import { RuleModule } from "@typescript-eslint/experimental-utils/dist/ts-eslint";
 import { isSymbolFlagSet } from "tsutils";
 import { Symbol, SymbolFlags } from "typescript";
+import { createRule } from "./common";
 import {
   createNoUnsafeAssignmentRule,
-  MessageId,
   UnsafeIndexAssignmentFunc,
   UnsafePropertyAssignmentFunc,
 } from "./unsafe-assignment-rule";
@@ -33,13 +32,13 @@ const message =
  * An ESLint rule to ban unsafe assignment to optional properties.
  */
 // eslint-disable-next-line total-functions/no-unsafe-readonly-mutable-assignment
-const noUnsafeOptionalPropertyAssignment: RuleModule<MessageId, readonly []> = {
+const noUnsafeOptionalPropertyAssignment = createRule({
+  name: "no-unsafe-readonly-mutable-assignment",
   meta: {
     type: "problem",
     docs: {
       description: "Bans unsafe assignment to optional properties.",
       recommended: "error",
-      url: "https://github.com/danielnixon/eslint-plugin-total-functions",
     },
     messages: {
       errorStringCallExpression: message,
@@ -55,6 +54,7 @@ const noUnsafeOptionalPropertyAssignment: RuleModule<MessageId, readonly []> = {
     unsafePropertyAssignmentFunc,
     unsafeIndexAssignmentFunc
   ),
-} as const;
+  defaultOptions: [],
+} as const);
 
 export default noUnsafeOptionalPropertyAssignment;

@@ -1,13 +1,13 @@
 import rule from "./no-unsafe-type-assertion";
-import { RuleTester } from "@typescript-eslint/experimental-utils/dist/ts-eslint";
-import { AST_NODE_TYPES } from "@typescript-eslint/experimental-utils/dist/ts-estree";
+import { AST_NODE_TYPES } from "@typescript-eslint/experimental-utils";
+import { ESLintUtils } from "@typescript-eslint/experimental-utils";
 
-const ruleTester = new RuleTester({
+const ruleTester = new ESLintUtils.RuleTester({
   parserOptions: {
     sourceType: "module",
     project: "./tsconfig.tests.json",
   },
-  parser: require.resolve("@typescript-eslint/parser"),
+  parser: "@typescript-eslint/parser",
 });
 
 // eslint-disable-next-line functional/no-expression-statement

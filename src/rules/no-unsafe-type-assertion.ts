@@ -1,19 +1,19 @@
-import { RuleModule } from "@typescript-eslint/experimental-utils/dist/ts-eslint";
 import { ESLintUtils, TSESTree } from "@typescript-eslint/experimental-utils";
 import ts from "typescript";
 import { isTypeFlagSet } from "tsutils";
+import { createRule } from "./common";
 
 /**
  * An ESLint rule to ban unsafe type assertions.
  */
 // eslint-disable-next-line total-functions/no-unsafe-readonly-mutable-assignment
-const noUnsafeTypeAssertion: RuleModule<"errorStringGeneric", readonly []> = {
+const noUnsafeTypeAssertion = createRule({
+  name: "no-unsafe-type-assertion",
   meta: {
     type: "problem",
     docs: {
       description: "Bans unsafe type assertions.",
       recommended: "error",
-      url: "https://github.com/danielnixon/eslint-plugin-total-functions",
     },
     messages: {
       errorStringGeneric: "This type assertion is not type-safe.",
@@ -67,6 +67,7 @@ const noUnsafeTypeAssertion: RuleModule<"errorStringGeneric", readonly []> = {
       TSAsExpression: reportUnsafe,
     };
   },
-} as const;
+  defaultOptions: [],
+} as const);
 
 export default noUnsafeTypeAssertion;

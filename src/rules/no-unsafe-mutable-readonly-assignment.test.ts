@@ -1,16 +1,16 @@
+import { AST_NODE_TYPES } from "@typescript-eslint/experimental-utils";
+import { ESLintUtils } from "@typescript-eslint/experimental-utils";
 import rule from "./no-unsafe-mutable-readonly-assignment";
-import { RuleTester } from "@typescript-eslint/experimental-utils/dist/ts-eslint";
-import { AST_NODE_TYPES } from "@typescript-eslint/experimental-utils/dist/ts-estree";
 
-const ruleTester = new RuleTester({
+const ruleTester = new ESLintUtils.RuleTester({
   parserOptions: {
     sourceType: "module",
     project: "./tsconfig.tests.json",
   },
-  parser: require.resolve("@typescript-eslint/parser"),
+  parser: "@typescript-eslint/parser",
 });
 
-// eslint-disable-next-line functional/no-expression-statement
+// eslint-disable-next-line functional/no-expression-statement, @typescript-eslint/no-unsafe-argument
 ruleTester.run("no-unsafe-mutable-readonly-assignment", rule, {
   valid: [
     /**

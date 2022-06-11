@@ -1,11 +1,8 @@
 import {
-  RuleContext,
-  RuleListener,
-} from "@typescript-eslint/experimental-utils/dist/ts-eslint";
-import {
   ESLintUtils,
   AST_NODE_TYPES,
 } from "@typescript-eslint/experimental-utils";
+import { TSESLint } from "@typescript-eslint/utils";
 import {
   Type,
   Symbol,
@@ -39,8 +36,6 @@ export type MessageId =
   | "errorStringArrowFunctionExpression"
   | "errorStringTSAsExpression"
   | "errorStringTSTypeAssertion";
-
-export type Context = Readonly<RuleContext<MessageId, readonly []>>;
 
 export type UnsafeIndexAssignmentFunc = (
   indexKind: IndexKind,
@@ -157,8 +152,10 @@ export const createNoUnsafeAssignmentRule =
     unsafePropertyAssignmentFunc: UnsafePropertyAssignmentFunc,
     unsafeIndexAssignmentFunc: UnsafeIndexAssignmentFunc
   ) =>
-  // eslint-disable-next-line sonarjs/cognitive-complexity
-  (context: Context): RuleListener => {
+  (
+    context: Readonly<TSESLint.RuleContext<MessageId, readonly unknown[]>>
+    // eslint-disable-next-line sonarjs/cognitive-complexity
+  ): TSESLint.RuleListener => {
     const parserServices = ESLintUtils.getParserServices(context);
     const checker = parserServices.program.getTypeChecker();
 

@@ -1,26 +1,17 @@
-import { RuleModule } from "@typescript-eslint/experimental-utils/dist/ts-eslint";
 import { ESLintUtils } from "@typescript-eslint/experimental-utils";
+import { createRule } from "./common";
 
 /**
  * An ESLint rule to enforce TypeScript strict mode.
  */
 // eslint-disable-next-line total-functions/no-unsafe-readonly-mutable-assignment
-const requireStrictMode: RuleModule<
-  | "strict"
-  | "noUncheckedIndexedAccess"
-  | "useUnknownInCatchVariables"
-  | "strictFunctionTypes"
-  | "strictBindCallApply"
-  | "strictNullChecks"
-  | "strictPropertyInitialization",
-  readonly []
-> = {
+const requireStrictMode = createRule({
+  name: "require-strict-mode",
   meta: {
     type: "problem",
     docs: {
       description: "Enforces the use of TypeScript's strict mode.",
       recommended: "error",
-      url: "https://github.com/danielnixon/eslint-plugin-total-functions",
     },
     messages: {
       strict: "TypeScript's strict mode is required.",
@@ -80,6 +71,7 @@ const requireStrictMode: RuleModule<
       },
     };
   },
-} as const;
+  defaultOptions: [],
+} as const);
 
 export default requireStrictMode;

@@ -1,14 +1,14 @@
 import rule from "./require-strict-mode";
-import { RuleTester } from "@typescript-eslint/experimental-utils/dist/ts-eslint";
+import { ESLintUtils } from "@typescript-eslint/experimental-utils";
 
-const ruleTesterForTSConfig = (config: string): RuleTester =>
-  new RuleTester({
+const ruleTesterForTSConfig = (config: string): ESLintUtils.RuleTester =>
+  new ESLintUtils.RuleTester({
     parserOptions: {
       sourceType: "module",
       project: config,
       // EXPERIMENTAL_useSourceOfProjectReferenceRedirect: true,
     },
-    parser: require.resolve("@typescript-eslint/parser"),
+    parser: "@typescript-eslint/parser",
   });
 
 const strictRuleTester = ruleTesterForTSConfig("./tsconfig.tests.json");
