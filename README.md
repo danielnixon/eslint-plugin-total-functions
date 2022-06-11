@@ -15,8 +15,9 @@ An ESLint plugin to enforce the use of total functions (and prevent the use of [
 ## Version Matrix
 
 | TypeScript       | ESLint  | eslint-plugin-total-functions | Suppported? |
-| :--------------: | :-----: |  :--------------------------: | :---------: |
-|  4.5.4           | 8.5.0   | 5.0.0                         |             |
+| :--------------: | :-----: | :---------------------------: | :---------: |
+|  4.7.3           | 8.17.0  | 6.0.0                         |             |
+|  4.5.4           | 8.5.0   | 5.0.0                         | No          |
 |  4.4.2           | 7.32.0  | 4.10.1                        | No          |
 |  4.3.5           | 7.30.0  | 4.8.0                         | No          |
 |  4.1.2           | 7.12.0  | 4.7.2                         | No          |
