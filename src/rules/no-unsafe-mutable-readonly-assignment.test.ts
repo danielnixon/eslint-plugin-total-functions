@@ -10,7 +10,7 @@ const ruleTester = new ESLintUtils.RuleTester({
   parser: "@typescript-eslint/parser",
 });
 
-// eslint-disable-next-line functional/no-expression-statement, @typescript-eslint/no-unsafe-argument
+// eslint-disable-next-line functional/no-expression-statement
 ruleTester.run("no-unsafe-mutable-readonly-assignment", rule, {
   valid: [
     /**
