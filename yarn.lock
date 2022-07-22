@@ -1851,10 +1851,10 @@ eslint-config-typed-fp@3.3.0:
   resolved "https://registry.yarnpkg.com/eslint-config-typed-fp/-/eslint-config-typed-fp-3.3.0.tgz#13c3de0143b8f46f02ba8b71ddb064f02af2a6ba"
   integrity sha512-kP6gUEtjvbFS0l1KI0672Xt3Wx5h8a1BdQBu8ggvKFsXSgg2JV8vq17IbFcPO+dz7AgqhBtiwzV92gVvUCy9og==
 
-eslint-plugin-functional@4.2.1:
-  version "4.2.1"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-functional/-/eslint-plugin-functional-4.2.1.tgz#c486f15695a31f916847c89f0f85a09c8ee423c6"
-  integrity sha512-j16ozgXrr0UdPBirdbgDZgRBPr9Prj3j1xoisE435wzRDMWQlSHHJ41LCzNrlfGDb7OFAyXVcVatVwALz2jckw==
+eslint-plugin-functional@4.2.2:
+  version "4.2.2"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-functional/-/eslint-plugin-functional-4.2.2.tgz#d4c10fec0f45db892590255a03f2f9ad06eddd24"
+  integrity sha512-sDz61AoXnR5dIipurwqoxvZ/CHzF1FHVGR5bUR+vJjqYiRNp+Y/m2SXEpyDqYwv8zSdZpBP77g8WR3+ZiJdZpw==
   dependencies:
     "@typescript-eslint/utils" "^5.10.2"
     deepmerge-ts "^4.0.3"
