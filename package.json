@@ -16,7 +16,7 @@
     "eslint": "8.23.1",
     "eslint-config-prettier": "8.5.0",
     "eslint-config-typed-fp": "3.3.0",
-    "eslint-plugin-functional": "4.3.1",
+    "eslint-plugin-functional": "4.4.0",
     "eslint-plugin-jest": "27.0.4",
     "eslint-plugin-prettier": "4.2.1",
     "eslint-plugin-sonarjs": "0.15.0",
