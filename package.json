@@ -22,7 +22,7 @@
     "eslint-plugin-sonarjs": "0.17.0",
     "eslint-plugin-total-functions": "6.0.0",
     "jest": "29.3.1",
-    "patch-package": "6.5.0",
+    "patch-package": "6.5.1",
     "prettier": "2.8.1",
     "ts-jest": "29.0.3",
     "type-coverage": "2.24.1",
