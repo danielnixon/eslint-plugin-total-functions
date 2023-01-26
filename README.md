@@ -5,8 +5,6 @@
 [![Test Coverage](https://codecov.io/gh/danielnixon/eslint-plugin-total-functions/branch/master/graph/badge.svg)](https://codecov.io/gh/danielnixon/eslint-plugin-total-functions)
 [![Mutation testing badge](https://img.shields.io/endpoint?style=flat&url=https%3A%2F%2Fbadge-api.stryker-mutator.io%2Fgithub.com%2Fdanielnixon%2Feslint-plugin-total-functions%2Fmaster)](https://dashboard.stryker-mutator.io/reports/github.com/danielnixon/eslint-plugin-total-functions/master)
 [![Known Vulnerabilities](https://snyk.io/test/github/danielnixon/eslint-plugin-total-functions/badge.svg?targetFile=package.json)](https://snyk.io/test/github/danielnixon/eslint-plugin-total-functions?targetFile=package.json)
-[![Total alerts](https://img.shields.io/lgtm/alerts/g/danielnixon/eslint-plugin-total-functions.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/danielnixon/eslint-plugin-total-functions/alerts/)
-[![Language grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/danielnixon/eslint-plugin-total-functions.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/danielnixon/eslint-plugin-total-functions/context:javascript)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/b228d6e8823946978bc94836211ee21b)](https://www.codacy.com/gh/danielnixon/eslint-plugin-total-functions/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=danielnixon/eslint-plugin-total-functions&amp;utm_campaign=Badge_Grade)
 [![npm](https://img.shields.io/npm/v/eslint-plugin-total-functions.svg)](https://www.npmjs.com/package/eslint-plugin-total-functions)
 
