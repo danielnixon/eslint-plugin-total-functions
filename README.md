@@ -161,8 +161,9 @@ This rule is excluded from the `recommended` config until [#83](https://github.c
 # See Also
 * [TypeScript for Functional Programmers](https://www.typescriptlang.org/docs/handbook/typescript-in-5-minutes-func.html)
 * https://github.com/danielnixon/eslint-config-typed-fp
-* https://github.com/danielnixon/readonly-types
-* https://github.com/jonaskello/eslint-plugin-functional
+* https://github.com/agiledigital/readonly-types
+* https://github.com/eslint-functional/eslint-plugin-functional
+* https://github.com/RebeccaStevens/is-immutable-type
 * https://github.com/gcanti/fp-ts
 * https://github.com/plantain-00/type-coverage
 * https://github.com/immutable-js/immutable-js
