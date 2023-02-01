@@ -1,3 +1,4 @@
+/* eslint-disable functional/prefer-immutable-types */
 import { isPropertyReadonlyInType } from "tsutils";
 import { Type, Symbol, IndexKind, TypeChecker } from "typescript";
 import { createRule } from "./common";
@@ -19,12 +20,12 @@ const unsafeIndexAssignmentFunc: UnsafeIndexAssignmentFunc = (
   );
   const sourceIndexInfo = checker.getIndexInfoOfType(sourceType, indexKind);
 
-  // eslint-disable-next-line functional/no-conditional-statement
+  // eslint-disable-next-line functional/no-conditional-statements
   if (destinationIndexInfo === undefined) {
     return false;
   }
 
-  // eslint-disable-next-line functional/no-conditional-statement
+  // eslint-disable-next-line functional/no-conditional-statements
   if (sourceIndexInfo === undefined) {
     return false;
   }
@@ -48,7 +49,7 @@ const unsafePropertyAssignmentFunc: UnsafePropertyAssignmentFunc = (
   sourceType: Type,
   checker: TypeChecker
 ): boolean => {
-  // eslint-disable-next-line functional/no-conditional-statement
+  // eslint-disable-next-line functional/no-conditional-statements
   if (sourceProperty === undefined) {
     return false;
   }

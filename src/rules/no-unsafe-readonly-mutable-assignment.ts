@@ -1,3 +1,4 @@
+/* eslint-disable functional/prefer-immutable-types */
 import { isPropertyReadonlyInType } from "tsutils";
 import { Type, Symbol, IndexKind, TypeChecker } from "typescript";
 import { createRule } from "./common";
@@ -40,7 +41,7 @@ const unsafePropertyAssignmentFunc: UnsafePropertyAssignmentFunc = (
   sourceType: Type,
   checker: TypeChecker
 ): boolean => {
-  // eslint-disable-next-line functional/no-conditional-statement
+  // eslint-disable-next-line functional/no-conditional-statements
   if (sourceProperty === undefined) {
     return false;
   }

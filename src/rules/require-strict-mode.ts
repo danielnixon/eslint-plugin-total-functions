@@ -1,3 +1,4 @@
+/* eslint-disable functional/prefer-immutable-types */
 import { ESLintUtils } from "@typescript-eslint/experimental-utils";
 import { createRule } from "./common";
 
@@ -45,11 +46,11 @@ const requireStrictMode = createRule({
           "useUnknownInCatchVariables",
         ] as const;
 
-        // eslint-disable-next-line functional/no-expression-statement, functional/no-return-void
+        // eslint-disable-next-line functional/no-expression-statements, functional/no-return-void
         mustBeEnabled.forEach((option) => {
-          // eslint-disable-next-line functional/no-conditional-statement
+          // eslint-disable-next-line functional/no-conditional-statements
           if (options[option] !== true) {
-            // eslint-disable-next-line functional/no-expression-statement
+            // eslint-disable-next-line functional/no-expression-statements
             context.report({
               node: node,
               messageId: option,
@@ -57,11 +58,11 @@ const requireStrictMode = createRule({
           }
         });
 
-        // eslint-disable-next-line functional/no-expression-statement, functional/no-return-void
+        // eslint-disable-next-line functional/no-expression-statements, functional/no-return-void
         mustNotBeDisabled.forEach((option) => {
-          // eslint-disable-next-line functional/no-conditional-statement
+          // eslint-disable-next-line functional/no-conditional-statements
           if (options[option] === false) {
-            // eslint-disable-next-line functional/no-expression-statement
+            // eslint-disable-next-line functional/no-expression-statements
             context.report({
               node: node,
               messageId: option,

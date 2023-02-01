@@ -2,6 +2,7 @@ import rule from "./no-unsafe-type-assertion";
 import { AST_NODE_TYPES } from "@typescript-eslint/experimental-utils";
 import { ESLintUtils } from "@typescript-eslint/experimental-utils";
 
+// eslint-disable-next-line functional/prefer-immutable-types
 const ruleTester = new ESLintUtils.RuleTester({
   parserOptions: {
     sourceType: "module",
@@ -10,7 +11,7 @@ const ruleTester = new ESLintUtils.RuleTester({
   parser: "@typescript-eslint/parser",
 });
 
-// eslint-disable-next-line functional/no-expression-statement
+// eslint-disable-next-line functional/no-expression-statements
 ruleTester.run("no-unsafe-type-assertion", rule, {
   valid: [
     // as const

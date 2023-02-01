@@ -1,3 +1,4 @@
+/* eslint-disable functional/prefer-immutable-types */
 import { ESLintUtils, TSESTree } from "@typescript-eslint/experimental-utils";
 import ts from "typescript";
 import { isTypeFlagSet } from "tsutils";
@@ -28,7 +29,7 @@ const noUnsafeTypeAssertion = createRule({
       rawDestinationType: ts.Type,
       rawSourceType: ts.Type
     ): boolean => {
-      // eslint-disable-next-line functional/no-conditional-statement
+      // eslint-disable-next-line functional/no-conditional-statements
       if (
         isTypeFlagSet(rawSourceType, ts.TypeFlags.Any) ||
         isTypeFlagSet(rawSourceType, ts.TypeFlags.Unknown)
@@ -52,9 +53,9 @@ const noUnsafeTypeAssertion = createRule({
       const sourceNode = destinationNode.expression;
       const rawSourceType = checker.getTypeAtLocation(sourceNode);
 
-      // eslint-disable-next-line functional/no-conditional-statement
+      // eslint-disable-next-line functional/no-conditional-statements
       if (isUnsafe(rawDestinationType, rawSourceType)) {
-        // eslint-disable-next-line functional/no-expression-statement
+        // eslint-disable-next-line functional/no-expression-statements
         context.report({
           node: node,
           messageId: "errorStringGeneric",

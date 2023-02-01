@@ -1,6 +1,7 @@
 import rule from "./require-strict-mode";
 import { ESLintUtils } from "@typescript-eslint/experimental-utils";
 
+// eslint-disable-next-line functional/prefer-immutable-types
 const ruleTesterForTSConfig = (config: string): ESLintUtils.RuleTester =>
   new ESLintUtils.RuleTester({
     parserOptions: {
@@ -11,9 +12,10 @@ const ruleTesterForTSConfig = (config: string): ESLintUtils.RuleTester =>
     parser: "@typescript-eslint/parser",
   });
 
+// eslint-disable-next-line functional/prefer-immutable-types
 const strictRuleTester = ruleTesterForTSConfig("./tsconfig.tests.json");
 
-// eslint-disable-next-line functional/no-expression-statement
+// eslint-disable-next-line functional/no-expression-statements
 strictRuleTester.run("require-strict-mode", rule, {
   valid: [
     {
@@ -29,7 +31,7 @@ strictRuleTester.run("require-strict-mode", rule, {
 //   "./tsconfig.tests.non-strict.json"
 // );
 
-// // eslint-disable-next-line functional/no-expression-statement
+// // eslint-disable-next-line functional/no-expression-statements
 // nonStrictRuleTester.run("require-strict-mode", rule, {
 //   valid: [],
 //   invalid: [
@@ -50,7 +52,7 @@ strictRuleTester.run("require-strict-mode", rule, {
 //   "./tsconfig.tests.non-noUncheckedIndexedAccess.json"
 // );
 
-// // eslint-disable-next-line functional/no-expression-statement
+// // eslint-disable-next-line functional/no-expression-statements
 // nonNoUncheckedIndexedAccessRuleTester.run("require-strict-mode", rule, {
 //   valid: [],
 //   invalid: [
@@ -71,7 +73,7 @@ strictRuleTester.run("require-strict-mode", rule, {
 //   "./tsconfig.tests.non-strictFunctionTypes.json"
 // );
 
-// // eslint-disable-next-line functional/no-expression-statement
+// // eslint-disable-next-line functional/no-expression-statements
 // strictFunctionTypesRuleTester.run("require-strict-mode", rule, {
 //   valid: [],
 //   invalid: [

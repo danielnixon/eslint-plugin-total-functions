@@ -1,3 +1,4 @@
+/* eslint-disable functional/prefer-immutable-types */
 import {
   ESLintUtils,
   AST_NODE_TYPES,
@@ -19,11 +20,13 @@ import {
   unionTypeParts,
 } from "tsutils";
 
+// eslint-disable-next-line functional/type-declaration-immutability
 export type TypePairArray = ReadonlyArray<{
   readonly destinationType: Type;
   readonly sourceType: Type;
 }>;
 
+// eslint-disable-next-line functional/type-declaration-immutability
 export type SignaturePairArray = ReadonlyArray<{
   readonly destinationSignature: Signature;
   readonly sourceSignature: Signature;
@@ -69,7 +72,7 @@ const isSignatureAssignable = (
   const allParametersAreAssignable = destinationSignature.parameters.every(
     (destinationParameter, index) => {
       const sourceParameter = sourceSignature.parameters[index];
-      // eslint-disable-next-line functional/no-conditional-statement
+      // eslint-disable-next-line functional/no-conditional-statements
       if (sourceParameter === undefined) {
         return false;
       }
@@ -239,7 +242,7 @@ export const createNoUnsafeAssignmentRule =
       checker: TypeChecker,
       seenTypes: TypePairArray
     ): boolean => {
-      // eslint-disable-next-line functional/no-conditional-statement
+      // eslint-disable-next-line functional/no-conditional-statements
       if (
         checker.isArrayType(destinationType) &&
         !isUnionOrIntersectionType(destinationType) &&
@@ -271,12 +274,12 @@ export const createNoUnsafeAssignmentRule =
           checker
         );
 
-        // eslint-disable-next-line functional/no-conditional-statement
+        // eslint-disable-next-line functional/no-conditional-statements
         if (isUnsafe) {
           return true;
         }
 
-        // eslint-disable-next-line functional/no-conditional-statement
+        // eslint-disable-next-line functional/no-conditional-statements
         if (sourceProperty === undefined) {
           return false;
         }
@@ -307,7 +310,7 @@ export const createNoUnsafeAssignmentRule =
       checker: TypeChecker,
       seenTypes: TypePairArray = []
     ): boolean => {
-      // eslint-disable-next-line functional/no-conditional-statement
+      // eslint-disable-next-line functional/no-conditional-statements
       if (rawDestinationType === rawSourceType) {
         // Never unsafe if the types are equal.
         return false;
@@ -368,7 +371,7 @@ export const createNoUnsafeAssignmentRule =
                     const sourceParameterSymbol =
                       sourceSignature.getParameters()[index];
 
-                    // eslint-disable-next-line functional/no-conditional-statement
+                    // eslint-disable-next-line functional/no-conditional-statements
                     if (sourceParameterSymbol === undefined) {
                       return false;
                     }
@@ -486,7 +489,7 @@ export const createNoUnsafeAssignmentRule =
     return {
       // eslint-disable-next-line functional/no-return-void
       TSTypeAssertion: (node): void => {
-        // eslint-disable-next-line functional/no-conditional-statement
+        // eslint-disable-next-line functional/no-conditional-statements
         if (
           node.typeAnnotation.type === AST_NODE_TYPES.TSTypeReference &&
           node.typeAnnotation.typeName.type === AST_NODE_TYPES.Identifier &&
@@ -501,7 +504,7 @@ export const createNoUnsafeAssignmentRule =
         const sourceNode = destinationNode.expression;
         const sourceType = checker.getTypeAtLocation(sourceNode);
 
-        // eslint-disable-next-line functional/no-conditional-statement
+        // eslint-disable-next-line functional/no-conditional-statements
         if (
           isUnsafeAssignment(
             destinationNode,
@@ -511,7 +514,7 @@ export const createNoUnsafeAssignmentRule =
             checker
           )
         ) {
-          // eslint-disable-next-line functional/no-expression-statement
+          // eslint-disable-next-line functional/no-expression-statements
           context.report({
             node: node,
             messageId: "errorStringTSTypeAssertion",
@@ -520,7 +523,7 @@ export const createNoUnsafeAssignmentRule =
       },
       // eslint-disable-next-line functional/no-return-void
       TSAsExpression: (node): void => {
-        // eslint-disable-next-line functional/no-conditional-statement
+        // eslint-disable-next-line functional/no-conditional-statements
         if (
           node.typeAnnotation.type === AST_NODE_TYPES.TSTypeReference &&
           node.typeAnnotation.typeName.type === AST_NODE_TYPES.Identifier &&
@@ -535,7 +538,7 @@ export const createNoUnsafeAssignmentRule =
         const sourceNode = destinationNode.expression;
         const sourceType = checker.getTypeAtLocation(sourceNode);
 
-        // eslint-disable-next-line functional/no-conditional-statement
+        // eslint-disable-next-line functional/no-conditional-statements
         if (
           isUnsafeAssignment(
             destinationNode,
@@ -545,7 +548,7 @@ export const createNoUnsafeAssignmentRule =
             checker
           )
         ) {
-          // eslint-disable-next-line functional/no-expression-statement
+          // eslint-disable-next-line functional/no-expression-statements
           context.report({
             node: node,
             messageId: "errorStringTSAsExpression",
@@ -554,9 +557,9 @@ export const createNoUnsafeAssignmentRule =
       },
       // eslint-disable-next-line functional/no-return-void
       VariableDeclaration: (node): void => {
-        // eslint-disable-next-line functional/no-expression-statement, @typescript-eslint/prefer-readonly-parameter-types, functional/no-return-void
+        // eslint-disable-next-line functional/no-expression-statements, functional/no-return-void
         node.declarations.forEach((declaration) => {
-          // eslint-disable-next-line functional/no-conditional-statement
+          // eslint-disable-next-line functional/no-conditional-statements
           if (
             declaration.id.type === AST_NODE_TYPES.Identifier &&
             declaration.id.typeAnnotation === undefined
@@ -565,7 +568,7 @@ export const createNoUnsafeAssignmentRule =
             return;
           }
 
-          // eslint-disable-next-line functional/no-conditional-statement
+          // eslint-disable-next-line functional/no-conditional-statements
           if (declaration.init === null) {
             // If there is no type annotation then there's no risk of unsafe assignment.
             return;
@@ -581,7 +584,7 @@ export const createNoUnsafeAssignmentRule =
           const leftType = checker.getTypeAtLocation(leftTsNode);
           const rightType = checker.getTypeAtLocation(rightTsNode);
 
-          // eslint-disable-next-line functional/no-conditional-statement
+          // eslint-disable-next-line functional/no-conditional-statements
           if (
             isUnsafeAssignment(
               leftTsNode,
@@ -591,7 +594,7 @@ export const createNoUnsafeAssignmentRule =
               checker
             )
           ) {
-            // eslint-disable-next-line functional/no-expression-statement
+            // eslint-disable-next-line functional/no-expression-statements
             context.report({
               node: node,
               messageId: "errorStringVariableDeclaration",
@@ -609,7 +612,7 @@ export const createNoUnsafeAssignmentRule =
         const leftType = checker.getTypeAtLocation(leftTsNode);
         const rightType = checker.getTypeAtLocation(rightTsNode);
 
-        // eslint-disable-next-line functional/no-conditional-statement
+        // eslint-disable-next-line functional/no-conditional-statements
         if (
           isUnsafeAssignment(
             leftTsNode,
@@ -619,7 +622,7 @@ export const createNoUnsafeAssignmentRule =
             checker
           )
         ) {
-          // eslint-disable-next-line functional/no-expression-statement
+          // eslint-disable-next-line functional/no-expression-statements
           context.report({
             node: node,
             messageId: "errorStringAssignmentExpression",
@@ -630,7 +633,7 @@ export const createNoUnsafeAssignmentRule =
       ReturnStatement: (node): void => {
         const tsNode = parserServices.esTreeNodeToTSNodeMap.get(node);
 
-        // eslint-disable-next-line functional/no-conditional-statement
+        // eslint-disable-next-line functional/no-conditional-statements
         if (tsNode.expression === undefined) {
           return;
         }
@@ -638,7 +641,7 @@ export const createNoUnsafeAssignmentRule =
         const destinationType = checker.getContextualType(tsNode.expression);
         const sourceType = checker.getTypeAtLocation(tsNode.expression);
 
-        // eslint-disable-next-line functional/no-conditional-statement
+        // eslint-disable-next-line functional/no-conditional-statements
         if (
           destinationType !== undefined &&
           isUnsafeAssignment(
@@ -649,7 +652,7 @@ export const createNoUnsafeAssignmentRule =
             checker
           )
         ) {
-          // eslint-disable-next-line functional/no-expression-statement
+          // eslint-disable-next-line functional/no-expression-statements
           context.report({
             node: node,
             messageId: "errorStringArrowFunctionExpression",
@@ -659,7 +662,7 @@ export const createNoUnsafeAssignmentRule =
       // TODO: YieldExpression?
       // eslint-disable-next-line functional/no-return-void
       ArrowFunctionExpression: (node): void => {
-        // eslint-disable-next-line functional/no-conditional-statement
+        // eslint-disable-next-line functional/no-conditional-statements
         if (node.returnType === undefined) {
           return;
         }
@@ -672,7 +675,7 @@ export const createNoUnsafeAssignmentRule =
         const sourceNode = parserServices.esTreeNodeToTSNodeMap.get(node.body);
         const sourceType = checker.getTypeAtLocation(sourceNode);
 
-        // eslint-disable-next-line functional/no-conditional-statement
+        // eslint-disable-next-line functional/no-conditional-statements
         if (
           isUnsafeAssignment(
             destinationNode,
@@ -682,7 +685,7 @@ export const createNoUnsafeAssignmentRule =
             checker
           )
         ) {
-          // eslint-disable-next-line functional/no-expression-statement
+          // eslint-disable-next-line functional/no-expression-statements
           context.report({
             node: node.body,
             messageId: "errorStringArrowFunctionExpression",
@@ -693,12 +696,12 @@ export const createNoUnsafeAssignmentRule =
       CallExpression: (node): void => {
         const tsNode = parserServices.esTreeNodeToTSNodeMap.get(node);
 
-        // eslint-disable-next-line functional/no-expression-statement, @typescript-eslint/prefer-readonly-parameter-types, functional/no-return-void
+        // eslint-disable-next-line functional/no-expression-statements, functional/no-return-void
         tsNode.arguments.forEach((argument, i) => {
           const argumentType = checker.getTypeAtLocation(argument);
           const paramType = checker.getContextualType(argument);
 
-          // eslint-disable-next-line functional/no-conditional-statement
+          // eslint-disable-next-line functional/no-conditional-statements
           if (
             paramType !== undefined &&
             isUnsafeAssignment(
@@ -709,7 +712,7 @@ export const createNoUnsafeAssignmentRule =
               checker
             )
           ) {
-            // eslint-disable-next-line functional/no-expression-statement
+            // eslint-disable-next-line functional/no-expression-statements
             context.report({
               node: node.arguments[i] ?? node,
               messageId: "errorStringCallExpression",

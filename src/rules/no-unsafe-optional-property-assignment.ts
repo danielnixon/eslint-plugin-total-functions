@@ -12,9 +12,9 @@ const unsafeIndexAssignmentFunc: UnsafeIndexAssignmentFunc = (): boolean =>
   false;
 
 const unsafePropertyAssignmentFunc: UnsafePropertyAssignmentFunc = (
-  // eslint-disable-next-line @typescript-eslint/ban-types
+  // eslint-disable-next-line functional/prefer-immutable-types, @typescript-eslint/ban-types
   destinationProperty: Symbol,
-  // eslint-disable-next-line @typescript-eslint/ban-types
+  // eslint-disable-next-line functional/prefer-immutable-types, @typescript-eslint/ban-types
   sourceProperty: Symbol | undefined
 ): boolean => {
   const destinationPropIsOptional = isSymbolFlagSet(
@@ -31,7 +31,7 @@ const message =
 /**
  * An ESLint rule to ban unsafe assignment to optional properties.
  */
-// eslint-disable-next-line total-functions/no-unsafe-readonly-mutable-assignment
+// eslint-disable-next-line functional/prefer-immutable-types, total-functions/no-unsafe-readonly-mutable-assignment
 const noUnsafeOptionalPropertyAssignment = createRule({
   name: "no-unsafe-readonly-mutable-assignment",
   meta: {
