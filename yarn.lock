@@ -953,7 +953,7 @@
     semver "^7.3.7"
     tsutils "^3.21.0"
 
-"@typescript-eslint/experimental-utils@^5.27.1", "@typescript-eslint/experimental-utils@^5.50.0":
+"@typescript-eslint/experimental-utils@^5.27.1":
   version "5.50.0"
   resolved "https://registry.yarnpkg.com/@typescript-eslint/experimental-utils/-/experimental-utils-5.50.0.tgz#d33160ef610cdcdfc376e3cb086cabd2c83e70c8"
   integrity sha512-gZIhzNRivy0RVqcxjKnQ+ipGc0qolilhBeNmvH+Dvu7Vymug+IfiYxTj2zM7mIlHsw6Q5aH7L7WmuTE3tZyzag==
@@ -1006,7 +1006,7 @@
     semver "^7.3.7"
     tsutils "^3.21.0"
 
-"@typescript-eslint/utils@5.50.0", "@typescript-eslint/utils@^5.10.0", "@typescript-eslint/utils@^5.49.0":
+"@typescript-eslint/utils@5.50.0", "@typescript-eslint/utils@^5.10.0", "@typescript-eslint/utils@^5.49.0", "@typescript-eslint/utils@^5.50.0":
   version "5.50.0"
   resolved "https://registry.yarnpkg.com/@typescript-eslint/utils/-/utils-5.50.0.tgz#807105f5ffb860644d30d201eefad7017b020816"
   integrity sha512-v/AnUFImmh8G4PH0NDkf6wA8hujNNcrwtecqW4vtQ1UOSNBaZl49zP1SHoZ/06e+UiwzHpgb5zP5+hwlYYWYAw==
@@ -1322,9 +1322,9 @@ camelcase@^6.2.0:
   integrity sha512-Gmy6FhYlCY7uOElZUSbxo2UCDH8owEk996gkbrpsgGtrJLM3J7jGxl9Ic7Qwwj4ivOE5AWZWRMecDdF7hqGjFA==
 
 caniuse-lite@^1.0.30001449:
-  version "1.0.30001449"
-  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001449.tgz#a8d11f6a814c75c9ce9d851dc53eb1d1dfbcd657"
-  integrity sha512-CPB+UL9XMT/Av+pJxCKGhdx+yg1hzplvFJQlJ2n68PyQGMz9L/E2zCyLdOL8uasbouTUgnPl+y0tccI/se+BEw==
+  version "1.0.30001450"
+  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001450.tgz#022225b91200589196b814b51b1bbe45144cf74f"
+  integrity sha512-qMBmvmQmFXaSxexkjjfMvD5rnDL0+m+dUMZKoDYsGG8iZN29RuYh9eRoMvKsT6uMAWlyUUGDEQGJJYjzCIO9ew==
 
 chalk@^2.0.0:
   version "2.4.2"
