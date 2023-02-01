@@ -1,8 +1,5 @@
 /* eslint-disable functional/prefer-immutable-types */
-import {
-  ESLintUtils,
-  AST_NODE_TYPES,
-} from "@typescript-eslint/experimental-utils";
+import { ESLintUtils, AST_NODE_TYPES } from "@typescript-eslint/utils";
 import { TSESLint } from "@typescript-eslint/utils";
 import {
   Type,

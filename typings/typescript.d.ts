@@ -1,6 +1,7 @@
-/* eslint-disable functional/no-method-signature */
+/* eslint-disable functional/prefer-immutable-types */
+/* eslint-disable @typescript-eslint/method-signature-style */
+/* eslint-disable functional/type-declaration-immutability */
 /* eslint-disable @typescript-eslint/consistent-type-definitions */
-/* eslint-disable functional/prefer-type-literal */
 import "typescript";
 
 declare module "typescript" {
