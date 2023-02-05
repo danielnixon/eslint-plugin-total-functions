@@ -1629,15 +1629,15 @@ eslint-config-typed-fp@4.1.0:
   resolved "https://registry.yarnpkg.com/eslint-config-typed-fp/-/eslint-config-typed-fp-4.1.0.tgz#b7abde11d7b65f0d8db47af7d418ee9e32c94c7e"
   integrity sha512-B6BvWQ2lbmdRevGOVfczhMm8dnRZDgnecgVsgAsGTnQw8wMNbAubLYV55U1EF8I+wl+ROeDuWiY37mpGvOfu7A==
 
-eslint-plugin-functional@5.0.0:
-  version "5.0.0"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-functional/-/eslint-plugin-functional-5.0.0.tgz#7caf899105a946bd45d0afe79c95de0df2290ea4"
-  integrity sha512-m+eOc59wv48azpnrQ1w/2QgxkudfQX15Hn3/5OvFVufDIc93Ar3C81pppL4TfTaqcJVD2KTYiOHHuwphp1Z66Q==
+eslint-plugin-functional@5.0.1:
+  version "5.0.1"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-functional/-/eslint-plugin-functional-5.0.1.tgz#ba6b6afa7513142977443d6a9c7344f537a857fa"
+  integrity sha512-zwl6daCIlr3ljGg+4mp9+LWoOzgzj3gY04XPa5w6xaEOgNnpmUiZMim0aTlKbuKwfpnpZ7SzpscrtA0/04+ugQ==
   dependencies:
     "@typescript-eslint/utils" "^5.49.0"
     deepmerge-ts "^4.2.2"
     escape-string-regexp "^4.0.0"
-    is-immutable-type "^1.2.3"
+    is-immutable-type "^1.2.4"
     semver "^7.3.8"
 
 eslint-plugin-jest@27.2.1:
@@ -2278,10 +2278,10 @@ is-glob@^4.0.0, is-glob@^4.0.1, is-glob@^4.0.3:
   dependencies:
     is-extglob "^2.1.1"
 
-is-immutable-type@^1.2.3:
-  version "1.2.3"
-  resolved "https://registry.yarnpkg.com/is-immutable-type/-/is-immutable-type-1.2.3.tgz#1613e5a335362d5bd73fe7fd0b7ee32450534dfb"
-  integrity sha512-DhrZmo/MFG8C2DTsh8YFTLxchMkkiD/fg4dLtxd+OEdqHHjH9u7aXGxDfBCvxxpP/KBkz+vbqzfTJ+v7BcQF0w==
+is-immutable-type@^1.2.4:
+  version "1.2.4"
+  resolved "https://registry.yarnpkg.com/is-immutable-type/-/is-immutable-type-1.2.4.tgz#128cf9af71331cfe301fa6f0680f1b482adc6b33"
+  integrity sha512-H/famjtztrVEl/P9izGTFLEJjmKsDoj+WBMVo+oSSDEuNTZpJFDn37/ovEb+3a3K5UU8zdkVUwBgddeBPH41pA==
 
 is-interactive@^2.0.0:
   version "2.0.0"
