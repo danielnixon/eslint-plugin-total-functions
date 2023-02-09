@@ -1006,7 +1006,7 @@
     semver "^7.3.7"
     tsutils "^3.21.0"
 
-"@typescript-eslint/utils@5.50.0", "@typescript-eslint/utils@^5.10.0", "@typescript-eslint/utils@^5.49.0", "@typescript-eslint/utils@^5.50.0":
+"@typescript-eslint/utils@5.50.0", "@typescript-eslint/utils@^5.10.0", "@typescript-eslint/utils@^5.50.0":
   version "5.50.0"
   resolved "https://registry.yarnpkg.com/@typescript-eslint/utils/-/utils-5.50.0.tgz#807105f5ffb860644d30d201eefad7017b020816"
   integrity sha512-v/AnUFImmh8G4PH0NDkf6wA8hujNNcrwtecqW4vtQ1UOSNBaZl49zP1SHoZ/06e+UiwzHpgb5zP5+hwlYYWYAw==
@@ -1629,12 +1629,13 @@ eslint-config-typed-fp@4.1.0:
   resolved "https://registry.yarnpkg.com/eslint-config-typed-fp/-/eslint-config-typed-fp-4.1.0.tgz#b7abde11d7b65f0d8db47af7d418ee9e32c94c7e"
   integrity sha512-B6BvWQ2lbmdRevGOVfczhMm8dnRZDgnecgVsgAsGTnQw8wMNbAubLYV55U1EF8I+wl+ROeDuWiY37mpGvOfu7A==
 
-eslint-plugin-functional@5.0.2:
-  version "5.0.2"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-functional/-/eslint-plugin-functional-5.0.2.tgz#fa710060d7b6fcc2e24149f6738f937804a6b304"
-  integrity sha512-1WYI3Ke+phPeQUc4TndkJk5soPNBDl2AqiR6xgfFWewvTIzYQF/+9Np6nLwFbj4OBTiYQbZSRrbvu0KIjl7cDg==
+eslint-plugin-functional@5.0.4:
+  version "5.0.4"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-functional/-/eslint-plugin-functional-5.0.4.tgz#768851d70371952d666855ef4fdb16d5e8414d15"
+  integrity sha512-vV5jUAWfFQfe4OfE1YM99mUYX5AW0uL7tJa+rYIwwTRzeQc39j6SfvGdLUg2sXkTpmcfO3VwBLD7Ij5yjpRM8w==
   dependencies:
-    "@typescript-eslint/utils" "^5.49.0"
+    "@typescript-eslint/type-utils" "^5.50.0"
+    "@typescript-eslint/utils" "^5.50.0"
     deepmerge-ts "^4.2.2"
     escape-string-regexp "^4.0.0"
     is-immutable-type "^1.2.4"
