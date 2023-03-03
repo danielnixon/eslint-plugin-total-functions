@@ -6,7 +6,7 @@
     "lib": ["esnext"],
     "target": "ES2015",
     "module": "CommonJS",
-    "declaration": true,                      /* Generates corresponding '.d.ts' file. */
+    // "declaration": true,                      /* Generates corresponding '.d.ts' file. */
     "outDir": "dist",                         /* Redirect output structure to the directory. */
 
     /* Strict Type-Checking Options */

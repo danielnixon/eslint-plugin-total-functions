@@ -1,6 +1,6 @@
 import rule from "./no-unsafe-type-assertion";
-import { AST_NODE_TYPES } from "@typescript-eslint/experimental-utils";
-import { ESLintUtils } from "@typescript-eslint/experimental-utils";
+import { AST_NODE_TYPES } from "@typescript-eslint/utils";
+import { ESLintUtils } from "@typescript-eslint/utils";
 
 // eslint-disable-next-line functional/prefer-immutable-types
 const ruleTester = new ESLintUtils.RuleTester({

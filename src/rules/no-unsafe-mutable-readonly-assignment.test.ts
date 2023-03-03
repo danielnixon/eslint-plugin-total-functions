@@ -1,5 +1,5 @@
-import { AST_NODE_TYPES } from "@typescript-eslint/experimental-utils";
-import { ESLintUtils } from "@typescript-eslint/experimental-utils";
+import { AST_NODE_TYPES } from "@typescript-eslint/utils";
+import { ESLintUtils } from "@typescript-eslint/utils";
 import rule from "./no-unsafe-mutable-readonly-assignment";
 
 // eslint-disable-next-line functional/prefer-immutable-types

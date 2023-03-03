@@ -37,8 +37,8 @@ const noDecreasingImmutability = createRule({
 
     const decreasingImmutabilityViolation = (
       checker: ts.TypeChecker,
-      destination: ts.Type,
-      source: ts.Type
+      destination: Readonly<ts.Type>,
+      source: Readonly<ts.Type>
     ): Violation | undefined => {
       const destinationImmutability = getTypeImmutability(checker, destination);
       const sourceImmutability = getTypeImmutability(checker, source);
@@ -56,8 +56,8 @@ const noDecreasingImmutability = createRule({
 
     const reportViolation = (
       checker: ts.TypeChecker,
-      destination: ts.Type,
-      source: ts.Type,
+      destination: Readonly<ts.Type>,
+      source: Readonly<ts.Type>,
       node: TSESTree.Node | TSESTree.Token
       // eslint-disable-next-line functional/no-return-void
     ): void => {
@@ -89,7 +89,7 @@ const noDecreasingImmutability = createRule({
         const leftType = checker.getTypeAtLocation(leftTsNode);
         const rightType = checker.getTypeAtLocation(rightTsNode);
 
-        // eslint-disable-next-line functional/no-expression-statements
+        // eslint-disable-next-line functional/no-expression-statements, total-functions/no-unsafe-mutable-readonly-assignment
         reportViolation(checker, leftType, rightType, node);
       },
     };
