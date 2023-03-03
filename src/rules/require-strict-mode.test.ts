@@ -1,5 +1,5 @@
 import rule from "./require-strict-mode";
-import { ESLintUtils } from "@typescript-eslint/experimental-utils";
+import { ESLintUtils } from "@typescript-eslint/utils";
 
 // eslint-disable-next-line functional/prefer-immutable-types
 const ruleTesterForTSConfig = (config: string): ESLintUtils.RuleTester =>

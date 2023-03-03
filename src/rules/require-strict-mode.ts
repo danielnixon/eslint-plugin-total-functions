@@ -1,5 +1,5 @@
 /* eslint-disable functional/prefer-immutable-types */
-import { ESLintUtils } from "@typescript-eslint/experimental-utils";
+import { ESLintUtils } from "@typescript-eslint/utils";
 import { createRule } from "./common";
 
 /**

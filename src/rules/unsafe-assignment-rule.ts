@@ -2,7 +2,7 @@
 import {
   ESLintUtils,
   AST_NODE_TYPES,
-} from "@typescript-eslint/experimental-utils";
+} from "@typescript-eslint/utils";
 import { TSESLint } from "@typescript-eslint/utils";
 import {
   Type,

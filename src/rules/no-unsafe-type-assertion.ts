@@ -1,5 +1,5 @@
 /* eslint-disable functional/prefer-immutable-types */
-import { ESLintUtils, TSESTree } from "@typescript-eslint/experimental-utils";
+import { ESLintUtils, TSESTree } from "@typescript-eslint/utils";
 import ts from "typescript";
 import { isTypeFlagSet } from "tsutils";
 import { createRule } from "./common";
