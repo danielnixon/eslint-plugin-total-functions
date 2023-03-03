@@ -15,22 +15,25 @@ import {
 import {
   getCallSignaturesOfType,
   intersectionTypeParts,
+  isCallExpression,
+  isExpression,
+  isIdentifier,
   isObjectType,
   isUnionOrIntersectionType,
   unionTypeParts,
 } from "tsutils";
 
 // eslint-disable-next-line functional/type-declaration-immutability
-export type TypePairArray = ReadonlyArray<{
+export type TypePairArray = readonly {
   readonly destinationType: Type;
   readonly sourceType: Type;
-}>;
+}[];
 
 // eslint-disable-next-line functional/type-declaration-immutability
-export type SignaturePairArray = ReadonlyArray<{
+export type SignaturePairArray = readonly {
   readonly destinationSignature: Signature;
   readonly sourceSignature: Signature;
-}>;
+}[];
 
 export type MessageId =
   | "errorStringCallExpression"
@@ -310,6 +313,45 @@ export const createNoUnsafeAssignmentRule =
       checker: TypeChecker,
       seenTypes: TypePairArray = []
     ): boolean => {
+      const allowedMemberExpressionForUnsafeAssignment: readonly string[] = [
+        "filter",
+        "map",
+        "concat",
+        "flatMap",
+        "flat",
+        "slice",
+      ] as const;
+
+      // eslint-disable-next-line functional/no-conditional-statements
+      if (isCallExpression(sourceNode)) {
+        // Allowed Member Expression Nodes that are safe to assign to a readonly type destination.
+        // eslint-disable-next-line functional/prefer-readonly-type
+        const allowedMemberExpressionNodes = sourceNode
+          .getChildren()
+          .filter((sourceChildNode) => {
+            // eslint-disable-next-line functional/no-conditional-statements
+            if (isExpression(sourceChildNode)) {
+              const lastNode = sourceChildNode.getLastToken();
+
+              // eslint-disable-next-line functional/no-conditional-statements
+              if (lastNode !== undefined && isIdentifier(lastNode)) {
+                return allowedMemberExpressionForUnsafeAssignment.includes(
+                  lastNode.getText()
+                );
+              }
+
+              return false;
+            }
+
+            return false;
+          });
+
+        // eslint-disable-next-line functional/no-conditional-statements
+        if (allowedMemberExpressionNodes.length > 0) {
+          return false;
+        }
+      }
+
       // eslint-disable-next-line functional/no-conditional-statements
       if (rawDestinationType === rawSourceType) {
         // Never unsafe if the types are equal.

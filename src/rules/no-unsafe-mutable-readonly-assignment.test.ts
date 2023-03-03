@@ -278,6 +278,63 @@ ruleTester.run("no-unsafe-mutable-readonly-assignment", rule, {
         const func = (): MutableA => ro;
       `,
     },
+    // Array safe mutable to readonly assignment with chained array operations.
+    {
+      filename: "file.ts",
+      code: `
+        const fooArray: readonly string[] = ["test"] as const;
+        const nextArray: readonly string[] = fooArray.filter((v) => v.length > 0).map((v) => v.length.toString());
+      `,
+    },
+    // Array safe mutable to readonly assignment. (array.filter)
+    {
+      filename: "file.ts",
+      code: `
+        const fooArray: readonly string[] = [""] as const;
+        const nextArray: readonly string[] = fooArray.filter((v) => v.length > 0);
+      `,
+    },
+    // Array safe mutable to readonly assignment. (array.map)
+    {
+      filename: "file.ts",
+      code: `
+        const fooArray: readonly string[] = ["test"] as const;
+        const nextArray: readonly string[] = fooArray.map((v) => v.length.toString());
+      `,
+    },
+    // Array safe mutable to readonly assignment. (array.concat)
+    {
+      filename: "file.ts",
+      code: `
+        const fooArray: readonly string[] = ["test-1"] as const;
+        const booArray: readonly string[] = ["test-2"] as const;
+        const nextArray: readonly string[] = fooArray.concat(booArray);
+      `,
+    },
+    // Array safe mutable to readonly assignment. (array.flatMap)
+    {
+      filename: "file.ts",
+      code: `
+        const fooArray: readonly string[][] = [["test"]] as const;
+        const nextArray: readonly string[] = fooArray.flatMap((v) => v.length.toString());
+      `,
+    },
+    // Array safe mutable to readonly assignment. (array.flat)
+    {
+      filename: "file.ts",
+      code: `
+        const fooArray: readonly string[][] = [["test"]] as const;
+        const nextArray: readonly string[] = fooArray.flat();
+      `,
+    },
+    // Array safe mutable to readonly assignment. (array.slice)
+    {
+      filename: "file.ts",
+      code: `
+        const fooArray: readonly string[] = ["test"] as const;
+        const nextArray: readonly string[] = fooArray.slice();
+      `,
+    },
     /**
      * type assertions
      */
@@ -457,6 +514,63 @@ ruleTester.run("no-unsafe-mutable-readonly-assignment", rule, {
         };
       `,
     },
+    // Return safe mutable array with chained array operations.
+    {
+      filename: "file.ts",
+      code: `
+        const fooArray: readonly string[] = ["test"] as const;
+        const nextArray = (): readonly string[] => fooArray.filter((v) => v.length > 0).map((v) => v.length.toString());
+      `,
+    },
+    // Return safe mutable array. (array.filter)
+    {
+      filename: "file.ts",
+      code: `
+        const fooArray: readonly string[] = [""] as const;
+        const nextArray = (): readonly string[] => fooArray.filter((v) => v.length > 0);
+      `,
+    },
+    // Return safe mutable array. (array.map)
+    {
+      filename: "file.ts",
+      code: `
+        const fooArray: readonly string[] = ["test"] as const;
+        const nextArray = (): readonly string[] => fooArray.map((v) => v.length.toString());
+      `,
+    },
+    // Return safe mutable array. (array.concat)
+    {
+      filename: "file.ts",
+      code: `
+        const fooArray: readonly string[] = ["test-1"] as const;
+        const booArray: readonly string[] = ["test-2"] as const;
+        const nextArray = (): readonly string[] => fooArray.concat(booArray);
+      `,
+    },
+    // Return safe mutable array. (array.flatMap)
+    {
+      filename: "file.ts",
+      code: `
+        const fooArray: readonly string[][] = [["test"]] as const;
+        const nextArray = (): readonly string[] => fooArray.flatMap((v) => v.length.toString());
+      `,
+    },
+    // Return safe mutable array. (array.flat)
+    {
+      filename: "file.ts",
+      code: `
+        const fooArray: readonly string[][] = [["test"]] as const;
+        const nextArray = (): readonly string[] => fooArray.flat();
+      `,
+    },
+    // Return safe mutable array. (array.slice)
+    {
+      filename: "file.ts",
+      code: `
+        const fooArray: readonly string[] = ["test"] as const;
+        const nextArray = (): readonly string[] => fooArray.slice();
+      `,
+    },
   ],
   invalid: [
     // initalization using mutable (literal) -> readonly
@@ -593,7 +707,7 @@ ruleTester.run("no-unsafe-mutable-readonly-assignment", rule, {
         type ReadonlyA = { readonly a?: string } & number;
 
         const ma: MutableA = 42;
-        const ra: ReadonlyA = ma;      
+        const ra: ReadonlyA = ma;
       `,
       errors: [
         {
