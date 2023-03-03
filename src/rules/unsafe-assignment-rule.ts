@@ -1,8 +1,5 @@
 /* eslint-disable functional/prefer-immutable-types */
-import {
-  ESLintUtils,
-  AST_NODE_TYPES,
-} from "@typescript-eslint/utils";
+import { ESLintUtils, AST_NODE_TYPES } from "@typescript-eslint/utils";
 import { TSESLint } from "@typescript-eslint/utils";
 import {
   Type,
@@ -24,10 +21,10 @@ import {
 } from "tsutils";
 
 // eslint-disable-next-line functional/type-declaration-immutability
-export type TypePairArray = readonly {
+export type TypePair = {
   readonly destinationType: Type;
   readonly sourceType: Type;
-}[];
+};
 
 // eslint-disable-next-line functional/type-declaration-immutability
 export type SignaturePairArray = readonly {
@@ -101,8 +98,6 @@ const assignableSignaturePairs = (
   sourceSignatures: readonly Signature[],
   checker: TypeChecker
 ): SignaturePairArray => {
-  // TODO https://github.com/danielnixon/eslint-plugin-total-functions/issues/100
-  // eslint-disable-next-line total-functions/no-unsafe-mutable-readonly-assignment
   return sourceSignatures.flatMap((sourceSignature) =>
     destinationSignatures
       .filter((destinationSignature) =>
@@ -129,18 +124,14 @@ const assignableTypePairs = (
   rawDestinationType: Type,
   rawSourceType: Type,
   checker: TypeChecker
-): TypePairArray => {
-  // TODO https://github.com/danielnixon/eslint-plugin-total-functions/issues/100
+): readonly TypePair[] => {
   // eslint-disable-next-line total-functions/no-unsafe-mutable-readonly-assignment
   const destinationTypeParts: readonly Type[] =
     unionTypeParts(rawDestinationType);
 
-  // TODO https://github.com/danielnixon/eslint-plugin-total-functions/issues/100
   // eslint-disable-next-line total-functions/no-unsafe-mutable-readonly-assignment
   const sourceTypeParts: readonly Type[] = unionTypeParts(rawSourceType);
 
-  // TODO https://github.com/danielnixon/eslint-plugin-total-functions/issues/100
-  // eslint-disable-next-line total-functions/no-unsafe-mutable-readonly-assignment
   return sourceTypeParts.flatMap((sourceTypePart) =>
     destinationTypeParts
       .filter((destinationTypePart) =>
@@ -172,7 +163,7 @@ export const createNoUnsafeAssignmentRule =
       destinationType: Type,
       sourceType: Type,
       checker: TypeChecker,
-      seenTypes: TypePairArray
+      seenTypes: readonly TypePair[]
     ): boolean => {
       const isUnsafe = unsafeIndexAssignmentFunc(
         indexKind,
@@ -216,7 +207,7 @@ export const createNoUnsafeAssignmentRule =
       // eslint-disable-next-line @typescript-eslint/ban-types
       sourceProperty: Symbol,
       checker: TypeChecker,
-      seenTypes: TypePairArray
+      seenTypes: readonly TypePair[]
     ): boolean => {
       const destinationPropertyType = checker.getTypeOfSymbolAtLocation(
         destinationProperty,
@@ -243,7 +234,7 @@ export const createNoUnsafeAssignmentRule =
       destinationType: Type,
       sourceType: Type,
       checker: TypeChecker,
-      seenTypes: TypePairArray
+      seenTypes: readonly TypePair[]
     ): boolean => {
       // eslint-disable-next-line functional/no-conditional-statements
       if (
@@ -287,12 +278,10 @@ export const createNoUnsafeAssignmentRule =
           return false;
         }
 
-        // TODO https://github.com/danielnixon/eslint-plugin-total-functions/issues/100
-        // eslint-disable-next-line total-functions/no-unsafe-mutable-readonly-assignment
-        const nextSeenTypes: TypePairArray = seenTypes.concat({
+        const nextSeenTypes: readonly TypePair[] = seenTypes.concat({
           destinationType,
           sourceType,
-        });
+        } as const);
 
         return isUnsafePropertyAssignmentRec(
           destinationNode,
@@ -311,7 +300,7 @@ export const createNoUnsafeAssignmentRule =
       rawDestinationType: Type,
       rawSourceType: Type,
       checker: TypeChecker,
-      seenTypes: TypePairArray = []
+      seenTypes: readonly TypePair[] = []
     ): boolean => {
       const allowedMemberExpressionForUnsafeAssignment: readonly string[] = [
         "filter",
@@ -373,12 +362,10 @@ export const createNoUnsafeAssignmentRule =
         return false;
       }
 
-      // TODO https://github.com/danielnixon/eslint-plugin-total-functions/issues/100
-      // eslint-disable-next-line total-functions/no-unsafe-mutable-readonly-assignment
-      const nextSeenTypes: TypePairArray = seenTypes.concat({
+      const nextSeenTypes: readonly TypePair[] = seenTypes.concat({
         destinationType: rawDestinationType,
         sourceType: rawSourceType,
-      });
+      } as const);
 
       const typePairs = assignableTypePairs(
         rawDestinationType,
@@ -386,20 +373,19 @@ export const createNoUnsafeAssignmentRule =
         checker
       );
 
-      // TODO https://github.com/danielnixon/eslint-plugin-total-functions/issues/100
-      // eslint-disable-next-line total-functions/no-unsafe-mutable-readonly-assignment
-      const objectTypePairs: TypePairArray = typePairs.filter((tp) =>
+      const objectTypePairs: readonly TypePair[] = typePairs.filter((tp) =>
         intersectionTypeParts(tp.destinationType).some(isObjectType)
       );
 
-      const isUnsafeFunctionAssignment = (typePairs: TypePairArray): boolean =>
+      const isUnsafeFunctionAssignment = (
+        typePairs: readonly TypePair[]
+      ): boolean =>
         typePairs.some(({ sourceType, destinationType }) => {
-          // TODO https://github.com/danielnixon/eslint-plugin-total-functions/issues/100
-          // eslint-disable-next-line total-functions/no-unsafe-mutable-readonly-assignment
-          const nextSeenTypesWithPair: TypePairArray = nextSeenTypes.concat({
-            destinationType,
-            sourceType,
-          });
+          const nextSeenTypesWithPair: readonly TypePair[] =
+            nextSeenTypes.concat({
+              destinationType,
+              sourceType,
+            } as const);
 
           const sourceCallSignatures = getCallSignaturesOfType(sourceType);
           const destinationCallSignatures =
@@ -482,15 +468,14 @@ export const createNoUnsafeAssignmentRule =
         });
 
       const inUnsafeObjectAssignment = (
-        objectTypePairs: TypePairArray
+        objectTypePairs: readonly TypePair[]
       ): boolean =>
         objectTypePairs.some(({ sourceType, destinationType }) => {
-          // TODO https://github.com/danielnixon/eslint-plugin-total-functions/issues/100
-          // eslint-disable-next-line total-functions/no-unsafe-mutable-readonly-assignment
-          const nextSeenTypesWithPair: TypePairArray = nextSeenTypes.concat({
-            destinationType,
-            sourceType,
-          });
+          const nextSeenTypesWithPair: readonly TypePair[] =
+            nextSeenTypes.concat({
+              destinationType,
+              sourceType,
+            } as const);
 
           // This is an unsafe assignment if...
           return (
