@@ -16,7 +16,7 @@ const messages = {
   strictNullChecks: "Do not disable the strictNullChecks compiler option.",
   strictPropertyInitialization:
     "Do not disable the strictPropertyInitialization compiler option.",
-};
+} as const;
 
 type CompilerOption = keyof CompilerOptions & keyof typeof messages;
 

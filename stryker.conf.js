@@ -4,7 +4,7 @@ module.exports = {
     excludedMutations: ["StringLiteral"]
   },
   packageManager: "yarn",
-  reporters: ["clear-text", "progress", "dashboard"],
+  reporters: ["clear-text", "progress", "html", "dashboard"],
   testRunner: "jest",
   coverageAnalysis: "perTest",
   checkers: ["typescript"],

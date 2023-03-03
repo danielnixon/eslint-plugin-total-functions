@@ -14,6 +14,13 @@ const ruleTester = new ESLintUtils.RuleTester({
 // eslint-disable-next-line functional/no-expression-statements
 ruleTester.run("no-unsafe-mutable-readonly-assignment", rule, {
   valid: [
+    // return statement, no expression
+    {
+      filename: "file.ts",
+      code: `
+        return;
+      `,
+    },
     /**
      * Call expressions
      */
