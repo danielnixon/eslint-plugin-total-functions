@@ -322,8 +322,12 @@ export const createNoUnsafeAssignmentRule =
         "slice",
       ] as const;
 
+      const arraySource = checker.isArrayType(rawSourceType);
+
+      const arrayDestination = checker.isArrayType(rawDestinationType);
+
       // eslint-disable-next-line functional/no-conditional-statements
-      if (isCallExpression(sourceNode)) {
+      if (isCallExpression(sourceNode) && arraySource && arrayDestination) {
         // Allowed Member Expression Nodes that are safe to assign to a readonly type destination.
         // eslint-disable-next-line functional/prefer-readonly-type
         const allowedMemberExpressionNodes = sourceNode
@@ -333,8 +337,19 @@ export const createNoUnsafeAssignmentRule =
             if (isExpression(sourceChildNode)) {
               const lastNode = sourceChildNode.getLastToken();
 
+              const firstNode = sourceChildNode.getChildAt(0);
+
+              // Not allow member expression of non-array member to be safe if it is unsafe assignment.
+              const arrayFirstNode = checker.isArrayType(
+                checker.getTypeAtLocation(firstNode)
+              );
+
               // eslint-disable-next-line functional/no-conditional-statements
-              if (lastNode !== undefined && isIdentifier(lastNode)) {
+              if (
+                lastNode !== undefined &&
+                isIdentifier(lastNode) &&
+                arrayFirstNode
+              ) {
                 return allowedMemberExpressionForUnsafeAssignment.includes(
                   lastNode.getText()
                 );

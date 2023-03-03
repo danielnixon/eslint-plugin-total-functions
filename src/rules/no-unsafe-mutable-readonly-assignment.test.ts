@@ -761,5 +761,47 @@ ruleTester.run("no-unsafe-mutable-readonly-assignment", rule, {
         },
       ],
     },
+    // mutable function value -> readonly.
+    {
+      filename: "file.ts",
+      code: `
+        type MyType = {
+          readonly filter: () => Record<string, string>;
+        };
+
+        const myValue: MyType = {
+          filter: () => ({ foo: "bar" }),
+        } as const;
+
+        const foo: Readonly<Record<string, string>> = myValue.filter();
+      `,
+      errors: [
+        {
+          messageId: "errorStringVariableDeclaration",
+          type: AST_NODE_TYPES.VariableDeclaration,
+        },
+      ],
+    },
+    // mutable function array value -> readonly.
+    {
+      filename: "file.ts",
+      code: `
+        type MyType = {
+          readonly filter: () => string[];
+        };
+
+        const myValue: MyType = {
+          filter: () => (["bar"]),
+        } as const;
+
+        const foo: readonly string[] = myValue.filter();
+      `,
+      errors: [
+        {
+          messageId: "errorStringVariableDeclaration",
+          type: AST_NODE_TYPES.VariableDeclaration,
+        },
+      ],
+    },
   ],
 } as const);
