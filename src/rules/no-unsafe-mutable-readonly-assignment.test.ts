@@ -88,6 +88,14 @@ ruleTester.run("no-unsafe-mutable-readonly-assignment", rule, {
         foo(mut);
       `,
     },
+    // string -> string (type doesn't change)
+    {
+      filename: "file.ts",
+      code: `
+        const foo: string = "";
+        const bar: string = foo;
+      `,
+    },
     // object literal -> mutable (no reference to object retained)
     {
       filename: "file.ts",
