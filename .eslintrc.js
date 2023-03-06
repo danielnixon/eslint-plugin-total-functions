@@ -3,20 +3,34 @@ module.exports = {
   parserOptions: {
     project: "./tsconfig.json",
     ecmaVersion: 2018,
-    sourceType: "module"
+    sourceType: "module",
   },
   extends: [
     "typed-fp",
     "plugin:sonarjs/recommended",
     "plugin:jest/recommended",
-    "plugin:prettier/recommended"
+    "plugin:prettier/recommended",
   ],
   env: {
     "jest/globals": true,
-    es6: true
+    es6: true,
   },
-  plugins: ["jest", "sonarjs", "functional", "@typescript-eslint", "prettier", "total-functions"],
+  plugins: [
+    "jest",
+    "sonarjs",
+    "functional",
+    "@typescript-eslint",
+    "prettier",
+    "total-functions",
+  ],
   rules: {
-    "total-functions/no-unsafe-mutable-readonly-assignment": "error"
-  }
+    "total-functions/no-unsafe-mutable-readonly-assignment": "error",
+  },
+  ignorePatterns: [
+    "dist/*",
+    "coverage/*",
+    ".eslintrc.js",
+    "stryker.conf.js",
+    "jest.config.js",
+  ],
 };
