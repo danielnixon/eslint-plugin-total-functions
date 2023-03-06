@@ -571,6 +571,14 @@ ruleTester.run("no-unsafe-mutable-readonly-assignment", rule, {
         const nextArray = (): readonly string[] => fooArray.slice();
       `,
     },
+    {
+      filename: "file.ts",
+      code: `
+        export function* mySaga(): Generator<void> {
+          yield;
+        }
+      `,
+    },
   ],
   invalid: [
     // initalization using mutable (literal) -> readonly
@@ -800,6 +808,25 @@ ruleTester.run("no-unsafe-mutable-readonly-assignment", rule, {
         {
           messageId: "errorStringVariableDeclaration",
           type: AST_NODE_TYPES.VariableDeclaration,
+        },
+      ],
+    },
+    // yield expression (generator)
+    {
+      filename: "file.ts",
+      code: `
+        type MutableA = { a: string };
+        type ReadonlyA = { readonly a: string };
+
+        export function* mySaga(): Generator<ReadonlyA> {
+          const foo: MutableA = { a: "" };
+          yield foo;
+        }
+      `,
+      errors: [
+        {
+          messageId: "errorStringArrowFunctionExpression",
+          type: AST_NODE_TYPES.YieldExpression,
         },
       ],
     },

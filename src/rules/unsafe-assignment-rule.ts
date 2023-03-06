@@ -17,14 +17,8 @@ import {
   isIdentifier,
   isObjectType,
   isUnionOrIntersectionType,
-  unionTypeParts,
 } from "tsutils";
-
-// eslint-disable-next-line functional/type-declaration-immutability
-export type TypePair = {
-  readonly destinationType: Type;
-  readonly sourceType: Type;
-};
+import { assignableTypePairs, TypePair } from "./common";
 
 // eslint-disable-next-line functional/type-declaration-immutability
 export type SignaturePairArray = readonly {
@@ -112,34 +106,6 @@ const assignableSignaturePairs = (
       .map((destinationSignature) => ({
         sourceSignature,
         destinationSignature,
-      }))
-  );
-};
-
-/**
- * Breaks the supplied types into their union type parts and returns an
- * array of pairs of constituent types that are assignable.
- */
-const assignableTypePairs = (
-  rawDestinationType: Type,
-  rawSourceType: Type,
-  checker: TypeChecker
-): readonly TypePair[] => {
-  // eslint-disable-next-line total-functions/no-unsafe-mutable-readonly-assignment
-  const destinationTypeParts: readonly Type[] =
-    unionTypeParts(rawDestinationType);
-
-  // eslint-disable-next-line total-functions/no-unsafe-mutable-readonly-assignment
-  const sourceTypeParts: readonly Type[] = unionTypeParts(rawSourceType);
-
-  return sourceTypeParts.flatMap((sourceTypePart) =>
-    destinationTypeParts
-      .filter((destinationTypePart) =>
-        checker.isTypeAssignableTo(sourceTypePart, destinationTypePart)
-      )
-      .map((destinationTypePart) => ({
-        sourceType: sourceTypePart,
-        destinationType: destinationTypePart,
       }))
   );
 };
@@ -701,7 +667,36 @@ export const createNoUnsafeAssignmentRule =
           } as const);
         }
       },
-      // TODO: YieldExpression?
+      // eslint-disable-next-line functional/no-return-void
+      YieldExpression: (node): void => {
+        const tsNode = parserServices.esTreeNodeToTSNodeMap.get(node);
+
+        // eslint-disable-next-line functional/no-conditional-statements
+        if (tsNode.expression === undefined) {
+          return;
+        }
+
+        const destinationType = checker.getContextualType(tsNode.expression);
+        const sourceType = checker.getTypeAtLocation(tsNode.expression);
+
+        // eslint-disable-next-line functional/no-conditional-statements
+        if (
+          destinationType !== undefined &&
+          isUnsafeAssignment(
+            tsNode.expression,
+            tsNode.expression,
+            destinationType,
+            sourceType,
+            checker
+          )
+        ) {
+          // eslint-disable-next-line functional/no-expression-statements
+          context.report({
+            node: node,
+            messageId: "errorStringArrowFunctionExpression",
+          } as const);
+        }
+      },
       // eslint-disable-next-line functional/no-return-void
       ArrowFunctionExpression: (node): void => {
         // eslint-disable-next-line functional/no-conditional-statements
