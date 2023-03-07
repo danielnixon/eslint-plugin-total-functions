@@ -4,6 +4,7 @@ import noUnsafeMutableReadonlyAssignment from "./no-unsafe-mutable-readonly-assi
 import noUnsafeOptionalPropertyAssignment from "./no-unsafe-optional-property-assignment";
 import requireStrictMode from "./require-strict-mode";
 import noUnsafeEnumAssignment from "./no-unsafe-enum-assignment";
+import noEnums from "./no-enums";
 
 export default {
   "require-strict-mode": requireStrictMode,
@@ -12,4 +13,5 @@ export default {
   "no-unsafe-mutable-readonly-assignment": noUnsafeMutableReadonlyAssignment,
   "no-unsafe-optional-property-assignment": noUnsafeOptionalPropertyAssignment,
   "no-unsafe-enum-assignment": noUnsafeEnumAssignment,
+  "no-enums": noEnums,
 };
