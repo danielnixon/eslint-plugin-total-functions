@@ -14,7 +14,8 @@ An ESLint plugin to enforce the use of total functions (and prevent the use of [
 
 | TypeScript       | ESLint  | eslint-plugin-total-functions | Suppported? |
 | :--------------: | :-----: | :---------------------------: | :---------: |
-|  4.7.3           | 8.17.0  | 6.0.0                         |             |
+|  4.9.5           | 8.35.0  | 6.2.0                         |             |
+|  4.7.3           | 8.17.0  | 6.0.0                         | No          |
 |  4.5.4           | 8.5.0   | 5.0.0                         | No          |
 |  4.4.2           | 7.32.0  | 4.10.1                        | No          |
 |  4.3.5           | 7.30.0  | 4.8.0                         | No          |
@@ -72,6 +73,8 @@ Alternatively you can configure individual rules separately (see below).
 |  no-unsafe-readonly-mutable-assignment  | ✅           | ✅    |        |
 |  no-unsafe-mutable-readonly-assignment  |              | ✅    | [Not yet](https://github.com/danielnixon/eslint-plugin-total-functions/issues/99) |
 |  no-unsafe-optional-property-assignment | [Not yet](https://github.com/danielnixon/eslint-plugin-total-functions/issues/83) | ✅    |       |
+|  no-unsafe-enum-assignment              | ✅           | ✅    |        |
+|  no-enums                               | ✅           | ✅    |        |
 
 ### total-functions/require-strict-mode
 
