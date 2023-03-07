@@ -284,8 +284,7 @@ export const createNoUnsafeAssignmentRule =
       // eslint-disable-next-line functional/no-conditional-statements
       if (isCallExpression(sourceNode) && arraySource && arrayDestination) {
         // Allowed Member Expression Nodes that are safe to assign to a readonly type destination.
-        // eslint-disable-next-line functional/prefer-readonly-type
-        const allowedMemberExpressionNodes = sourceNode
+        const allowedMemberExpressionNodes: readonly Node[] = sourceNode
           .getChildren()
           .filter((sourceChildNode) => {
             // eslint-disable-next-line functional/no-conditional-statements
