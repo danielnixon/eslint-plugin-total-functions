@@ -162,6 +162,42 @@ This rule bans assignment from one type to another, if:
 
 This rule is excluded from the `recommended` config until [#83](https://github.com/danielnixon/eslint-plugin-total-functions/issues/83) lands.
 
+### total-functions/no-enums
+
+Enums have a number of issues, including unsoundness issues (which are especially relevant here). This rule bans the declaration of enums entirely. Use an alternative such as a union of strings instead.
+
+### total-functions/no-unsafe-enum-assignment
+
+If you do use an enum (or are forced to by a library), this rule flags unsafe assignment that the TypeScript compiler permits. For example:
+
+```typescript
+  enum ZeroOrOne {
+    Zero = 0,
+    One = 1,
+  }
+
+  // This compiles but is flagged by no-unsafe-enum-assignment
+  const zeroOrOne: ZeroOrOne = 2;
+
+  // This is not flagged by no-unsafe-enum-assignment
+  const zeroOrOne: ZeroOrOne = ZeroOrOne.Zero;
+```
+
+### total-functions/no-partial-url-constructor
+
+The URL constructor can throw (i.e. it is partial).
+
+```typescript
+// This compiles and foo appears to be a URL. It isn't.
+const foo: URL = new URL(""); // Throws TypeError [ERR_INVALID_URL]: Invalid URL
+```
+
+Instead, you should use a wrapper that catches that error and returns `URL | undefined` or similar (perhaps using an `Option` type).
+
+URL also happens to be mutable, which will be flagged by [prefer-immutable-types](https://github.com/eslint-functional/eslint-plugin-functional/blob/main/docs/rules/prefer-immutable-types.md). The [readonly-types](https://github.com/agiledigital/readonly-types) package provides a `readonlyURL` function that solves both of these issues.
+
+https://github.com/agiledigital/readonly-types
+
 # See Also
 * [TypeScript for Functional Programmers](https://www.typescriptlang.org/docs/handbook/typescript-in-5-minutes-func.html)
 * https://github.com/danielnixon/eslint-config-typed-fp
@@ -171,3 +207,4 @@ This rule is excluded from the `recommended` config until [#83](https://github.c
 * https://github.com/gcanti/fp-ts
 * https://github.com/plantain-00/type-coverage
 * https://github.com/immutable-js/immutable-js
+* https://github.com/shian15810/eslint-plugin-typescript-enum
