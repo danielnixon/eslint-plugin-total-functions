@@ -196,8 +196,6 @@ Instead, you should use a wrapper that catches that error and returns `URL | und
 
 URL also happens to be mutable, which will be flagged by [prefer-immutable-types](https://github.com/eslint-functional/eslint-plugin-functional/blob/main/docs/rules/prefer-immutable-types.md). The [readonly-types](https://github.com/agiledigital/readonly-types) package provides a `readonlyURL` function that solves both of these issues.
 
-https://github.com/agiledigital/readonly-types
-
 # See Also
 * [TypeScript for Functional Programmers](https://www.typescriptlang.org/docs/handbook/typescript-in-5-minutes-func.html)
 * https://github.com/danielnixon/eslint-config-typed-fp
