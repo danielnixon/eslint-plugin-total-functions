@@ -75,6 +75,7 @@ Alternatively you can configure individual rules separately (see below).
 |  no-unsafe-optional-property-assignment | [Not yet](https://github.com/danielnixon/eslint-plugin-total-functions/issues/83) | ✅    |       |
 |  no-unsafe-enum-assignment              | ✅           | ✅    |        |
 |  no-enums                               | ✅           | ✅    |        |
+|  no-partial-url-constructor             | ✅           | ✅    |        |
 
 ### total-functions/require-strict-mode
 

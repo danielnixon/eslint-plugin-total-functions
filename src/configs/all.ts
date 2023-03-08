@@ -8,5 +8,6 @@ export = {
     "total-functions/require-strict-mode": "error",
     "total-functions/no-unsafe-enum-assignment": "error",
     "total-functions/no-enums": "error",
+    "total-functions/no-partial-url-constructor": "error",
   },
 };

@@ -5,6 +5,7 @@ import noUnsafeOptionalPropertyAssignment from "./no-unsafe-optional-property-as
 import requireStrictMode from "./require-strict-mode";
 import noUnsafeEnumAssignment from "./no-unsafe-enum-assignment";
 import noEnums from "./no-enums";
+import noPartialUrlConstructor from "./no-partial-url-constructor";
 
 export default {
   "require-strict-mode": requireStrictMode,
@@ -14,4 +15,5 @@ export default {
   "no-unsafe-optional-property-assignment": noUnsafeOptionalPropertyAssignment,
   "no-unsafe-enum-assignment": noUnsafeEnumAssignment,
   "no-enums": noEnums,
+  "no-partial-url-constructor": noPartialUrlConstructor,
 };
