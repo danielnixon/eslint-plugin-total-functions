@@ -76,6 +76,7 @@ Alternatively you can configure individual rules separately (see below).
 |  no-unsafe-enum-assignment              | ✅           | ✅    |        |
 |  no-enums                               | ✅           | ✅    |        |
 |  no-partial-url-constructor             | ✅           | ✅    |        |
+|  no-partial-division                    | ✅           | ✅    |        |
 
 ### total-functions/require-strict-mode
 
@@ -195,6 +196,25 @@ const foo: URL = new URL(""); // Throws TypeError [ERR_INVALID_URL]: Invalid URL
 Instead, you should use a wrapper that catches that error and returns `URL | undefined` or similar (perhaps using an `Option` type).
 
 URL also happens to be mutable, which will be flagged by [prefer-immutable-types](https://github.com/eslint-functional/eslint-plugin-functional/blob/main/docs/rules/prefer-immutable-types.md). The [readonly-types](https://github.com/agiledigital/readonly-types) package provides a `readonlyURL` function that solves both of these issues.
+
+### total-functions/no-partial-division
+
+Division by zero is undefined. That makes the division operator partial.
+
+In the case of `number`, it results in `Infinity` (IEEE 754...).
+
+In the case of `bigint` it throws a `RangeError`.
+
+The latter is much more indisputably partial than the former.
+
+```
+> 1 / 0
+Infinity
+> 1n / 0n
+Uncaught RangeError: Division by zero
+```
+
+This rule flags division unless the denominator is provably non-zero. If you need division, you should wrap it in a wrapper that returns undefined when the denominator is zero.
 
 # See Also
 * [TypeScript for Functional Programmers](https://www.typescriptlang.org/docs/handbook/typescript-in-5-minutes-func.html)
