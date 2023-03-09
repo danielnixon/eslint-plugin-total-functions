@@ -17,6 +17,12 @@ ruleTester.run("no-partial-url-constructor", rule, {
     {
       filename: "file.ts",
       code: `
+        new URL("http://example.com");
+      `,
+    },
+    {
+      filename: "file.ts",
+      code: `
         new Set()
       `,
     },
@@ -38,6 +44,55 @@ ruleTester.run("no-partial-url-constructor", rule, {
       filename: "file.ts",
       code: `
         new URL()
+      `,
+      errors: [
+        {
+          messageId: "errorStringGeneric",
+          type: AST_NODE_TYPES.NewExpression,
+        },
+      ],
+    },
+    {
+      filename: "file.ts",
+      code: `
+        new global.URL("")
+      `,
+      errors: [
+        {
+          messageId: "errorStringGeneric",
+          type: AST_NODE_TYPES.NewExpression,
+        },
+      ],
+    },
+    {
+      filename: "file.ts",
+      code: `
+        new globalThis.URL("")
+      `,
+      errors: [
+        {
+          messageId: "errorStringGeneric",
+          type: AST_NODE_TYPES.NewExpression,
+        },
+      ],
+    },
+    {
+      filename: "file.ts",
+      code: `
+        new window.URL("")
+      `,
+      errors: [
+        {
+          messageId: "errorStringGeneric",
+          type: AST_NODE_TYPES.NewExpression,
+        },
+      ],
+    },
+    {
+      filename: "file.ts",
+      code: `
+        const ATurdByAnyOtherName = URL;
+        const foo = new ATurdByAnyOtherName("");
       `,
       errors: [
         {

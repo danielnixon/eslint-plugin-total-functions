@@ -1,5 +1,5 @@
 /* eslint-disable functional/prefer-immutable-types */
-import { AST_NODE_TYPES } from "@typescript-eslint/utils";
+import { AST_NODE_TYPES, ESLintUtils } from "@typescript-eslint/utils";
 import { createRule } from "./common";
 
 /**
@@ -21,15 +21,50 @@ const noPartialUrlConstructor = createRule({
     schema: [],
   },
   create: (context) => {
+    const parserServices = ESLintUtils.getParserServices(context);
+    const checker = parserServices.program.getTypeChecker();
+
+    const isValidUrl = (s: string): boolean => {
+      // eslint-disable-next-line functional/no-try-statements
+      try {
+        // eslint-disable-next-line functional/no-expression-statements, total-functions/no-partial-url-constructor
+        new URL(s);
+        return true;
+      } catch {
+        return false;
+      }
+    };
+
     return {
       // eslint-disable-next-line functional/no-return-void
       NewExpression: (node) => {
+        const objectNode = parserServices.esTreeNodeToTSNodeMap.get(
+          node.callee
+        );
+        const objectType = checker.getTypeAtLocation(objectNode);
+
+        const prototype = checker.getPropertyOfType(objectType, "prototype");
+
+        const prototypeTypeName =
+          prototype !== undefined
+            ? checker.getTypeOfSymbolAtLocation(prototype, objectNode).symbol
+                .name
+            : undefined;
+
         // eslint-disable-next-line functional/no-conditional-statements
-        if (
-          node.callee.type === AST_NODE_TYPES.Identifier &&
-          // TODO inspect the type instead of just relying on the type name.
-          node.callee.name === "URL"
-        ) {
+        if (prototypeTypeName === "URL") {
+          // eslint-disable-next-line functional/no-conditional-statements
+          if (
+            node.arguments.length === 1 &&
+            node.arguments[0] !== undefined &&
+            node.arguments[0].type === AST_NODE_TYPES.Literal &&
+            typeof node.arguments[0].value === "string" &&
+            isValidUrl(node.arguments[0].value)
+          ) {
+            // Don't flag it as an error if the argument is a valid URL literal string.
+            return;
+          }
+
           // eslint-disable-next-line functional/no-expression-statements
           context.report({
             node: node,
