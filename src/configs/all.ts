@@ -9,5 +9,6 @@ export = {
     "total-functions/no-unsafe-enum-assignment": "error",
     "total-functions/no-enums": "error",
     "total-functions/no-partial-url-constructor": "error",
+    "total-functions/no-partial-division": "error",
   },
 };

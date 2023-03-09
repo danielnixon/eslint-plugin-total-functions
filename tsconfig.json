@@ -4,7 +4,7 @@
     
     /* Basic Options */
     "lib": ["esnext"],
-    "target": "ES2015",
+    "target": "ES2020",
     "module": "CommonJS",
     // "declaration": true,                      /* Generates corresponding '.d.ts' file. */
     "outDir": "dist",                         /* Redirect output structure to the directory. */

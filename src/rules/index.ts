@@ -6,6 +6,7 @@ import requireStrictMode from "./require-strict-mode";
 import noUnsafeEnumAssignment from "./no-unsafe-enum-assignment";
 import noEnums from "./no-enums";
 import noPartialUrlConstructor from "./no-partial-url-constructor";
+import noPartialDivision from "./no-partial-division";
 
 export default {
   "require-strict-mode": requireStrictMode,
@@ -16,4 +17,5 @@ export default {
   "no-unsafe-enum-assignment": noUnsafeEnumAssignment,
   "no-enums": noEnums,
   "no-partial-url-constructor": noPartialUrlConstructor,
+  "no-partial-division": noPartialDivision,
 };
