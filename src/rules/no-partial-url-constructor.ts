@@ -15,6 +15,8 @@ const noPartialUrlConstructor = createRule({
       recommended: "error",
     },
     messages: {
+      errorStringWillDefinitelyThrow:
+        "This invalid URL constructor will throw a TypeError at runtime.",
       errorStringGeneric:
         "Don't use the URL constructor directly because it can throw and because URLs are mutable. Instead, use `readonlyURL` from the readonly-types package.",
     },
@@ -36,7 +38,7 @@ const noPartialUrlConstructor = createRule({
     };
 
     return {
-      // eslint-disable-next-line functional/no-return-void
+      // eslint-disable-next-line functional/no-return-void, sonarjs/cognitive-complexity
       NewExpression: (node) => {
         const objectNode = parserServices.esTreeNodeToTSNodeMap.get(
           node.callee
@@ -52,16 +54,28 @@ const noPartialUrlConstructor = createRule({
             : undefined;
 
         // eslint-disable-next-line functional/no-conditional-statements
+        if (node.arguments.length === 0 || node.arguments.length > 2) {
+          // TypeScript will catch this case.
+          return;
+        }
+
+        // eslint-disable-next-line functional/no-conditional-statements
         if (prototypeTypeName === "URL") {
           // eslint-disable-next-line functional/no-conditional-statements
           if (
             node.arguments.length === 1 &&
             node.arguments[0] !== undefined &&
             node.arguments[0].type === AST_NODE_TYPES.Literal &&
-            typeof node.arguments[0].value === "string" &&
-            isValidUrl(node.arguments[0].value)
+            typeof node.arguments[0].value === "string"
           ) {
-            // Don't flag it as an error if the arguments form a valid URL.
+            // eslint-disable-next-line functional/no-conditional-statements
+            if (!isValidUrl(node.arguments[0].value)) {
+              // eslint-disable-next-line functional/no-expression-statements
+              context.report({
+                node: node.arguments[0],
+                messageId: "errorStringWillDefinitelyThrow",
+              } as const);
+            }
             return;
           }
 
@@ -73,10 +87,16 @@ const noPartialUrlConstructor = createRule({
             typeof node.arguments[0].value === "string" &&
             node.arguments[1] !== undefined &&
             node.arguments[1].type === AST_NODE_TYPES.Literal &&
-            typeof node.arguments[1].value === "string" &&
-            isValidUrl(node.arguments[0].value, node.arguments[1].value)
+            typeof node.arguments[1].value === "string"
           ) {
-            // Don't flag it as an error if the arguments form a valid URL.
+            // eslint-disable-next-line functional/no-conditional-statements
+            if (!isValidUrl(node.arguments[0].value, node.arguments[1].value)) {
+              // eslint-disable-next-line functional/no-expression-statements
+              context.report({
+                node: node,
+                messageId: "errorStringWillDefinitelyThrow",
+              } as const);
+            }
             return;
           }
 

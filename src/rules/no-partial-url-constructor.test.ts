@@ -17,6 +17,13 @@ ruleTester.run("no-partial-url-constructor", rule, {
     {
       filename: "file.ts",
       code: `
+        // tsc will catch this so this rule doesn't need to
+        new URL()
+      `,
+    },
+    {
+      filename: "file.ts",
+      code: `
         new URL("http://example.com");
       `,
     },
@@ -44,7 +51,8 @@ ruleTester.run("no-partial-url-constructor", rule, {
     {
       filename: "file.ts",
       code: `
-        new URL("foo")
+        const str: string = "foo";
+        new URL(str);
       `,
       errors: [
         {
@@ -56,11 +64,23 @@ ruleTester.run("no-partial-url-constructor", rule, {
     {
       filename: "file.ts",
       code: `
+        new URL("foo")
+      `,
+      errors: [
+        {
+          messageId: "errorStringWillDefinitelyThrow",
+          type: AST_NODE_TYPES.Literal,
+        },
+      ],
+    },
+    {
+      filename: "file.ts",
+      code: `
         new URL("foo", "bar")
       `,
       errors: [
         {
-          messageId: "errorStringGeneric",
+          messageId: "errorStringWillDefinitelyThrow",
           type: AST_NODE_TYPES.NewExpression,
         },
       ],
@@ -72,19 +92,7 @@ ruleTester.run("no-partial-url-constructor", rule, {
       `,
       errors: [
         {
-          messageId: "errorStringGeneric",
-          type: AST_NODE_TYPES.NewExpression,
-        },
-      ],
-    },
-    {
-      filename: "file.ts",
-      code: `
-        new URL()
-      `,
-      errors: [
-        {
-          messageId: "errorStringGeneric",
+          messageId: "errorStringWillDefinitelyThrow",
           type: AST_NODE_TYPES.NewExpression,
         },
       ],
@@ -96,8 +104,8 @@ ruleTester.run("no-partial-url-constructor", rule, {
       `,
       errors: [
         {
-          messageId: "errorStringGeneric",
-          type: AST_NODE_TYPES.NewExpression,
+          messageId: "errorStringWillDefinitelyThrow",
+          type: AST_NODE_TYPES.Literal,
         },
       ],
     },
@@ -108,8 +116,8 @@ ruleTester.run("no-partial-url-constructor", rule, {
       `,
       errors: [
         {
-          messageId: "errorStringGeneric",
-          type: AST_NODE_TYPES.NewExpression,
+          messageId: "errorStringWillDefinitelyThrow",
+          type: AST_NODE_TYPES.Literal,
         },
       ],
     },
@@ -120,8 +128,8 @@ ruleTester.run("no-partial-url-constructor", rule, {
       `,
       errors: [
         {
-          messageId: "errorStringGeneric",
-          type: AST_NODE_TYPES.NewExpression,
+          messageId: "errorStringWillDefinitelyThrow",
+          type: AST_NODE_TYPES.Literal,
         },
       ],
     },
@@ -133,8 +141,8 @@ ruleTester.run("no-partial-url-constructor", rule, {
       `,
       errors: [
         {
-          messageId: "errorStringGeneric",
-          type: AST_NODE_TYPES.NewExpression,
+          messageId: "errorStringWillDefinitelyThrow",
+          type: AST_NODE_TYPES.Literal,
         },
       ],
     },
