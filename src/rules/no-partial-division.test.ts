@@ -26,6 +26,12 @@ ruleTester.run("no-partial-division", rule, {
         1n / 1n;
       `,
     },
+    {
+      filename: "file.ts",
+      code: `
+        1 + 1;
+      `,
+    },
   ],
   invalid: [
     {
