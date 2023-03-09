@@ -24,11 +24,11 @@ const noPartialUrlConstructor = createRule({
     const parserServices = ESLintUtils.getParserServices(context);
     const checker = parserServices.program.getTypeChecker();
 
-    const isValidUrl = (s: string): boolean => {
+    const isValidUrl = (s: string, base?: string): boolean => {
       // eslint-disable-next-line functional/no-try-statements
       try {
         // eslint-disable-next-line functional/no-expression-statements, total-functions/no-partial-url-constructor
-        new URL(s);
+        new URL(s, base);
         return true;
       } catch {
         return false;
@@ -61,7 +61,22 @@ const noPartialUrlConstructor = createRule({
             typeof node.arguments[0].value === "string" &&
             isValidUrl(node.arguments[0].value)
           ) {
-            // Don't flag it as an error if the argument is a valid URL literal string.
+            // Don't flag it as an error if the arguments form a valid URL.
+            return;
+          }
+
+          // eslint-disable-next-line functional/no-conditional-statements
+          if (
+            node.arguments.length === 2 &&
+            node.arguments[0] !== undefined &&
+            node.arguments[0].type === AST_NODE_TYPES.Literal &&
+            typeof node.arguments[0].value === "string" &&
+            node.arguments[1] !== undefined &&
+            node.arguments[1].type === AST_NODE_TYPES.Literal &&
+            typeof node.arguments[1].value === "string" &&
+            isValidUrl(node.arguments[0].value, node.arguments[1].value)
+          ) {
+            // Don't flag it as an error if the arguments form a valid URL.
             return;
           }
 

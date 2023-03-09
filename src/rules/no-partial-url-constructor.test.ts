@@ -23,6 +23,19 @@ ruleTester.run("no-partial-url-constructor", rule, {
     {
       filename: "file.ts",
       code: `
+        new URL("/hello", "http://example.com");
+      `,
+    },
+    // TODO support this form
+    // {
+    //   filename: "file.ts",
+    //   code: `
+    //     new URL("/hello", new URL("http://example.com"));
+    //   `,
+    // },
+    {
+      filename: "file.ts",
+      code: `
         new Set()
       `,
     },
@@ -32,6 +45,30 @@ ruleTester.run("no-partial-url-constructor", rule, {
       filename: "file.ts",
       code: `
         new URL("foo")
+      `,
+      errors: [
+        {
+          messageId: "errorStringGeneric",
+          type: AST_NODE_TYPES.NewExpression,
+        },
+      ],
+    },
+    {
+      filename: "file.ts",
+      code: `
+        new URL("foo", "bar")
+      `,
+      errors: [
+        {
+          messageId: "errorStringGeneric",
+          type: AST_NODE_TYPES.NewExpression,
+        },
+      ],
+    },
+    {
+      filename: "file.ts",
+      code: `
+        new URL("http://example.com", "bar")
       `,
       errors: [
         {
