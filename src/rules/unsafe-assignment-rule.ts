@@ -204,7 +204,8 @@ export const createNoUnsafeAssignmentRule =
     ): boolean => {
       // eslint-disable-next-line functional/no-conditional-statements
       if (
-        checker.isArrayType(destinationType) &&
+        (checker.isArrayType(destinationType) ||
+          checker.isArrayType(sourceType)) &&
         !isUnionOrIntersectionType(destinationType) &&
         !isUnionOrIntersectionType(sourceType)
       ) {
@@ -212,11 +213,6 @@ export const createNoUnsafeAssignmentRule =
         //
         // If one of these arrays is readonly and the other mutable, it will be caught by `isUnsafeIndexAssignment`,
         // so we needn't compare each individual property.
-        //
-        // Additionally, the length property of tuples is technically mutable (wtf) so we ignore arrays for this reason too.
-        // Observe:
-        //   const foo = [] as const;
-        //   foo.length = 0;
         //
         // TODO what about tuples?
         // TODO should we ignore other built-in types like strings, symbols and numbers for performance too?
