@@ -81,7 +81,43 @@ ruleTester.run("no-partial-division", rule, {
     {
       filename: "file.ts",
       code: `;
+        const result = 1 / 0.0;
+      `,
+      errors: [
+        {
+          messageId: "errorStringGeneric",
+          type: AST_NODE_TYPES.BinaryExpression,
+        },
+      ],
+    },
+    {
+      filename: "file.ts",
+      code: `;
+        const result = 1 / -0;
+      `,
+      errors: [
+        {
+          messageId: "errorStringGeneric",
+          type: AST_NODE_TYPES.BinaryExpression,
+        },
+      ],
+    },
+    {
+      filename: "file.ts",
+      code: `;
         const result = 1n / 0n;
+      `,
+      errors: [
+        {
+          messageId: "errorStringGeneric",
+          type: AST_NODE_TYPES.BinaryExpression,
+        },
+      ],
+    },
+    {
+      filename: "file.ts",
+      code: `;
+        const result = 1n / -0n;
       `,
       errors: [
         {
