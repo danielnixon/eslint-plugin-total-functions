@@ -33,6 +33,7 @@
     "@typescript-eslint/parser": "^5.54.1",
     "@typescript-eslint/type-utils": "^5.54.1",
     "@typescript-eslint/utils": "^5.54.1",
+    "is-immutable-type": "^1.2.4",
     "tsutils": "^3.21.0"
   },
   "peerDependencies": {

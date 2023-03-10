@@ -19,6 +19,12 @@ import {
   isUnionOrIntersectionType,
 } from "tsutils";
 import { assignableTypePairs, TypePair } from "./common";
+import {
+  getDefaultOverrides,
+  getTypeImmutability,
+  isImmutable,
+  isReadonlyDeep,
+} from "is-immutable-type";
 
 // eslint-disable-next-line functional/type-declaration-immutability
 export type SignaturePairArray = readonly {
@@ -40,6 +46,88 @@ export type UnsafeIndexAssignmentFunc = (
   sourceType: Type,
   checker: TypeChecker
 ) => boolean;
+
+/**
+ * Individual rules that are implemented in terms of this reusable `createNoUnsafeAssignmentRule`
+ * will have their own specific needs to determine if an assignment is safe or not.
+ *
+ * @returns "safe" if the assignment is safe, "unsafe" if it is unsafe and undefined if the custom logic
+ * has no opinion in this case and the default logic should be used. If "safe" or "unsafe" are returned,
+ * the default logic won't be applied at all.
+ */
+export type CustomUnsafeAssignmentFunc = (
+  destinationNode: Node,
+  sourceNode: Node,
+  rawDestinationType: Type,
+  rawSourceType: Type,
+  checker: TypeChecker
+) => "safe" | "unsafe" | undefined;
+
+/**
+ * Custom assignment safety logic that applies to the mutable-readonly and readonly-mutable
+ * rules but not to the no-unsafe-optional-property-assignment rule.
+ */
+export const safeReadonlyMutableAssignment: CustomUnsafeAssignmentFunc = (
+  _destinationNode: Node,
+  _sourceNode: Node,
+  rawDestinationType: Type,
+  rawSourceType: Type,
+  checker: TypeChecker
+) => {
+  // eslint-disable-next-line functional/no-conditional-statements
+  if (
+    getCallSignaturesOfType(rawDestinationType).length > 0 ||
+    getCallSignaturesOfType(rawSourceType).length > 0
+  ) {
+    // is-immutable-type doesn't flag when function parameters are readonly versus mutable
+    // so if either type is callable, we defer to our default logic.
+    return undefined;
+  }
+
+  // eslint-disable-next-line functional/no-try-statements
+  try {
+    // TODO expose eslint global settings for immutability overrides
+    // https://github.com/eslint-functional/eslint-plugin-functional/blob/main/docs/rules/settings/immutability.md
+    const immutabilityOverrides = getDefaultOverrides();
+
+    const destinationImmutability = getTypeImmutability(
+      checker,
+      // eslint-disable-next-line total-functions/no-unsafe-mutable-readonly-assignment
+      rawDestinationType,
+      immutabilityOverrides
+    );
+
+    const sourceImmutability = getTypeImmutability(
+      checker,
+      // eslint-disable-next-line total-functions/no-unsafe-mutable-readonly-assignment
+      rawSourceType,
+      immutabilityOverrides
+    );
+
+    // eslint-disable-next-line functional/no-conditional-statements
+    if (
+      isImmutable(destinationImmutability) &&
+      isImmutable(sourceImmutability)
+    ) {
+      // If both sides are immutable, assignment is completely safe.
+      return "safe";
+    }
+
+    // eslint-disable-next-line functional/no-conditional-statements
+    if (
+      isReadonlyDeep(destinationImmutability) &&
+      isReadonlyDeep(sourceImmutability)
+    ) {
+      // If both sides are readonly deep, assignment "safe enough" that we don't bother flagging it.
+      return "safe";
+    }
+  } catch {
+    return undefined;
+  }
+
+  // Otherwise, let's delve deeply into the types and see if it's safe.
+  return undefined;
+};
 
 export type UnsafePropertyAssignmentFunc = (
   // eslint-disable-next-line @typescript-eslint/ban-types
@@ -113,7 +201,8 @@ const assignableSignaturePairs = (
 export const createNoUnsafeAssignmentRule =
   (
     unsafePropertyAssignmentFunc: UnsafePropertyAssignmentFunc,
-    unsafeIndexAssignmentFunc: UnsafeIndexAssignmentFunc
+    unsafeIndexAssignmentFunc: UnsafeIndexAssignmentFunc,
+    customUnsafeAssignmentFunc: CustomUnsafeAssignmentFunc
   ) =>
   (
     context: Readonly<TSESLint.RuleContext<MessageId, readonly unknown[]>>
@@ -155,6 +244,7 @@ export const createNoUnsafeAssignmentRule =
         (destinationIndexType !== undefined &&
           sourceIndexType !== undefined &&
           isUnsafeAssignment(
+            customUnsafeAssignmentFunc,
             destinationNode,
             sourceNode,
             destinationIndexType,
@@ -185,6 +275,7 @@ export const createNoUnsafeAssignmentRule =
       );
 
       return isUnsafeAssignment(
+        customUnsafeAssignmentFunc,
         destinationNode,
         sourceNode,
         destinationPropertyType,
@@ -261,6 +352,7 @@ export const createNoUnsafeAssignmentRule =
     };
 
     const isUnsafeAssignment = (
+      customUnsafeAssignmentFunc: CustomUnsafeAssignmentFunc,
       destinationNode: Node,
       sourceNode: Node,
       rawDestinationType: Type,
@@ -268,6 +360,30 @@ export const createNoUnsafeAssignmentRule =
       checker: TypeChecker,
       seenTypes: readonly TypePair[] = []
     ): boolean => {
+      // eslint-disable-next-line functional/no-conditional-statements
+      if (rawDestinationType === rawSourceType) {
+        // Never unsafe if the types are equal.
+        return false;
+      }
+
+      const customSafetyResult = customUnsafeAssignmentFunc(
+        destinationNode,
+        sourceNode,
+        rawDestinationType,
+        rawSourceType,
+        checker
+      );
+
+      // eslint-disable-next-line functional/no-conditional-statements
+      if (customSafetyResult === "safe") {
+        return false;
+      }
+
+      // eslint-disable-next-line functional/no-conditional-statements
+      if (customSafetyResult === "unsafe") {
+        return true;
+      }
+
       const allowedMemberExpressionForUnsafeAssignment: readonly string[] = [
         "filter",
         "map",
@@ -319,12 +435,6 @@ export const createNoUnsafeAssignmentRule =
         if (allowedMemberExpressionNodes.length > 0) {
           return false;
         }
-      }
-
-      // eslint-disable-next-line functional/no-conditional-statements
-      if (rawDestinationType === rawSourceType) {
-        // Never unsafe if the types are equal.
-        return false;
       }
 
       const nextSeenTypes: readonly TypePair[] = seenTypes.concat({
@@ -392,6 +502,7 @@ export const createNoUnsafeAssignmentRule =
 
                     // Source and destination swapped here - function parameters are contravariant.
                     return isUnsafeAssignment(
+                      customUnsafeAssignmentFunc,
                       sourceNode,
                       destinationNode,
                       sourceParameterType,
@@ -418,6 +529,7 @@ export const createNoUnsafeAssignmentRule =
                 destinationType !== sourceType &&
                 // and the return types of the functions are unsafe assignment,
                 (isUnsafeAssignment(
+                  customUnsafeAssignmentFunc,
                   destinationNode,
                   sourceNode,
                   destinationReturnType,
@@ -514,6 +626,7 @@ export const createNoUnsafeAssignmentRule =
         // eslint-disable-next-line functional/no-conditional-statements
         if (
           isUnsafeAssignment(
+            customUnsafeAssignmentFunc,
             destinationNode,
             sourceNode,
             destinationType,
@@ -548,6 +661,7 @@ export const createNoUnsafeAssignmentRule =
         // eslint-disable-next-line functional/no-conditional-statements
         if (
           isUnsafeAssignment(
+            customUnsafeAssignmentFunc,
             destinationNode,
             sourceNode,
             destinationType,
@@ -594,6 +708,7 @@ export const createNoUnsafeAssignmentRule =
           // eslint-disable-next-line functional/no-conditional-statements
           if (
             isUnsafeAssignment(
+              customUnsafeAssignmentFunc,
               leftTsNode,
               rightTsNode,
               leftType,
@@ -622,6 +737,7 @@ export const createNoUnsafeAssignmentRule =
         // eslint-disable-next-line functional/no-conditional-statements
         if (
           isUnsafeAssignment(
+            customUnsafeAssignmentFunc,
             leftTsNode,
             rightTsNode,
             leftType,
@@ -652,6 +768,7 @@ export const createNoUnsafeAssignmentRule =
         if (
           destinationType !== undefined &&
           isUnsafeAssignment(
+            customUnsafeAssignmentFunc,
             tsNode.expression,
             tsNode.expression,
             destinationType,
@@ -682,6 +799,7 @@ export const createNoUnsafeAssignmentRule =
         if (
           destinationType !== undefined &&
           isUnsafeAssignment(
+            customUnsafeAssignmentFunc,
             tsNode.expression,
             tsNode.expression,
             destinationType,
@@ -714,6 +832,7 @@ export const createNoUnsafeAssignmentRule =
         // eslint-disable-next-line functional/no-conditional-statements
         if (
           isUnsafeAssignment(
+            customUnsafeAssignmentFunc,
             destinationNode,
             sourceNode,
             destinationType,
@@ -741,6 +860,7 @@ export const createNoUnsafeAssignmentRule =
           if (
             paramType !== undefined &&
             isUnsafeAssignment(
+              customUnsafeAssignmentFunc,
               argument,
               argument,
               paramType,

@@ -560,6 +560,16 @@ ruleTester.run("no-unsafe-readonly-mutable-assignment", rule, {
         type Nested<P> = { baz: Recursive<P> }
       `,
     },
+    // https://github.com/danielnixon/eslint-plugin-total-functions/issues/577
+    {
+      filename: "file.ts",
+      code: `
+        const arr : readonly number[] = [];
+        const obj : {} = arr;
+        const it1 : Iterable<number> = arr;
+        const it2 : Readonly<Iterable<number>> = arr;
+      `,
+    },
   ],
   invalid: [
     /**

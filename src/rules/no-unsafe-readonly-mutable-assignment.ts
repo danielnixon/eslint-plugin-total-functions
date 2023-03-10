@@ -4,6 +4,7 @@ import { Type, Symbol, IndexKind, TypeChecker } from "typescript";
 import { createRule } from "./common";
 import {
   createNoUnsafeAssignmentRule,
+  safeReadonlyMutableAssignment,
   UnsafeIndexAssignmentFunc,
   UnsafePropertyAssignmentFunc,
 } from "./unsafe-assignment-rule";
@@ -91,7 +92,8 @@ const noUnsafeReadonlyMutableAssignment = createRule({
   },
   create: createNoUnsafeAssignmentRule(
     unsafePropertyAssignmentFunc,
-    unsafeIndexAssignmentFunc
+    unsafeIndexAssignmentFunc,
+    safeReadonlyMutableAssignment
   ),
   defaultOptions: [],
 } as const);

@@ -33,7 +33,7 @@ const message =
  */
 // eslint-disable-next-line functional/prefer-immutable-types, total-functions/no-unsafe-readonly-mutable-assignment
 const noUnsafeOptionalPropertyAssignment = createRule({
-  name: "no-unsafe-readonly-mutable-assignment",
+  name: "no-unsafe-optional-property-assignment",
   meta: {
     type: "problem",
     docs: {
@@ -52,7 +52,9 @@ const noUnsafeOptionalPropertyAssignment = createRule({
   },
   create: createNoUnsafeAssignmentRule(
     unsafePropertyAssignmentFunc,
-    unsafeIndexAssignmentFunc
+    unsafeIndexAssignmentFunc,
+    // eslint-disable-next-line functional/functional-parameters
+    () => undefined
   ),
   defaultOptions: [],
 } as const);
