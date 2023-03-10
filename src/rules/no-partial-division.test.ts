@@ -32,6 +32,38 @@ ruleTester.run("no-partial-division", rule, {
         1 + 1;
       `,
     },
+    {
+      filename: "file.ts",
+      code: `
+        const foo = 1;
+        const bar = 1 as const;
+        const result = foo / bar;
+      `,
+    },
+    {
+      filename: "file.ts",
+      code: `
+        const foo = 1;
+        const bar = 1;
+        const result = foo / bar;
+      `,
+    },
+    {
+      filename: "file.ts",
+      code: `
+        const foo: bigint = 1n;
+        const bar = 1n as const;
+        const result = foo / bar;
+      `,
+    },
+    {
+      filename: "file.ts",
+      code: `
+        const foo = 1n;
+        const bar = 1n;
+        const result = foo / bar;
+      `,
+    },
   ],
   invalid: [
     {
@@ -77,6 +109,20 @@ ruleTester.run("no-partial-division", rule, {
       code: `
         const foo: bigint = 1n;
         const bar: bigint = 1n;
+        const result = foo / bar;
+      `,
+      errors: [
+        {
+          messageId: "errorStringGeneric",
+          type: AST_NODE_TYPES.BinaryExpression,
+        },
+      ],
+    },
+    {
+      filename: "file.ts",
+      code: `
+        const foo = 1n;
+        const bar = 0n;
         const result = foo / bar;
       `,
       errors: [

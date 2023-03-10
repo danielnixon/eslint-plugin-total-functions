@@ -1,5 +1,7 @@
 /* eslint-disable functional/prefer-immutable-types */
-import { AST_NODE_TYPES } from "@typescript-eslint/utils";
+import { isTypeFlagSet } from "@typescript-eslint/type-utils";
+import { AST_NODE_TYPES, ESLintUtils } from "@typescript-eslint/utils";
+import { BigIntLiteralType, TypeFlags } from "typescript";
 import { createRule } from "./common";
 
 /**
@@ -21,6 +23,9 @@ const noPartialDivision = createRule({
     schema: [],
   },
   create: (context) => {
+    const parserServices = ESLintUtils.getParserServices(context);
+    const checker = parserServices.program.getTypeChecker();
+
     return {
       // eslint-disable-next-line functional/no-return-void
       BinaryExpression: (node) => {
@@ -40,9 +45,38 @@ const noPartialDivision = createRule({
           return;
         }
 
-        // TODO expand this to inspect type information and not report an issue
-        // if the type of the denominator is a literal numeric type (non-zero, of course)
-        // even when not a literal value.
+        // eslint-disable-next-line functional/no-conditional-statements
+        if (node.right.type === AST_NODE_TYPES.Identifier) {
+          const denominatorNode = parserServices.esTreeNodeToTSNodeMap.get(
+            node.right
+          );
+          const denominatorNodeType =
+            checker.getTypeAtLocation(denominatorNode);
+
+          // eslint-disable-next-line functional/no-conditional-statements
+          if (
+            isTypeFlagSet(denominatorNodeType, TypeFlags.NumberLike) &&
+            denominatorNodeType.isNumberLiteral() &&
+            denominatorNodeType.value !== 0
+          ) {
+            // Division by a number type that is known to be non-zero is safe.
+            return;
+          }
+
+          // TODO find a way to get ahold of a BigIntLiteralType without type assertions.
+          // There is no equivalent of `isNumberLiteral()` for bigints.
+          // `isLiteral()` returns false so isn't useful.
+          const bigIntBase10Value =
+            // eslint-disable-next-line @typescript-eslint/consistent-type-assertions, @typescript-eslint/no-unnecessary-condition
+            (denominatorNodeType as Partial<BigIntLiteralType>)?.value
+              ?.base10Value;
+
+          // eslint-disable-next-line functional/no-conditional-statements
+          if (bigIntBase10Value !== undefined && bigIntBase10Value !== "0") {
+            // Division by a bigint type that is known to be non-zero is safe.
+            return;
+          }
+        }
 
         // All other division is not provably safe.
         // eslint-disable-next-line functional/no-expression-statements

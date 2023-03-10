@@ -108,6 +108,7 @@ const noPartialStringNormalize = createRule({
           typeof argument.value === "string" &&
           safeValues.includes(argument.value)
         ) {
+          // TODO errorStringWillDefinitelyThrow
           // These four values are all safe.
           return;
         }
