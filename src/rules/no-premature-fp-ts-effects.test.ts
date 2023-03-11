@@ -40,6 +40,15 @@ ruleTester.run("no-premature-fp-ts-effects", rule, {
         const lazyResult: string = lazy();
       `,
     },
+    // exercise the try/catch around calleeType.symbol.name (this test prompts it to throw)
+    {
+      filename: "file.ts",
+      code: `
+        const foo: { a: () => string } | undefined =
+        Date.now() > 0 ? undefined : { a: () => "" };
+        foo?.a();
+      `,
+    },
   ],
   invalid: [
     {

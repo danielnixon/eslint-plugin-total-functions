@@ -52,8 +52,25 @@ const noPrematureFpTsEffects = createRule({
           "TaskThese",
         ];
 
-        // eslint-disable-next-line functional/no-conditional-statements
-        if (!effectInterfaceNames.includes(calleeType.symbol.name)) {
+        // eslint-disable-next-line functional/no-try-statements
+        try {
+          // eslint-disable-next-line functional/no-conditional-statements
+          if (!effectInterfaceNames.includes(calleeType.symbol.name)) {
+            return;
+          }
+        } catch {
+          /**
+           * Accessing symbol is risky for reasons I don't fully understand.
+           * We'll sometimes see:
+            TypeError: Converting circular structure to JSON
+              --> starting at object with constructor 'Object'
+              |     property 'object' -> object with constructor 'Object'
+              --- property 'parent' closes the circle
+              at stringify (<anonymous>)
+
+            at messageParent (node_modules/jest-worker/build/workers/messageParent.js:29:19
+
+           */
           return;
         }
 
