@@ -78,5 +78,21 @@ ruleTester.run("no-premature-fp-ts-effects", rule, {
         },
       ],
     },
+    {
+      filename: "file.ts",
+      code: `
+        export interface IO<A> {
+          (): A
+        }
+        const logErrors = (): IO<void> => () => undefined;
+        const result = logErrors()();
+      `,
+      errors: [
+        {
+          messageId: "errorStringGeneric",
+          type: AST_NODE_TYPES.CallExpression,
+        },
+      ],
+    },
   ],
 } as const);

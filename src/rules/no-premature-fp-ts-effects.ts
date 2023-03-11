@@ -1,5 +1,5 @@
 /* eslint-disable functional/prefer-immutable-types */
-import { AST_NODE_TYPES, ESLintUtils } from "@typescript-eslint/utils";
+import { ESLintUtils } from "@typescript-eslint/utils";
 import { createRule } from "./common";
 
 /**
@@ -27,11 +27,6 @@ const noPrematureFpTsEffects = createRule({
     return {
       // eslint-disable-next-line functional/no-return-void
       CallExpression: (node) => {
-        // eslint-disable-next-line functional/no-conditional-statements
-        if (node.callee.type !== AST_NODE_TYPES.Identifier) {
-          return;
-        }
-
         // eslint-disable-next-line functional/no-conditional-statements
         if (node.arguments.length > 0) {
           return;
