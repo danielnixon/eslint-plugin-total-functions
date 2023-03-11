@@ -571,6 +571,26 @@ ruleTester.run("no-unsafe-mutable-readonly-assignment", rule, {
         const nextArray = (): readonly string[] => fooArray.slice();
       `,
     },
+    // Return safe mutable array.
+    {
+      filename: "file.ts",
+      code: `
+        const fooArray: readonly string[] = ["test"] as const;
+        const nextArray = (): readonly string[] => {
+          return fooArray.slice();
+        }
+      `,
+    },
+    // Yield safe mutable array.
+    {
+      filename: "file.ts",
+      code: `
+        const fooArray: readonly string[] = ["test"] as const;
+        export function* mySaga(): Generator<readonly string[]> {
+          yield fooArray.slice();
+        }
+      `,
+    },
     {
       filename: "file.ts",
       code: `
@@ -803,6 +823,27 @@ ruleTester.run("no-unsafe-mutable-readonly-assignment", rule, {
         } as const;
 
         const foo: readonly string[] = myValue.filter();
+      `,
+      errors: [
+        {
+          messageId: "errorStringVariableDeclaration",
+          type: AST_NODE_TYPES.VariableDeclaration,
+        },
+      ],
+    },
+    {
+      filename: "file.ts",
+      code: `
+        type MyReadonlyType = { readonly a: string };
+        type MyMutableType = { a: string };
+        
+        const mutableVal: MyMutableType = { a: "" };
+        const readonlyArrayOfMutable: readonly MyMutableType[] = [mutableVal] as const;
+        
+        const shouldBeImmutable: readonly MyReadonlyType[] =
+          readonlyArrayOfMutable.concat({
+            a: "",
+          });
       `,
       errors: [
         {

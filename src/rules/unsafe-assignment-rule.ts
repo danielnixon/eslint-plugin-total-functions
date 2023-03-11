@@ -1,5 +1,10 @@
 /* eslint-disable functional/prefer-immutable-types */
-import { ESLintUtils, AST_NODE_TYPES } from "@typescript-eslint/utils";
+import {
+  ESLintUtils,
+  AST_NODE_TYPES,
+  TSESTree,
+  ParserServices,
+} from "@typescript-eslint/utils";
 import { TSESLint } from "@typescript-eslint/utils";
 import {
   Type,
@@ -12,9 +17,6 @@ import {
 import {
   getCallSignaturesOfType,
   intersectionTypeParts,
-  isCallExpression,
-  isExpression,
-  isIdentifier,
   isObjectType,
   isUnionOrIntersectionType,
 } from "tsutils";
@@ -264,59 +266,6 @@ export const createNoUnsafeAssignmentRule =
       checker: TypeChecker,
       seenTypes: readonly TypePair[] = []
     ): boolean => {
-      const allowedMemberExpressionForUnsafeAssignment: readonly string[] = [
-        "filter",
-        "map",
-        "concat",
-        "flatMap",
-        "flat",
-        "slice",
-      ] as const;
-
-      const arraySource = checker.isArrayType(rawSourceType);
-
-      const arrayDestination = checker.isArrayType(rawDestinationType);
-
-      // eslint-disable-next-line functional/no-conditional-statements
-      if (isCallExpression(sourceNode) && arraySource && arrayDestination) {
-        // Allowed Member Expression Nodes that are safe to assign to a readonly type destination.
-        const allowedMemberExpressionNodes: readonly Node[] = sourceNode
-          .getChildren()
-          .filter((sourceChildNode) => {
-            // eslint-disable-next-line functional/no-conditional-statements
-            if (isExpression(sourceChildNode)) {
-              const lastNode = sourceChildNode.getLastToken();
-
-              const firstNode = sourceChildNode.getChildAt(0);
-
-              // Not allow member expression of non-array member to be safe if it is unsafe assignment.
-              const arrayFirstNode = checker.isArrayType(
-                checker.getTypeAtLocation(firstNode)
-              );
-
-              // eslint-disable-next-line functional/no-conditional-statements
-              if (
-                lastNode !== undefined &&
-                isIdentifier(lastNode) &&
-                arrayFirstNode
-              ) {
-                return allowedMemberExpressionForUnsafeAssignment.includes(
-                  lastNode.getText()
-                );
-              }
-
-              return false;
-            }
-
-            return false;
-          });
-
-        // eslint-disable-next-line functional/no-conditional-statements
-        if (allowedMemberExpressionNodes.length > 0) {
-          return false;
-        }
-      }
-
       // eslint-disable-next-line functional/no-conditional-statements
       if (rawDestinationType === rawSourceType) {
         // Never unsafe if the types are equal.
@@ -489,6 +438,73 @@ export const createNoUnsafeAssignmentRule =
       );
     };
 
+    // Special handling for array methods that return mutable arrays but that
+    // we know are shallow copies and therefore safe to have their result
+    // assigned to a readonly array.
+    const isSafeAssignmentFromArrayMethod = (
+      sourceExpression: TSESTree.Expression,
+      destinationNode: Node,
+      sourceNode: Node,
+      destinationType: Type,
+      sourceType: Type,
+      checker: TypeChecker,
+      parserServices: ParserServices
+    ): boolean => {
+      const safeArrayMethods: readonly string[] = [
+        "filter",
+        "map",
+        "concat",
+        "flatMap",
+        "flat",
+        "slice",
+      ] as const;
+
+      // Arrays have number index types. This gives us access to the type within the array.
+      const destinationIndexType = destinationType.getNumberIndexType();
+      const sourceIndexType = sourceType.getNumberIndexType();
+
+      // eslint-disable-next-line functional/no-conditional-statements, sonarjs/prefer-single-boolean-return
+      if (
+        // We are assigning to and from arrays
+        checker.isArrayType(destinationType) &&
+        checker.isArrayType(sourceType) &&
+        destinationIndexType !== undefined &&
+        sourceIndexType !== undefined &&
+        // and the assignment is from calling a member (obj.method(...))
+        sourceExpression.type === AST_NODE_TYPES.CallExpression &&
+        sourceExpression.callee.type === AST_NODE_TYPES.MemberExpression &&
+        // and the thing being called is an array
+        // (so we can avoid permitting calls to array methods on other types)
+        checker.isArrayType(
+          checker.getTypeAtLocation(
+            parserServices.esTreeNodeToTSNodeMap.get(
+              sourceExpression.callee.object
+            )
+          )
+        ) &&
+        // and the method being called is an identifier that we can match on like "concat"
+        sourceExpression.callee.property.type === AST_NODE_TYPES.Identifier &&
+        // and it's not computed (obj["method"])
+        // TODO: support computed properties like myArray["concat"]?
+        !sourceExpression.callee.computed &&
+        // and the method being called is one that we know is safe to assign to a readonly array
+        safeArrayMethods.includes(sourceExpression.callee.property.name) &&
+        // and the types within the source and destination array are themselves safe to assign
+        // (avoid this issue: https://github.com/danielnixon/eslint-plugin-total-functions/issues/730)
+        !isUnsafeAssignment(
+          destinationNode,
+          sourceNode,
+          destinationIndexType,
+          sourceIndexType,
+          checker
+        )
+      ) {
+        return true;
+      }
+
+      return false;
+    };
+
     return {
       // eslint-disable-next-line functional/no-return-void
       TSTypeAssertion: (node): void => {
@@ -589,6 +605,21 @@ export const createNoUnsafeAssignmentRule =
 
           // eslint-disable-next-line functional/no-conditional-statements
           if (
+            isSafeAssignmentFromArrayMethod(
+              declaration.init,
+              leftTsNode,
+              rightTsNode,
+              leftType,
+              rightType,
+              checker,
+              parserServices
+            )
+          ) {
+            return;
+          }
+
+          // eslint-disable-next-line functional/no-conditional-statements
+          if (
             isUnsafeAssignment(
               leftTsNode,
               rightTsNode,
@@ -617,6 +648,21 @@ export const createNoUnsafeAssignmentRule =
 
         // eslint-disable-next-line functional/no-conditional-statements
         if (
+          isSafeAssignmentFromArrayMethod(
+            node.right,
+            leftTsNode,
+            rightTsNode,
+            leftType,
+            rightType,
+            checker,
+            parserServices
+          )
+        ) {
+          return;
+        }
+
+        // eslint-disable-next-line functional/no-conditional-statements
+        if (
           isUnsafeAssignment(
             leftTsNode,
             rightTsNode,
@@ -634,6 +680,11 @@ export const createNoUnsafeAssignmentRule =
       },
       // eslint-disable-next-line functional/no-return-void
       ReturnStatement: (node): void => {
+        // eslint-disable-next-line functional/no-conditional-statements
+        if (node.argument === null) {
+          return;
+        }
+
         const tsNode = parserServices.esTreeNodeToTSNodeMap.get(node);
 
         // eslint-disable-next-line functional/no-conditional-statements
@@ -642,11 +693,31 @@ export const createNoUnsafeAssignmentRule =
         }
 
         const destinationType = checker.getContextualType(tsNode.expression);
+
+        // eslint-disable-next-line functional/no-conditional-statements
+        if (destinationType === undefined) {
+          return;
+        }
+
         const sourceType = checker.getTypeAtLocation(tsNode.expression);
 
         // eslint-disable-next-line functional/no-conditional-statements
         if (
-          destinationType !== undefined &&
+          isSafeAssignmentFromArrayMethod(
+            node.argument,
+            tsNode.expression,
+            tsNode.expression,
+            destinationType,
+            sourceType,
+            checker,
+            parserServices
+          )
+        ) {
+          return;
+        }
+
+        // eslint-disable-next-line functional/no-conditional-statements
+        if (
           isUnsafeAssignment(
             tsNode.expression,
             tsNode.expression,
@@ -662,8 +733,14 @@ export const createNoUnsafeAssignmentRule =
           } as const);
         }
       },
+      // TODO fix this copypasta between YieldExpression and ReturnStatement
       // eslint-disable-next-line functional/no-return-void
       YieldExpression: (node): void => {
+        // eslint-disable-next-line functional/no-conditional-statements
+        if (node.argument === undefined) {
+          return;
+        }
+
         const tsNode = parserServices.esTreeNodeToTSNodeMap.get(node);
 
         // eslint-disable-next-line functional/no-conditional-statements
@@ -672,11 +749,31 @@ export const createNoUnsafeAssignmentRule =
         }
 
         const destinationType = checker.getContextualType(tsNode.expression);
+
+        // eslint-disable-next-line functional/no-conditional-statements
+        if (destinationType === undefined) {
+          return;
+        }
+
         const sourceType = checker.getTypeAtLocation(tsNode.expression);
 
         // eslint-disable-next-line functional/no-conditional-statements
         if (
-          destinationType !== undefined &&
+          isSafeAssignmentFromArrayMethod(
+            node.argument,
+            tsNode.expression,
+            tsNode.expression,
+            destinationType,
+            sourceType,
+            checker,
+            parserServices
+          )
+        ) {
+          return;
+        }
+
+        // eslint-disable-next-line functional/no-conditional-statements
+        if (
           isUnsafeAssignment(
             tsNode.expression,
             tsNode.expression,
@@ -698,7 +795,7 @@ export const createNoUnsafeAssignmentRule =
         if (node.returnType === undefined) {
           return;
         }
-        // TODO fix this
+
         // eslint-disable-next-line total-functions/no-unsafe-mutable-readonly-assignment
         const destinationNode: Node = parserServices.esTreeNodeToTSNodeMap.get(
           node.returnType.typeAnnotation
@@ -706,6 +803,22 @@ export const createNoUnsafeAssignmentRule =
         const destinationType = checker.getTypeAtLocation(destinationNode);
         const sourceNode = parserServices.esTreeNodeToTSNodeMap.get(node.body);
         const sourceType = checker.getTypeAtLocation(sourceNode);
+
+        // eslint-disable-next-line functional/no-conditional-statements
+        if (
+          node.body.type !== AST_NODE_TYPES.BlockStatement &&
+          isSafeAssignmentFromArrayMethod(
+            node.body,
+            destinationNode,
+            sourceNode,
+            destinationType,
+            sourceType,
+            checker,
+            parserServices
+          )
+        ) {
+          return;
+        }
 
         // eslint-disable-next-line functional/no-conditional-statements
         if (
