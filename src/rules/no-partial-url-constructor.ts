@@ -1,6 +1,6 @@
 /* eslint-disable functional/prefer-immutable-types */
 import { AST_NODE_TYPES, ESLintUtils } from "@typescript-eslint/utils";
-import { createRule } from "./common";
+import { createRule, typeSymbolName } from "./common";
 
 /**
  * An ESLint rule to ban the partial URL construction.
@@ -40,6 +40,12 @@ const noPartialUrlConstructor = createRule({
     return {
       // eslint-disable-next-line functional/no-return-void, sonarjs/cognitive-complexity
       NewExpression: (node) => {
+        // eslint-disable-next-line functional/no-conditional-statements
+        if (node.arguments.length === 0 || node.arguments.length > 2) {
+          // TypeScript will catch this case.
+          return;
+        }
+
         const objectNode = parserServices.esTreeNodeToTSNodeMap.get(
           node.callee
         );
@@ -47,20 +53,16 @@ const noPartialUrlConstructor = createRule({
 
         const prototype = checker.getPropertyOfType(objectType, "prototype");
 
-        const prototypeTypeName =
+        const prototypeType =
           prototype !== undefined
-            ? checker.getTypeOfSymbolAtLocation(prototype, objectNode).symbol
-                .name
+            ? checker.getTypeOfSymbolAtLocation(prototype, objectNode)
             : undefined;
 
         // eslint-disable-next-line functional/no-conditional-statements
-        if (node.arguments.length === 0 || node.arguments.length > 2) {
-          // TypeScript will catch this case.
-          return;
-        }
-
-        // eslint-disable-next-line functional/no-conditional-statements
-        if (prototypeTypeName === "URL") {
+        if (
+          prototypeType !== undefined &&
+          typeSymbolName(prototypeType) === "URL"
+        ) {
           // eslint-disable-next-line functional/no-conditional-statements
           if (
             node.arguments.length === 1 &&
