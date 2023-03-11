@@ -77,6 +77,8 @@ Alternatively you can configure individual rules separately (see below).
 |  no-enums                               | ✅           | ✅    |        |
 |  no-partial-url-constructor             | ✅           | ✅    |        |
 |  no-partial-division                    | ✅           | ✅    |        |
+|  no-partial-string-normalize            | ✅           | ✅    |        |
+|  no-premature-fp-ts-effects             | ✅           | ✅    |        |
 
 ### total-functions/require-strict-mode
 
