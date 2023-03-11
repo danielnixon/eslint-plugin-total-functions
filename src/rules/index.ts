@@ -7,6 +7,8 @@ import noUnsafeEnumAssignment from "./no-unsafe-enum-assignment";
 import noEnums from "./no-enums";
 import noPartialUrlConstructor from "./no-partial-url-constructor";
 import noPartialDivision from "./no-partial-division";
+import noPartialStringNormalize from "./no-partial-string-normalize";
+import noPrematureFpTsEffects from "./no-premature-fp-ts-effects";
 
 export default {
   "require-strict-mode": requireStrictMode,
@@ -18,4 +20,6 @@ export default {
   "no-enums": noEnums,
   "no-partial-url-constructor": noPartialUrlConstructor,
   "no-partial-division": noPartialDivision,
+  "no-partial-string-normalize": noPartialStringNormalize,
+  "no-premature-fp-ts-effects": noPrematureFpTsEffects,
 };

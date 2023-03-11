@@ -6,7 +6,7 @@ import { createRule } from "./common";
  * An ESLint rule to ban interpretation (execution) of fp-ts effects.
  */
 // eslint-disable-next-line total-functions/no-unsafe-readonly-mutable-assignment
-const noEnums = createRule({
+const noPrematureFpTsEffects = createRule({
   name: "no-premature-fp-ts-effects",
   meta: {
     type: "problem",
@@ -75,4 +75,4 @@ const noEnums = createRule({
   defaultOptions: [],
 } as const);
 
-export default noEnums;
+export default noPrematureFpTsEffects;
