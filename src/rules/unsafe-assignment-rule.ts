@@ -272,6 +272,11 @@ export const createNoUnsafeAssignmentRule =
         return false;
       }
 
+      // Infinite recursion suspected...
+      if (seenTypes.length > 200) {
+        return false;
+      }
+
       const nextSeenTypes: readonly TypePair[] = seenTypes.concat({
         destinationType: rawDestinationType,
         sourceType: rawSourceType,
