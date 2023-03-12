@@ -570,6 +570,33 @@ ruleTester.run("no-unsafe-readonly-mutable-assignment", rule, {
         const it2 : Readonly<Iterable<number>> = arr;
       `,
     },
+    // multiple call signatures, recursive
+    // TODO fix stack overflow properly instead of just terminating iteration arbitrarily
+    {
+      filename: "file.ts",
+      code: `
+        interface Foo<A extends object> {
+          <B extends {}>(b: Foo<B> & { b: Foo<B> }): Foo<A & B>;
+          <C extends Foo<any>>(b: Foo<C> & { b: Foo<C> }): Foo<A & C>;
+        }
+
+        declare const a: Foo<{ a: string }>;
+
+        const b = a as Foo<{ b: string }>;
+      `,
+    },
+    {
+      filename: "file.ts",
+      code: `
+        interface Foo<A extends object> {
+          <C extends Foo<any>>(b: Foo<C> & { b: Foo<C> }): Foo<A & C>;
+        }
+
+        declare const a: Foo<{ a: string }>;
+
+        const b = a as Foo<{ b: string }>;
+      `,
+    },
   ],
   invalid: [
     /**

@@ -134,6 +134,7 @@ export const createNoUnsafeAssignmentRule =
       destinationType: Type,
       sourceType: Type,
       checker: TypeChecker,
+      checkCallSignaturesIterationsRemaining: number,
       seenTypes: readonly TypePair[]
     ): boolean => {
       const isUnsafe = unsafeIndexAssignmentFunc(
@@ -165,6 +166,7 @@ export const createNoUnsafeAssignmentRule =
             destinationIndexType,
             sourceIndexType,
             checker,
+            checkCallSignaturesIterationsRemaining,
             seenTypes
           ))
       );
@@ -178,6 +180,7 @@ export const createNoUnsafeAssignmentRule =
       // eslint-disable-next-line @typescript-eslint/ban-types
       sourceProperty: Symbol,
       checker: TypeChecker,
+      checkCallSignaturesIterationsRemaining: number,
       seenTypes: readonly TypePair[]
     ): boolean => {
       const destinationPropertyType = checker.getTypeOfSymbolAtLocation(
@@ -195,6 +198,7 @@ export const createNoUnsafeAssignmentRule =
         destinationPropertyType,
         sourcePropertyType,
         checker,
+        checkCallSignaturesIterationsRemaining,
         seenTypes
       );
     };
@@ -205,6 +209,7 @@ export const createNoUnsafeAssignmentRule =
       destinationType: Type,
       sourceType: Type,
       checker: TypeChecker,
+      checkCallSignaturesIterationsRemaining: number,
       seenTypes: readonly TypePair[]
     ): boolean => {
       // eslint-disable-next-line functional/no-conditional-statements
@@ -256,6 +261,7 @@ export const createNoUnsafeAssignmentRule =
           destinationProperty,
           sourceProperty,
           checker,
+          checkCallSignaturesIterationsRemaining,
           nextSeenTypes
         );
       });
@@ -267,6 +273,7 @@ export const createNoUnsafeAssignmentRule =
       rawDestinationType: Type,
       rawSourceType: Type,
       checker: TypeChecker,
+      checkCallSignaturesIterationsRemaining: number,
       seenTypes: readonly TypePair[] = []
     ): boolean => {
       // eslint-disable-next-line functional/no-conditional-statements
@@ -291,9 +298,15 @@ export const createNoUnsafeAssignmentRule =
       );
 
       const isUnsafeFunctionAssignment = (
-        typePairs: readonly TypePair[]
-      ): boolean =>
-        typePairs.some(({ sourceType, destinationType }) => {
+        typePairs: readonly TypePair[],
+        checkCallSignaturesIterationsRemaining: number
+      ): boolean => {
+        // eslint-disable-next-line functional/no-conditional-statements
+        if (checkCallSignaturesIterationsRemaining <= 0) {
+          return false;
+        }
+
+        return typePairs.some(({ sourceType, destinationType }) => {
           const nextSeenTypesWithPair: readonly TypePair[] =
             nextSeenTypes.concat({
               destinationType,
@@ -345,6 +358,7 @@ export const createNoUnsafeAssignmentRule =
                       sourceParameterType,
                       destinationParameterType,
                       checker,
+                      checkCallSignaturesIterationsRemaining - 1,
                       nextSeenTypesWithPair
                     );
                   });
@@ -371,6 +385,7 @@ export const createNoUnsafeAssignmentRule =
                   destinationReturnType,
                   sourceReturnType,
                   checker,
+                  checkCallSignaturesIterationsRemaining - 1,
                   nextSeenTypesWithPair
                 ) ||
                   // or the parameter types of the functions are unsafe assignment.
@@ -379,6 +394,7 @@ export const createNoUnsafeAssignmentRule =
             }
           );
         });
+      };
 
       const inUnsafeObjectAssignment = (
         objectTypePairs: readonly TypePair[]
@@ -411,6 +427,7 @@ export const createNoUnsafeAssignmentRule =
               destinationType,
               sourceType,
               checker,
+              checkCallSignaturesIterationsRemaining,
               nextSeenTypesWithPair
             ) ||
               // unsafe number index assignment, or
@@ -421,6 +438,7 @@ export const createNoUnsafeAssignmentRule =
                 destinationType,
                 sourceType,
                 checker,
+                checkCallSignaturesIterationsRemaining,
                 nextSeenTypesWithPair
               ) ||
               // unsafe property assignment.
@@ -430,6 +448,7 @@ export const createNoUnsafeAssignmentRule =
                 destinationType,
                 sourceType,
                 checker,
+                checkCallSignaturesIterationsRemaining,
                 nextSeenTypesWithPair
               ))
           );
@@ -437,7 +456,10 @@ export const createNoUnsafeAssignmentRule =
 
       return (
         inUnsafeObjectAssignment(objectTypePairs) ||
-        isUnsafeFunctionAssignment(typePairs)
+        isUnsafeFunctionAssignment(
+          typePairs,
+          checkCallSignaturesIterationsRemaining
+        )
       );
     };
 
@@ -451,6 +473,7 @@ export const createNoUnsafeAssignmentRule =
       destinationType: Type,
       sourceType: Type,
       checker: TypeChecker,
+      checkCallSignaturesIterationsRemaining: number,
       parserServices: ParserServices
     ): boolean => {
       const safeArrayMethods: readonly string[] = [
@@ -499,7 +522,8 @@ export const createNoUnsafeAssignmentRule =
           sourceNode,
           destinationIndexType,
           sourceIndexType,
-          checker
+          checker,
+          checkCallSignaturesIterationsRemaining
         )
       ) {
         return true;
@@ -507,6 +531,12 @@ export const createNoUnsafeAssignmentRule =
 
       return false;
     };
+
+    // Recursively checking call signature assignability is currently
+    // vulnerable to infinite recursion. This is a hack to terminate after a specified number
+    // of iterations and, if we haven't determined safety yet, assume the assignment is safe.
+    // Rationale: better to fail to flag an issue than to explode linting with a stack overflow.
+    const checkCallSignaturesIterations = 1;
 
     return {
       // eslint-disable-next-line functional/no-return-void
@@ -533,7 +563,8 @@ export const createNoUnsafeAssignmentRule =
             sourceNode,
             destinationType,
             sourceType,
-            checker
+            checker,
+            checkCallSignaturesIterations
           )
         ) {
           // eslint-disable-next-line functional/no-expression-statements
@@ -567,7 +598,8 @@ export const createNoUnsafeAssignmentRule =
             sourceNode,
             destinationType,
             sourceType,
-            checker
+            checker,
+            checkCallSignaturesIterations
           )
         ) {
           // eslint-disable-next-line functional/no-expression-statements
@@ -615,6 +647,7 @@ export const createNoUnsafeAssignmentRule =
               leftType,
               rightType,
               checker,
+              checkCallSignaturesIterations,
               parserServices
             )
           ) {
@@ -628,7 +661,8 @@ export const createNoUnsafeAssignmentRule =
               rightTsNode,
               leftType,
               rightType,
-              checker
+              checker,
+              checkCallSignaturesIterations
             )
           ) {
             // eslint-disable-next-line functional/no-expression-statements
@@ -658,6 +692,7 @@ export const createNoUnsafeAssignmentRule =
             leftType,
             rightType,
             checker,
+            checkCallSignaturesIterations,
             parserServices
           )
         ) {
@@ -671,7 +706,8 @@ export const createNoUnsafeAssignmentRule =
             rightTsNode,
             leftType,
             rightType,
-            checker
+            checker,
+            checkCallSignaturesIterations
           )
         ) {
           // eslint-disable-next-line functional/no-expression-statements
@@ -713,6 +749,7 @@ export const createNoUnsafeAssignmentRule =
             destinationType,
             sourceType,
             checker,
+            checkCallSignaturesIterations,
             parserServices
           )
         ) {
@@ -726,7 +763,8 @@ export const createNoUnsafeAssignmentRule =
             tsNode.expression,
             destinationType,
             sourceType,
-            checker
+            checker,
+            checkCallSignaturesIterations
           )
         ) {
           // eslint-disable-next-line functional/no-expression-statements
@@ -769,6 +807,7 @@ export const createNoUnsafeAssignmentRule =
             destinationType,
             sourceType,
             checker,
+            checkCallSignaturesIterations,
             parserServices
           )
         ) {
@@ -782,7 +821,8 @@ export const createNoUnsafeAssignmentRule =
             tsNode.expression,
             destinationType,
             sourceType,
-            checker
+            checker,
+            checkCallSignaturesIterations
           )
         ) {
           // eslint-disable-next-line functional/no-expression-statements
@@ -817,6 +857,7 @@ export const createNoUnsafeAssignmentRule =
             destinationType,
             sourceType,
             checker,
+            checkCallSignaturesIterations,
             parserServices
           )
         ) {
@@ -830,7 +871,8 @@ export const createNoUnsafeAssignmentRule =
             sourceNode,
             destinationType,
             sourceType,
-            checker
+            checker,
+            checkCallSignaturesIterations
           )
         ) {
           // eslint-disable-next-line functional/no-expression-statements
@@ -857,7 +899,8 @@ export const createNoUnsafeAssignmentRule =
               argument,
               paramType,
               argumentType,
-              checker
+              checker,
+              checkCallSignaturesIterations
             )
           ) {
             // eslint-disable-next-line functional/no-expression-statements
