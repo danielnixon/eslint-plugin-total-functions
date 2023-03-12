@@ -105,10 +105,13 @@ const assignableSignaturePairs = (
           checker
         )
       )
-      .map((destinationSignature) => ({
-        sourceSignature,
-        destinationSignature,
-      }))
+      .map(
+        (destinationSignature) =>
+          ({
+            sourceSignature,
+            destinationSignature,
+          } as const)
+      )
   );
 };
 
@@ -269,11 +272,6 @@ export const createNoUnsafeAssignmentRule =
       // eslint-disable-next-line functional/no-conditional-statements
       if (rawDestinationType === rawSourceType) {
         // Never unsafe if the types are equal.
-        return false;
-      }
-
-      // Infinite recursion suspected...
-      if (seenTypes.length > 200) {
         return false;
       }
 

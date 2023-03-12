@@ -35,10 +35,13 @@ export const assignableTypePairs = (
       .filter((destinationTypePart) =>
         checker.isTypeAssignableTo(sourceTypePart, destinationTypePart)
       )
-      .map((destinationTypePart) => ({
-        sourceType: sourceTypePart,
-        destinationType: destinationTypePart,
-      }))
+      .map(
+        (destinationTypePart) =>
+          ({
+            sourceType: sourceTypePart,
+            destinationType: destinationTypePart,
+          } as const)
+      )
   );
 };
 
