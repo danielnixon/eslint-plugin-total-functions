@@ -68,7 +68,7 @@ ruleTester.run("no-partial-division", rule, {
   invalid: [
     {
       filename: "file.ts",
-      code: `;
+      code: `
         const result = 1 / 0;
       `,
       errors: [
@@ -80,7 +80,7 @@ ruleTester.run("no-partial-division", rule, {
     },
     {
       filename: "file.ts",
-      code: `;
+      code: `
         const result = 1 / 0.0;
       `,
       errors: [
@@ -92,7 +92,7 @@ ruleTester.run("no-partial-division", rule, {
     },
     {
       filename: "file.ts",
-      code: `;
+      code: `
         const result = 1 / -0;
       `,
       errors: [
@@ -104,7 +104,7 @@ ruleTester.run("no-partial-division", rule, {
     },
     {
       filename: "file.ts",
-      code: `;
+      code: `
         const result = 1n / 0n;
       `,
       errors: [
@@ -116,7 +116,7 @@ ruleTester.run("no-partial-division", rule, {
     },
     {
       filename: "file.ts",
-      code: `;
+      code: `
         const result = 1n / -0n;
       `,
       errors: [

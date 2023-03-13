@@ -27,14 +27,14 @@ ruleTester.run("no-partial-string-normalize", rule, {
     },
     {
       filename: "file.ts",
-      code: `;
+      code: `
         const normalize = (s: string): s => s;
         normalize("hello");
       `,
     },
     {
       filename: "file.ts",
-      code: `;
+      code: `
         type Foo = {
           readonly normalize: (s: string) => string;
         };
@@ -48,26 +48,26 @@ ruleTester.run("no-partial-string-normalize", rule, {
     },
     {
       filename: "file.ts",
-      code: `;
+      code: `
         "".toString();
       `,
     },
     {
       filename: "file.ts",
-      code: `;
+      code: `
         "".normalize("NFKD", "whoops");
       `,
     },
     {
       filename: "file.ts",
-      code: `;
+      code: `
         const nfkd = "NFKD";
         "".normalize(nfkd);
       `,
     },
     {
       filename: "file.ts",
-      code: `;
+      code: `
         const arg = undefined;
         "".normalize(arg);
       `,
@@ -76,7 +76,7 @@ ruleTester.run("no-partial-string-normalize", rule, {
   invalid: [
     {
       filename: "file.ts",
-      code: `;
+      code: `
         "".normalize("asdf");
       `,
       errors: [
@@ -88,7 +88,7 @@ ruleTester.run("no-partial-string-normalize", rule, {
     },
     {
       filename: "file.ts",
-      code: `;
+      code: `
         ""["normalize"]("asdf");
       `,
       errors: [
@@ -100,7 +100,7 @@ ruleTester.run("no-partial-string-normalize", rule, {
     },
     {
       filename: "file.ts",
-      code: `;
+      code: `
         const arg: string = "NFC";
         "".normalize(arg);
       `,
@@ -113,7 +113,7 @@ ruleTester.run("no-partial-string-normalize", rule, {
     },
     {
       filename: "file.ts",
-      code: `;
+      code: `
         const n = "normalize" as const;
         const foo = ""[n]("");
       `,
@@ -126,7 +126,7 @@ ruleTester.run("no-partial-string-normalize", rule, {
     },
     {
       filename: "file.ts",
-      code: `;
+      code: `
         let n: "normalize" | "includes" = "normalize";
         if (Date.now > 0) {
           n = "includes";
