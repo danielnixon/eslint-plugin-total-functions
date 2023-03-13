@@ -591,12 +591,52 @@ ruleTester.run("no-unsafe-mutable-readonly-assignment", rule, {
         }
       `,
     },
+    // generators
     {
       filename: "file.ts",
       code: `
         export function* mySaga(): Generator<void> {
           yield;
         }
+      `,
+    },
+    // The five turtles.
+    // https://effectivetypescript.com/2021/05/06/unsoundness/#There-Are-Five-Turtles
+    // https://www.youtube.com/watch?v=wpgKd-rwnMw&t=1714s
+    {
+      filename: "file.ts",
+      code: `
+        type Foo<U> = {
+          readonly a: U;
+          readonly b: Foo<Foo<U>>;
+        };
+        
+        type Bar<U> = {
+          readonly a: U;
+          readonly b: Bar<Bar<U>>;
+        };
+        
+        declare const foo: Foo<string>;
+        
+        const bar: Bar<string> = foo;
+      `,
+    },
+    {
+      filename: "file.ts",
+      code: `
+        type Foo<U> = {
+          readonly a: U;
+          readonly b: () => Foo<Foo<U>>;
+        };
+        
+        type Bar<U> = {
+          readonly a: U;
+          readonly b: () => Bar<Bar<U>>;
+        };
+        
+        declare const foo: Foo<string>;
+        
+        const bar: Bar<string> = foo;
       `,
     },
   ],

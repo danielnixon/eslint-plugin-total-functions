@@ -134,7 +134,7 @@ export const createNoUnsafeAssignmentRule =
       destinationType: Type,
       sourceType: Type,
       checker: TypeChecker,
-      checkCallSignaturesIterationsRemaining: number,
+      recursiveIterations: number,
       seenTypes: readonly TypePair[]
     ): boolean => {
       const isUnsafe = unsafeIndexAssignmentFunc(
@@ -166,7 +166,7 @@ export const createNoUnsafeAssignmentRule =
             destinationIndexType,
             sourceIndexType,
             checker,
-            checkCallSignaturesIterationsRemaining,
+            recursiveIterations,
             seenTypes
           ))
       );
@@ -180,7 +180,7 @@ export const createNoUnsafeAssignmentRule =
       // eslint-disable-next-line @typescript-eslint/ban-types
       sourceProperty: Symbol,
       checker: TypeChecker,
-      checkCallSignaturesIterationsRemaining: number,
+      recursiveIterations: number,
       seenTypes: readonly TypePair[]
     ): boolean => {
       const destinationPropertyType = checker.getTypeOfSymbolAtLocation(
@@ -198,7 +198,7 @@ export const createNoUnsafeAssignmentRule =
         destinationPropertyType,
         sourcePropertyType,
         checker,
-        checkCallSignaturesIterationsRemaining,
+        recursiveIterations,
         seenTypes
       );
     };
@@ -209,7 +209,7 @@ export const createNoUnsafeAssignmentRule =
       destinationType: Type,
       sourceType: Type,
       checker: TypeChecker,
-      checkCallSignaturesIterationsRemaining: number,
+      recursiveIterations: number,
       seenTypes: readonly TypePair[]
     ): boolean => {
       // eslint-disable-next-line functional/no-conditional-statements
@@ -261,7 +261,7 @@ export const createNoUnsafeAssignmentRule =
           destinationProperty,
           sourceProperty,
           checker,
-          checkCallSignaturesIterationsRemaining,
+          recursiveIterations,
           nextSeenTypes
         );
       });
@@ -273,9 +273,16 @@ export const createNoUnsafeAssignmentRule =
       rawDestinationType: Type,
       rawSourceType: Type,
       checker: TypeChecker,
-      checkCallSignaturesIterationsRemaining: number,
+      recursiveIterationsPrev: number,
       seenTypes: readonly TypePair[] = []
     ): boolean => {
+      // eslint-disable-next-line functional/no-conditional-statements, @typescript-eslint/no-unnecessary-condition
+      if (recursiveIterationsPrev <= 0) {
+        return false;
+      }
+
+      const recursiveIterations = recursiveIterationsPrev - 1;
+
       // eslint-disable-next-line functional/no-conditional-statements
       if (rawDestinationType === rawSourceType) {
         // Never unsafe if the types are equal.
@@ -298,14 +305,8 @@ export const createNoUnsafeAssignmentRule =
       );
 
       const isUnsafeFunctionAssignment = (
-        typePairs: readonly TypePair[],
-        checkCallSignaturesIterationsRemaining: number
+        typePairs: readonly TypePair[]
       ): boolean => {
-        // eslint-disable-next-line functional/no-conditional-statements
-        if (checkCallSignaturesIterationsRemaining <= 0) {
-          return false;
-        }
-
         return typePairs.some(({ sourceType, destinationType }) => {
           const nextSeenTypesWithPair: readonly TypePair[] =
             nextSeenTypes.concat({
@@ -358,7 +359,7 @@ export const createNoUnsafeAssignmentRule =
                       sourceParameterType,
                       destinationParameterType,
                       checker,
-                      checkCallSignaturesIterationsRemaining - 1,
+                      recursiveIterations,
                       nextSeenTypesWithPair
                     );
                   });
@@ -385,7 +386,7 @@ export const createNoUnsafeAssignmentRule =
                   destinationReturnType,
                   sourceReturnType,
                   checker,
-                  checkCallSignaturesIterationsRemaining - 1,
+                  recursiveIterations,
                   nextSeenTypesWithPair
                 ) ||
                   // or the parameter types of the functions are unsafe assignment.
@@ -427,7 +428,7 @@ export const createNoUnsafeAssignmentRule =
               destinationType,
               sourceType,
               checker,
-              checkCallSignaturesIterationsRemaining,
+              recursiveIterations,
               nextSeenTypesWithPair
             ) ||
               // unsafe number index assignment, or
@@ -438,7 +439,7 @@ export const createNoUnsafeAssignmentRule =
                 destinationType,
                 sourceType,
                 checker,
-                checkCallSignaturesIterationsRemaining,
+                recursiveIterations,
                 nextSeenTypesWithPair
               ) ||
               // unsafe property assignment.
@@ -448,7 +449,7 @@ export const createNoUnsafeAssignmentRule =
                 destinationType,
                 sourceType,
                 checker,
-                checkCallSignaturesIterationsRemaining,
+                recursiveIterations,
                 nextSeenTypesWithPair
               ))
           );
@@ -456,10 +457,7 @@ export const createNoUnsafeAssignmentRule =
 
       return (
         inUnsafeObjectAssignment(objectTypePairs) ||
-        isUnsafeFunctionAssignment(
-          typePairs,
-          checkCallSignaturesIterationsRemaining
-        )
+        isUnsafeFunctionAssignment(typePairs)
       );
     };
 
@@ -473,7 +471,7 @@ export const createNoUnsafeAssignmentRule =
       destinationType: Type,
       sourceType: Type,
       checker: TypeChecker,
-      checkCallSignaturesIterationsRemaining: number,
+      recursiveIterations: number,
       parserServices: ParserServices
     ): boolean => {
       const safeArrayMethods: readonly string[] = [
@@ -523,7 +521,7 @@ export const createNoUnsafeAssignmentRule =
           destinationIndexType,
           sourceIndexType,
           checker,
-          checkCallSignaturesIterationsRemaining
+          recursiveIterations
         )
       ) {
         return true;
@@ -532,11 +530,10 @@ export const createNoUnsafeAssignmentRule =
       return false;
     };
 
-    // Recursively checking call signature assignability is currently
-    // vulnerable to infinite recursion. This is a hack to terminate after a specified number
-    // of iterations and, if we haven't determined safety yet, assume the assignment is safe.
-    // Rationale: better to fail to flag an issue than to explode linting with a stack overflow.
-    const checkCallSignaturesIterations = 1;
+    // The five turtles.
+    // https://effectivetypescript.com/2021/05/06/unsoundness/#There-Are-Five-Turtles
+    // https://www.youtube.com/watch?v=wpgKd-rwnMw&t=1714s
+    const recursiveIterations = 5;
 
     return {
       // eslint-disable-next-line functional/no-return-void
@@ -564,7 +561,7 @@ export const createNoUnsafeAssignmentRule =
             destinationType,
             sourceType,
             checker,
-            checkCallSignaturesIterations
+            recursiveIterations
           )
         ) {
           // eslint-disable-next-line functional/no-expression-statements
@@ -599,7 +596,7 @@ export const createNoUnsafeAssignmentRule =
             destinationType,
             sourceType,
             checker,
-            checkCallSignaturesIterations
+            recursiveIterations
           )
         ) {
           // eslint-disable-next-line functional/no-expression-statements
@@ -647,7 +644,7 @@ export const createNoUnsafeAssignmentRule =
               leftType,
               rightType,
               checker,
-              checkCallSignaturesIterations,
+              recursiveIterations,
               parserServices
             )
           ) {
@@ -662,7 +659,7 @@ export const createNoUnsafeAssignmentRule =
               leftType,
               rightType,
               checker,
-              checkCallSignaturesIterations
+              recursiveIterations
             )
           ) {
             // eslint-disable-next-line functional/no-expression-statements
@@ -692,7 +689,7 @@ export const createNoUnsafeAssignmentRule =
             leftType,
             rightType,
             checker,
-            checkCallSignaturesIterations,
+            recursiveIterations,
             parserServices
           )
         ) {
@@ -707,7 +704,7 @@ export const createNoUnsafeAssignmentRule =
             leftType,
             rightType,
             checker,
-            checkCallSignaturesIterations
+            recursiveIterations
           )
         ) {
           // eslint-disable-next-line functional/no-expression-statements
@@ -749,7 +746,7 @@ export const createNoUnsafeAssignmentRule =
             destinationType,
             sourceType,
             checker,
-            checkCallSignaturesIterations,
+            recursiveIterations,
             parserServices
           )
         ) {
@@ -764,7 +761,7 @@ export const createNoUnsafeAssignmentRule =
             destinationType,
             sourceType,
             checker,
-            checkCallSignaturesIterations
+            recursiveIterations
           )
         ) {
           // eslint-disable-next-line functional/no-expression-statements
@@ -807,7 +804,7 @@ export const createNoUnsafeAssignmentRule =
             destinationType,
             sourceType,
             checker,
-            checkCallSignaturesIterations,
+            recursiveIterations,
             parserServices
           )
         ) {
@@ -822,7 +819,7 @@ export const createNoUnsafeAssignmentRule =
             destinationType,
             sourceType,
             checker,
-            checkCallSignaturesIterations
+            recursiveIterations
           )
         ) {
           // eslint-disable-next-line functional/no-expression-statements
@@ -857,7 +854,7 @@ export const createNoUnsafeAssignmentRule =
             destinationType,
             sourceType,
             checker,
-            checkCallSignaturesIterations,
+            recursiveIterations,
             parserServices
           )
         ) {
@@ -872,7 +869,7 @@ export const createNoUnsafeAssignmentRule =
             destinationType,
             sourceType,
             checker,
-            checkCallSignaturesIterations
+            recursiveIterations
           )
         ) {
           // eslint-disable-next-line functional/no-expression-statements
@@ -900,7 +897,7 @@ export const createNoUnsafeAssignmentRule =
               paramType,
               argumentType,
               checker,
-              checkCallSignaturesIterations
+              recursiveIterations
             )
           ) {
             // eslint-disable-next-line functional/no-expression-statements
