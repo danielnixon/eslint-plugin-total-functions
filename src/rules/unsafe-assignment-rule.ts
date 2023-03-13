@@ -276,7 +276,7 @@ export const createNoUnsafeAssignmentRule =
       recursiveIterationsPrev: number,
       seenTypes: readonly TypePair[] = []
     ): boolean => {
-      // eslint-disable-next-line functional/no-conditional-statements, @typescript-eslint/no-unnecessary-condition
+      // eslint-disable-next-line functional/no-conditional-statements
       if (recursiveIterationsPrev <= 0) {
         return false;
       }
