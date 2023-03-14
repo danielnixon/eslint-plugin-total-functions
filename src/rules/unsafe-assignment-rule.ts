@@ -53,6 +53,8 @@ export type UnsafePropertyAssignmentFunc = (
   checker: TypeChecker
 ) => boolean;
 
+const maxDepth = 100;
+
 const isSignatureAssignable = (
   destinationNode: Node,
   sourceNode: Node,
@@ -134,7 +136,7 @@ export const createNoUnsafeAssignmentRule =
       destinationType: Type,
       sourceType: Type,
       checker: TypeChecker,
-      recursiveIterations: number,
+      depth: number,
       seenTypes: readonly TypePair[]
     ): boolean => {
       const isUnsafe = unsafeIndexAssignmentFunc(
@@ -166,7 +168,7 @@ export const createNoUnsafeAssignmentRule =
             destinationIndexType,
             sourceIndexType,
             checker,
-            recursiveIterations,
+            depth,
             seenTypes
           ))
       );
@@ -180,7 +182,7 @@ export const createNoUnsafeAssignmentRule =
       // eslint-disable-next-line @typescript-eslint/ban-types
       sourceProperty: Symbol,
       checker: TypeChecker,
-      recursiveIterations: number,
+      depth: number,
       seenTypes: readonly TypePair[]
     ): boolean => {
       const destinationPropertyType = checker.getTypeOfSymbolAtLocation(
@@ -198,7 +200,7 @@ export const createNoUnsafeAssignmentRule =
         destinationPropertyType,
         sourcePropertyType,
         checker,
-        recursiveIterations,
+        depth,
         seenTypes
       );
     };
@@ -209,7 +211,7 @@ export const createNoUnsafeAssignmentRule =
       destinationType: Type,
       sourceType: Type,
       checker: TypeChecker,
-      recursiveIterations: number,
+      depth: number,
       seenTypes: readonly TypePair[]
     ): boolean => {
       // eslint-disable-next-line functional/no-conditional-statements
@@ -253,6 +255,9 @@ export const createNoUnsafeAssignmentRule =
         const nextSeenTypes: readonly TypePair[] = seenTypes.concat({
           destinationType,
           sourceType,
+          destinationRecursionIdentity:
+            checker.getRecursionIdentity(destinationType),
+          sourceRecursionIdentity: checker.getRecursionIdentity(sourceType),
         } as const);
 
         return isUnsafePropertyAssignmentRec(
@@ -261,7 +266,7 @@ export const createNoUnsafeAssignmentRule =
           destinationProperty,
           sourceProperty,
           checker,
-          recursiveIterations,
+          depth,
           nextSeenTypes
         );
       });
@@ -273,25 +278,26 @@ export const createNoUnsafeAssignmentRule =
       rawDestinationType: Type,
       rawSourceType: Type,
       checker: TypeChecker,
-      recursiveIterationsPrev: number,
+      depth: number,
       seenTypes: readonly TypePair[] = []
     ): boolean => {
-      // eslint-disable-next-line functional/no-conditional-statements
-      if (recursiveIterationsPrev <= 0) {
-        return false;
-      }
-
-      const recursiveIterations = recursiveIterationsPrev - 1;
-
       // eslint-disable-next-line functional/no-conditional-statements
       if (rawDestinationType === rawSourceType) {
         // Never unsafe if the types are equal.
         return false;
       }
 
+      // eslint-disable-next-line functional/no-conditional-statements
+      if (depth >= maxDepth) {
+        return false;
+      }
+
       const nextSeenTypes: readonly TypePair[] = seenTypes.concat({
         destinationType: rawDestinationType,
         sourceType: rawSourceType,
+        destinationRecursionIdentity:
+          checker.getRecursionIdentity(rawDestinationType),
+        sourceRecursionIdentity: checker.getRecursionIdentity(rawSourceType),
       } as const);
 
       const typePairs = assignableTypePairs(
@@ -312,6 +318,9 @@ export const createNoUnsafeAssignmentRule =
             nextSeenTypes.concat({
               destinationType,
               sourceType,
+              destinationRecursionIdentity:
+                checker.getRecursionIdentity(destinationType),
+              sourceRecursionIdentity: checker.getRecursionIdentity(sourceType),
             } as const);
 
           const sourceCallSignatures = getCallSignaturesOfType(sourceType);
@@ -359,23 +368,28 @@ export const createNoUnsafeAssignmentRule =
                       sourceParameterType,
                       destinationParameterType,
                       checker,
-                      recursiveIterations,
+                      depth + 1,
                       nextSeenTypesWithPair
                     );
                   });
               };
 
               const sourceReturnType = sourceSignature.getReturnType();
+              const sourceRecursionIdentity =
+                checker.getRecursionIdentity(sourceReturnType);
               const destinationReturnType =
                 destinationSignature.getReturnType();
+              const destinationRecursionIdentity =
+                checker.getRecursionIdentity(destinationType);
 
               // This is an unsafe assignment if...
               return (
                 // we're not in an infinitely recursive type,
                 seenTypes.every(
                   (t) =>
-                    t.destinationType !== destinationType &&
-                    t.sourceType !== sourceType
+                    t.destinationRecursionIdentity !==
+                      destinationRecursionIdentity &&
+                    t.sourceRecursionIdentity !== sourceRecursionIdentity
                 ) &&
                 // and the types we're assigning from and to are different,
                 destinationType !== sourceType &&
@@ -386,7 +400,7 @@ export const createNoUnsafeAssignmentRule =
                   destinationReturnType,
                   sourceReturnType,
                   checker,
-                  recursiveIterations,
+                  depth + 1,
                   nextSeenTypesWithPair
                 ) ||
                   // or the parameter types of the functions are unsafe assignment.
@@ -401,10 +415,17 @@ export const createNoUnsafeAssignmentRule =
         objectTypePairs: readonly TypePair[]
       ): boolean =>
         objectTypePairs.some(({ sourceType, destinationType }) => {
+          const sourceRecursionIdentity =
+            checker.getRecursionIdentity(sourceType);
+          const destinationRecursionIdentity =
+            checker.getRecursionIdentity(destinationType);
+
           const nextSeenTypesWithPair: readonly TypePair[] =
             nextSeenTypes.concat({
               destinationType,
               sourceType,
+              destinationRecursionIdentity: destinationRecursionIdentity,
+              sourceRecursionIdentity: sourceRecursionIdentity,
             } as const);
 
           // This is an unsafe assignment if...
@@ -412,8 +433,9 @@ export const createNoUnsafeAssignmentRule =
             // we're not in an infinitely recursive type,
             seenTypes.every(
               (t) =>
-                t.destinationType !== destinationType &&
-                t.sourceType !== sourceType
+                t.destinationRecursionIdentity !==
+                  destinationRecursionIdentity &&
+                t.sourceRecursionIdentity !== sourceRecursionIdentity
             ) &&
             // and the types we're assigning from and to are different,
             // TODO this seems to be required to prevent a hang in https://github.com/oaf-project/oaf-react-router
@@ -428,7 +450,7 @@ export const createNoUnsafeAssignmentRule =
               destinationType,
               sourceType,
               checker,
-              recursiveIterations,
+              depth + 1,
               nextSeenTypesWithPair
             ) ||
               // unsafe number index assignment, or
@@ -439,7 +461,7 @@ export const createNoUnsafeAssignmentRule =
                 destinationType,
                 sourceType,
                 checker,
-                recursiveIterations,
+                depth + 1,
                 nextSeenTypesWithPair
               ) ||
               // unsafe property assignment.
@@ -449,7 +471,7 @@ export const createNoUnsafeAssignmentRule =
                 destinationType,
                 sourceType,
                 checker,
-                recursiveIterations,
+                depth + 1,
                 nextSeenTypesWithPair
               ))
           );
@@ -471,7 +493,7 @@ export const createNoUnsafeAssignmentRule =
       destinationType: Type,
       sourceType: Type,
       checker: TypeChecker,
-      recursiveIterations: number,
+      depth: number,
       parserServices: ParserServices
     ): boolean => {
       const safeArrayMethods: readonly string[] = [
@@ -521,7 +543,7 @@ export const createNoUnsafeAssignmentRule =
           destinationIndexType,
           sourceIndexType,
           checker,
-          recursiveIterations
+          depth
         )
       ) {
         return true;
@@ -529,11 +551,6 @@ export const createNoUnsafeAssignmentRule =
 
       return false;
     };
-
-    // The five turtles.
-    // https://effectivetypescript.com/2021/05/06/unsoundness/#There-Are-Five-Turtles
-    // https://www.youtube.com/watch?v=wpgKd-rwnMw&t=1714s
-    const recursiveIterations = 5;
 
     return {
       // eslint-disable-next-line functional/no-return-void
@@ -561,7 +578,7 @@ export const createNoUnsafeAssignmentRule =
             destinationType,
             sourceType,
             checker,
-            recursiveIterations
+            0
           )
         ) {
           // eslint-disable-next-line functional/no-expression-statements
@@ -596,7 +613,7 @@ export const createNoUnsafeAssignmentRule =
             destinationType,
             sourceType,
             checker,
-            recursiveIterations
+            0
           )
         ) {
           // eslint-disable-next-line functional/no-expression-statements
@@ -644,7 +661,7 @@ export const createNoUnsafeAssignmentRule =
               leftType,
               rightType,
               checker,
-              recursiveIterations,
+              0,
               parserServices
             )
           ) {
@@ -659,7 +676,7 @@ export const createNoUnsafeAssignmentRule =
               leftType,
               rightType,
               checker,
-              recursiveIterations
+              0
             )
           ) {
             // eslint-disable-next-line functional/no-expression-statements
@@ -689,7 +706,7 @@ export const createNoUnsafeAssignmentRule =
             leftType,
             rightType,
             checker,
-            recursiveIterations,
+            0,
             parserServices
           )
         ) {
@@ -704,7 +721,7 @@ export const createNoUnsafeAssignmentRule =
             leftType,
             rightType,
             checker,
-            recursiveIterations
+            0
           )
         ) {
           // eslint-disable-next-line functional/no-expression-statements
@@ -746,7 +763,7 @@ export const createNoUnsafeAssignmentRule =
             destinationType,
             sourceType,
             checker,
-            recursiveIterations,
+            0,
             parserServices
           )
         ) {
@@ -761,7 +778,7 @@ export const createNoUnsafeAssignmentRule =
             destinationType,
             sourceType,
             checker,
-            recursiveIterations
+            0
           )
         ) {
           // eslint-disable-next-line functional/no-expression-statements
@@ -804,7 +821,7 @@ export const createNoUnsafeAssignmentRule =
             destinationType,
             sourceType,
             checker,
-            recursiveIterations,
+            0,
             parserServices
           )
         ) {
@@ -819,7 +836,7 @@ export const createNoUnsafeAssignmentRule =
             destinationType,
             sourceType,
             checker,
-            recursiveIterations
+            0
           )
         ) {
           // eslint-disable-next-line functional/no-expression-statements
@@ -854,7 +871,7 @@ export const createNoUnsafeAssignmentRule =
             destinationType,
             sourceType,
             checker,
-            recursiveIterations,
+            0,
             parserServices
           )
         ) {
@@ -869,7 +886,7 @@ export const createNoUnsafeAssignmentRule =
             destinationType,
             sourceType,
             checker,
-            recursiveIterations
+            0
           )
         ) {
           // eslint-disable-next-line functional/no-expression-statements
@@ -897,7 +914,7 @@ export const createNoUnsafeAssignmentRule =
               paramType,
               argumentType,
               checker,
-              recursiveIterations
+              0
             )
           ) {
             // eslint-disable-next-line functional/no-expression-statements

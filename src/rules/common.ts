@@ -11,7 +11,9 @@ export const createRule = ESLintUtils.RuleCreator(
 // eslint-disable-next-line functional/type-declaration-immutability
 export type TypePair = {
   readonly destinationType: Type;
+  readonly destinationRecursionIdentity: object;
   readonly sourceType: Type;
+  readonly sourceRecursionIdentity: object;
 };
 
 /**
@@ -39,6 +41,10 @@ export const assignableTypePairs = (
         (destinationTypePart) =>
           ({
             sourceType: sourceTypePart,
+            sourceRecursionIdentity:
+              checker.getRecursionIdentity(sourceTypePart),
+            destinationRecursionIdentity:
+              checker.getRecursionIdentity(destinationTypePart),
             destinationType: destinationTypePart,
           } as const)
       )

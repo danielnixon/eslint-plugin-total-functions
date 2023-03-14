@@ -911,5 +911,75 @@ ruleTester.run("no-unsafe-mutable-readonly-assignment", rule, {
         },
       ],
     },
+    // deep(ish) type
+    {
+      filename: "file.ts",
+      code: `
+        type A = {
+          a: string;
+        };
+        
+        type B = {
+          a: A;
+        };
+        
+        type C = {
+          b: B;
+        };
+        
+        type D = {
+          c: C;
+        };
+        
+        type E = {
+          d: D;
+        };
+        
+        type F = {
+          e: E;
+        };
+        
+        type G = {
+          f: F;
+        };
+        
+        type A2 = {
+          readonly a: string;
+        };
+        
+        type B2 = {
+          a: A2;
+        };
+        
+        type C2 = {
+          b: B2;
+        };
+        
+        type D2 = {
+          c: C2;
+        };
+        
+        type E2 = {
+          d: D2;
+        };
+        
+        type F2 = {
+          e: E2;
+        };
+        
+        type G2 = {
+          f: F2;
+        };
+        
+        declare const g: G;
+        export const g2: G2 = g;
+      `,
+      errors: [
+        {
+          messageId: "errorStringVariableDeclaration",
+          type: AST_NODE_TYPES.VariableDeclaration,
+        },
+      ],
+    },
   ],
 } as const);
