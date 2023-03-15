@@ -1,10 +1,11 @@
 /* eslint-disable functional/prefer-immutable-types */
 import { ESLintUtils } from "@typescript-eslint/utils";
-import { createRule } from "./common";
-import { fpTsEffectType } from "./fp-ts";
+import { isThenableType } from "tsutils";
+import { createRule, typeSymbolName } from "./common";
+import { effects, fpTsEffectType } from "./fp-ts";
 
 /**
- * An ESLint rule to ban nested fp-ts effects.
+ * An ESLint rule to ban problematic nested fp-ts effects.
  */
 // eslint-disable-next-line total-functions/no-unsafe-readonly-mutable-assignment
 const noNestedFpTsEffects = createRule({
@@ -12,11 +13,11 @@ const noNestedFpTsEffects = createRule({
   meta: {
     type: "problem",
     docs: {
-      description: "Bans nested fp-ts effects.",
+      description: "Bans problematic nested fp-ts effects.",
       recommended: "error",
     },
     messages: {
-      errorStringGeneric: "Do not nest effects.",
+      errorStringGeneric: "Do not nest these fp-ts effects.",
     },
     schema: [],
   },
@@ -37,18 +38,36 @@ const noNestedFpTsEffects = createRule({
           return;
         }
 
-        const nestedEffectType = fpTsEffectType(effectType.typeParameter);
-
+        // TODO report other types of problematic nesting besides Tasks within IOs.
         // eslint-disable-next-line functional/no-conditional-statements
-        if (nestedEffectType === undefined) {
-          return;
-        }
+        if (
+          effectType.effectName === "IO" &&
+          effectType.effectTypeParameter !== undefined
+        ) {
+          const effectTypeParameterName = typeSymbolName(
+            effectType.effectTypeParameter
+          );
+          // eslint-disable-next-line functional/no-conditional-statements
+          if (effectTypeParameterName === undefined) {
+            return;
+          }
+          const isNestedEffect = effects.includes(effectTypeParameterName);
 
-        // eslint-disable-next-line functional/no-expression-statements
-        context.report({
-          node: node,
-          messageId: "errorStringGeneric",
-        } as const);
+          const isNestedPromise = isThenableType(
+            checker,
+            tsNode,
+            effectType.effectTypeParameter
+          );
+
+          // eslint-disable-next-line functional/no-conditional-statements
+          if (isNestedEffect || isNestedPromise) {
+            // eslint-disable-next-line functional/no-expression-statements
+            context.report({
+              node: node,
+              messageId: "errorStringGeneric",
+            } as const);
+          }
+        }
       },
     };
   },

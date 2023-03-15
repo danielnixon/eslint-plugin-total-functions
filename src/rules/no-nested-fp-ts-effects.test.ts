@@ -77,20 +77,6 @@ ruleTester.run("no-async-effect-within-io", rule, {
         const bar = liftIO("a");
       `,
     },
-    // IO<Promise<A>> is valid, for now
-    // https://github.com/danielnixon/eslint-plugin-total-functions/issues/727
-    {
-      filename: "file.ts",
-      code: `
-        export interface IO<A> {
-          (): A;
-        }
-
-        declare const liftIO: <A>(val: A) => IO<A>;
-
-        const foo = liftIO(Promise.resolve("a"));
-      `,
-    },
   ],
   invalid: [
     // IO<Task<A>> is invalid
@@ -135,6 +121,25 @@ ruleTester.run("no-async-effect-within-io", rule, {
         declare const liftTaskEither: <A>(val: A) => TaskEither<A>;
 
         const foo = liftIO(liftTaskEither("a"));
+      `,
+      errors: [
+        {
+          messageId: "errorStringGeneric",
+          type: AST_NODE_TYPES.CallExpression,
+        },
+      ],
+    },
+    // IO<Promise<A>> is invalid
+    {
+      filename: "file.ts",
+      code: `
+        export interface IO<A> {
+          (): A;
+        }
+
+        declare const liftIO: <A>(val: A) => IO<A>;
+
+        const foo = liftIO(Promise.resolve("a"));
       `,
       errors: [
         {
