@@ -1,6 +1,3 @@
-/* eslint-disable functional/prefer-immutable-types */
-/* eslint-disable @typescript-eslint/consistent-type-definitions */
-/* eslint-disable functional/functional-parameters */
 import rule from "./no-nested-fp-ts-effects";
 import { AST_NODE_TYPES } from "@typescript-eslint/utils";
 import { ESLintUtils } from "@typescript-eslint/utils";
