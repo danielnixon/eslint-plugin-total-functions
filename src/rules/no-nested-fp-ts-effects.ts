@@ -4,20 +4,19 @@ import { createRule } from "./common";
 import { fpTsEffectType } from "./fp-ts";
 
 /**
- * An ESLint rule to ban interpretation (execution) of fp-ts effects.
+ * An ESLint rule to ban nested fp-ts effects.
  */
 // eslint-disable-next-line total-functions/no-unsafe-readonly-mutable-assignment
-const noPrematureFpTsEffects = createRule({
-  name: "no-premature-fp-ts-effects",
+const noNestedFpTsEffects = createRule({
+  name: "no-nested-fp-ts-effects",
   meta: {
     type: "problem",
     docs: {
-      description: "Bans interpretation (execution) of fp-ts effects.",
+      description: "Bans nested fp-ts effects.",
       recommended: "error",
     },
     messages: {
-      errorStringGeneric:
-        "Ensure you aren't interpreting this fp-ts effect until the very end of your program.",
+      errorStringGeneric: "Do not nest effects.",
     },
     schema: [],
   },
@@ -28,24 +27,22 @@ const noPrematureFpTsEffects = createRule({
     return {
       // eslint-disable-next-line functional/no-return-void
       CallExpression: (node) => {
-        // eslint-disable-next-line functional/no-conditional-statements
-        if (node.arguments.length > 0) {
-          return;
-        }
+        const tsNode = parserServices.esTreeNodeToTSNodeMap.get(node);
+        const expressionType = checker.getTypeAtLocation(tsNode);
 
-        const calleeNode = parserServices.esTreeNodeToTSNodeMap.get(
-          node.callee
-        );
-        const calleeType = checker.getTypeAtLocation(calleeNode);
-
-        const effectType = fpTsEffectType(calleeType);
+        const effectType = fpTsEffectType(expressionType);
 
         // eslint-disable-next-line functional/no-conditional-statements
         if (effectType === undefined) {
           return;
         }
 
-        // TODO: don't flag error if we can confirm we are at the program entrypoint.
+        const nestedEffectType = fpTsEffectType(effectType.typeParameter);
+
+        // eslint-disable-next-line functional/no-conditional-statements
+        if (nestedEffectType === undefined) {
+          return;
+        }
 
         // eslint-disable-next-line functional/no-expression-statements
         context.report({
@@ -58,4 +55,4 @@ const noPrematureFpTsEffects = createRule({
   defaultOptions: [],
 } as const);
 
-export default noPrematureFpTsEffects;
+export default noNestedFpTsEffects;
