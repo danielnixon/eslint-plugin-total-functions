@@ -79,6 +79,7 @@ Alternatively you can configure individual rules separately (see below).
 |  no-partial-division                    | ✅           | ✅    |        |
 |  no-partial-string-normalize            | ✅           | ✅    |        |
 |  no-premature-fp-ts-effects             | ✅           | ✅    |        |
+|  no-nested-fp-ts-effects                |              | ✅    |        |
 |  no-partial-array-reduce                | ✅           | ✅    |        |
 |  no-hidden-type-assertions              |              | ✅    |        |
 
