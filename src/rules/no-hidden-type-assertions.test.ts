@@ -109,6 +109,30 @@ ruleTester.run("no-hidden-type-assertions", rule, {
         export const result = axios.request(() => "hello");
       `,
     },
+    // chainFirstIOK
+    {
+      filename: "file.ts",
+      code: `
+        declare const chainFirstIOK: <A, B>(
+          f: (a: A) => Promise<B>
+        ) => (first: Promise<A>) => Promise<A>;
+        
+        export const result = chainFirstIOK<string, boolean>(() =>
+          Promise.resolve(true)
+        );
+      `,
+    },
+    // object literal type hidden type assertion but set to unknown
+    {
+      filename: "file.ts",
+      code: `        
+        declare class Axios {
+          readonly request: <T = any>(url: string) => { t: T };
+        }
+        declare const axios: Axios;
+        export const result = axios.request<unknown>("hello");
+      `,
+    },
   ],
   invalid: [
     // Hidden type assertion set to arbitrary type
@@ -207,5 +231,23 @@ ruleTester.run("no-hidden-type-assertions", rule, {
         },
       ],
     },
+    // TODO fix this case
+    // object literal type
+    // {
+    //   filename: "file.ts",
+    //   code: `
+    //     declare class Axios {
+    //       readonly request: <T = any>(url: string) => { t: T };
+    //     }
+    //     declare const axios: Axios;
+    //     export const result = axios.request<boolean>("hello");
+    //   `,
+    //   errors: [
+    //     {
+    //       messageId: "errorStringGeneric",
+    //       type: AST_NODE_TYPES.CallExpression,
+    //     },
+    //   ],
+    // },
   ],
 } as const);

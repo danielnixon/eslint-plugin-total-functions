@@ -4,13 +4,19 @@ import {
   isTypeUnknownType,
 } from "@typescript-eslint/type-utils";
 import { ESLintUtils } from "@typescript-eslint/utils";
-import { isFunctionTypeNode } from "typescript";
+import {
+  isArrayTypeNode,
+  isFunctionTypeNode,
+  isTypeLiteralNode,
+  NodeArray,
+  ParameterDeclaration,
+  TypeNode,
+} from "typescript";
 import {
   isConditionalTypeNode,
   isIndexedAccessTypeNode,
   isTypeReferenceNode,
   SyntaxKind,
-  TypeNode,
 } from "typescript";
 import { createRule } from "./common";
 
@@ -39,6 +45,7 @@ const noHiddenTypeAssertions = createRule({
     const explodeTypeNode = (
       type: TypeNode,
       depth: number
+      // eslint-disable-next-line sonarjs/cognitive-complexity
     ): readonly TypeNode[] => {
       // TODO write a test that exercises this
       // eslint-disable-next-line functional/no-conditional-statements
@@ -53,10 +60,25 @@ const noHiddenTypeAssertions = createRule({
         : isIndexedAccessTypeNode(type)
         ? [type.objectType, type.indexType]
         : isFunctionTypeNode(type)
-        ? [type.type]
+        ? [type.type, ...parametersToTypeNodes(type.parameters, depth)] // TODO type params?
+        : isTypeLiteralNode(type)
+        ? [] // TODO support type literals
+        : isArrayTypeNode(type)
+        ? [type.elementType]
         : [];
 
       return [type, ...next.flatMap(explodeTypeNode)] as const;
+    };
+
+    const parametersToTypeNodes = (
+      parameters: NodeArray<ParameterDeclaration>,
+      depth: number
+    ): readonly TypeNode[] => {
+      return parameters
+        .flatMap((parameter) =>
+          parameter.type !== undefined ? [parameter.type] : []
+        )
+        .flatMap((parameter) => explodeTypeNode(parameter, depth));
     };
 
     return {
@@ -80,11 +102,10 @@ const noHiddenTypeAssertions = createRule({
         }
 
         const typeParameters = callSignature.declaration.typeParameters;
-        const parameters = callSignature.declaration.parameters
-          .flatMap((parameter) =>
-            parameter.type !== undefined ? [parameter.type] : []
-          )
-          .flatMap((parameter) => explodeTypeNode(parameter, 0));
+        const parameters = parametersToTypeNodes(
+          callSignature.declaration.parameters,
+          0
+        );
 
         const returnType = callSignature.declaration.type;
 
