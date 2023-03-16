@@ -80,6 +80,7 @@ Alternatively you can configure individual rules separately (see below).
 |  no-partial-string-normalize            | ✅           | ✅    |        |
 |  no-premature-fp-ts-effects             | ✅           | ✅    |        |
 |  no-partial-array-reduce                | ✅           | ✅    |        |
+|  no-hidden-type-assertions              |              | ✅    |        |
 
 ### total-functions/require-strict-mode
 
