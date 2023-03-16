@@ -11,6 +11,7 @@ import noPartialStringNormalize from "./no-partial-string-normalize";
 import noPrematureFpTsEffects from "./no-premature-fp-ts-effects";
 import noPartialArrayReduce from "./no-partial-array-reduce";
 import noNestedFpTsEffects from "./no-nested-fp-ts-effects";
+import noHiddenTypeAssertions from "./no-hidden-type-assertions";
 
 export default {
   "require-strict-mode": requireStrictMode,
@@ -26,4 +27,5 @@ export default {
   "no-premature-fp-ts-effects": noPrematureFpTsEffects,
   "no-nested-fp-ts-effects": noNestedFpTsEffects,
   "no-partial-array-reduce": noPartialArrayReduce,
+  "no-hidden-type-assertions": noHiddenTypeAssertions,
 };
