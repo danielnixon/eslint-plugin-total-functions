@@ -15,5 +15,7 @@ export = {
     // "total-functions/no-nested-fp-ts-effects": "error",
     "total-functions/no-premature-fp-ts-effects": "error",
     "total-functions/no-partial-array-reduce": "error",
+    // Not ready for prime time
+    // "total-functions/no-hidden-type-assertions": "error",
   },
 };
