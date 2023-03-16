@@ -7,7 +7,9 @@ import { ESLintUtils } from "@typescript-eslint/utils";
 import {
   isArrayTypeNode,
   isFunctionTypeNode,
+  isIntersectionTypeNode,
   isTypeLiteralNode,
+  isUnionTypeNode,
   NodeArray,
   ParameterDeclaration,
   TypeNode,
@@ -65,6 +67,10 @@ const noHiddenTypeAssertions = createRule({
         ? [] // TODO support type literals
         : isArrayTypeNode(type)
         ? [type.elementType]
+        : isUnionTypeNode(type)
+        ? type.types
+        : isIntersectionTypeNode(type)
+        ? type.types
         : [];
 
       return [type, ...next.flatMap(explodeTypeNode)] as const;
@@ -82,7 +88,7 @@ const noHiddenTypeAssertions = createRule({
     };
 
     return {
-      // eslint-disable-next-line functional/no-return-void
+      // eslint-disable-next-line functional/no-return-void, sonarjs/cognitive-complexity
       CallExpression: (node) => {
         const tsExpressionNode = parserServices.esTreeNodeToTSNodeMap.get(node);
         const callSignature = checker.getResolvedSignature(tsExpressionNode);
@@ -139,12 +145,23 @@ const noHiddenTypeAssertions = createRule({
         // are they all set to `unknown` type arguments in this specific call?
         // If so, this is safe even if the function being called is a hidden type assertion.
         const allCorrespondingTypeArgumentsAreUnknownType =
-          typeParamsUsedInReturnType.every(({ index }) => {
+          typeParamsUsedInReturnType.every(({ typeParameter, index }) => {
             const typeArgument = (tsExpressionNode.typeArguments ?? [])[index];
+            const typeArgumentType =
+              typeArgument !== undefined
+                ? checker.getTypeAtLocation(typeArgument)
+                : undefined;
+
+            const typeParamDefaultType =
+              typeParameter.default !== undefined
+                ? checker.getTypeAtLocation(typeParameter.default)
+                : undefined;
+
+            const typeToCheck = typeArgumentType ?? typeParamDefaultType;
+
             return (
-              typeArgument !== undefined &&
-              (isTypeUnknownType(checker.getTypeAtLocation(typeArgument)) ||
-                isTypeNeverType(checker.getTypeAtLocation(typeArgument)))
+              typeToCheck !== undefined &&
+              (isTypeUnknownType(typeToCheck) || isTypeNeverType(typeToCheck))
             );
           });
 
