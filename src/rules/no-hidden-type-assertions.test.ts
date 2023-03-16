@@ -125,12 +125,20 @@ ruleTester.run("no-hidden-type-assertions", rule, {
     // object literal type hidden type assertion but set to unknown
     {
       filename: "file.ts",
-      code: `        
+      code: `
         declare class Axios {
           readonly request: <T = any>(url: string) => { t: T };
         }
         declare const axios: Axios;
         export const result = axios.request<unknown>("hello");
+      `,
+    },
+    // TODO fix this case
+    {
+      filename: "file.ts",
+      code: `
+        declare const right: <E = never, A = never>(a: A) => E | A;
+        export const result = right("hello");
       `,
     },
   ],

@@ -7,7 +7,9 @@ import { ESLintUtils } from "@typescript-eslint/utils";
 import {
   isArrayTypeNode,
   isFunctionTypeNode,
+  isIntersectionTypeNode,
   isTypeLiteralNode,
+  isUnionTypeNode,
   NodeArray,
   ParameterDeclaration,
   TypeNode,
@@ -65,6 +67,10 @@ const noHiddenTypeAssertions = createRule({
         ? [] // TODO support type literals
         : isArrayTypeNode(type)
         ? [type.elementType]
+        : isUnionTypeNode(type)
+        ? type.types
+        : isIntersectionTypeNode(type)
+        ? type.types
         : [];
 
       return [type, ...next.flatMap(explodeTypeNode)] as const;
