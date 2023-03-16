@@ -87,6 +87,17 @@ ruleTester.run("no-hidden-type-assertions", rule, {
         export const result = foo("hello", "world");
       `,
     },
+    // function type parameter
+    {
+      filename: "file.ts",
+      code: `
+        declare class Axios {
+          readonly request: <T = any>(url: () => T) => Promise<T>;
+        }
+        declare const axios: Axios;
+        export const result = axios.request(() => "hello");
+      `,
+    },
   ],
   invalid: [
     // Hidden type assertion set to arbitrary type

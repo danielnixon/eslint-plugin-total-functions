@@ -1,6 +1,7 @@
 /* eslint-disable functional/prefer-immutable-types */
 import { isTypeUnknownType } from "@typescript-eslint/type-utils";
 import { ESLintUtils } from "@typescript-eslint/utils";
+import { isFunctionTypeNode } from "typescript";
 import {
   isConditionalTypeNode,
   isIndexedAccessTypeNode,
@@ -48,6 +49,8 @@ const noHiddenTypeAssertions = createRule({
         ? [type.checkType, type.trueType, type.falseType]
         : isIndexedAccessTypeNode(type)
         ? [type.objectType, type.indexType]
+        : isFunctionTypeNode(type)
+        ? [type.type]
         : [];
 
       return [type, ...next.flatMap(explodeTypeNode)] as const;
