@@ -4,13 +4,12 @@ import {
   isTypeUnknownType,
 } from "@typescript-eslint/type-utils";
 import { ESLintUtils } from "@typescript-eslint/utils";
-import { isFunctionTypeNode } from "typescript";
+import { isFunctionTypeNode, isTypeLiteralNode, Node } from "typescript";
 import {
   isConditionalTypeNode,
   isIndexedAccessTypeNode,
   isTypeReferenceNode,
   SyntaxKind,
-  TypeNode,
 } from "typescript";
 import { createRule } from "./common";
 
@@ -37,9 +36,10 @@ const noHiddenTypeAssertions = createRule({
     const checker = parserServices.program.getTypeChecker();
 
     const explodeTypeNode = (
-      type: TypeNode,
+      type: Node,
       depth: number
-    ): readonly TypeNode[] => {
+      // eslint-disable-next-line sonarjs/cognitive-complexity
+    ): readonly Node[] => {
       // TODO write a test that exercises this
       // eslint-disable-next-line functional/no-conditional-statements
       if (depth >= 100) {
@@ -54,6 +54,8 @@ const noHiddenTypeAssertions = createRule({
         ? [type.objectType, type.indexType]
         : isFunctionTypeNode(type)
         ? [type.type]
+        : isTypeLiteralNode(type)
+        ? type.members
         : [];
 
       return [type, ...next.flatMap(explodeTypeNode)] as const;

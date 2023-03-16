@@ -1,3 +1,5 @@
+/* eslint-disable functional/prefer-immutable-types */
+/* eslint-disable functional/functional-parameters */
 import rule from "./no-hidden-type-assertions";
 import { AST_NODE_TYPES } from "@typescript-eslint/utils";
 import { ESLintUtils } from "@typescript-eslint/utils";
@@ -109,6 +111,19 @@ ruleTester.run("no-hidden-type-assertions", rule, {
         export const result = axios.request(() => "hello");
       `,
     },
+    // chainFirstIOK
+    {
+      filename: "file.ts",
+      code: `
+        declare const chainFirstIOK: <A, B>(
+          f: (a: A) => Promise<B>
+        ) => (first: Promise<A>) => Promise<A>;
+        
+        export const result = chainFirstIOK<string, boolean>(() =>
+          Promise.resolve(true)
+        );
+      `,
+    },
   ],
   invalid: [
     // Hidden type assertion set to arbitrary type
@@ -199,6 +214,23 @@ ruleTester.run("no-hidden-type-assertions", rule, {
         declare const axios: Axios;
         
         export const result = axios.request<"asdf">("hello");
+      `,
+      errors: [
+        {
+          messageId: "errorStringGeneric",
+          type: AST_NODE_TYPES.CallExpression,
+        },
+      ],
+    },
+    // object literal type
+    {
+      filename: "file.ts",
+      code: `        
+        declare class Axios {
+          readonly request: <T = any>(url: string) => { t: T };
+        }
+        declare const axios: Axios;
+        export const result = axios.request<boolean>("hello");
       `,
       errors: [
         {
