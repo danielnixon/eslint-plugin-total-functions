@@ -32,6 +32,17 @@ ruleTester.run("no-hidden-type-assertions", rule, {
         export const result: Promise<unknown> = axios.request<unknown>("hello");
       `,
     },
+    // Hidden type assertion but set to `never`
+    {
+      filename: "file.ts",
+      code: `
+        declare class Axios {
+          readonly request: <T>() => Promise<T>;
+        }
+        declare const axios: Axios;
+        export const result = axios.request<never>();
+      `,
+    },
     // Generic used in input value, explicitly provided
     {
       filename: "file.ts",

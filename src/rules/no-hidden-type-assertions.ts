@@ -1,5 +1,8 @@
 /* eslint-disable functional/prefer-immutable-types */
-import { isTypeUnknownType } from "@typescript-eslint/type-utils";
+import {
+  isTypeNeverType,
+  isTypeUnknownType,
+} from "@typescript-eslint/type-utils";
 import { ESLintUtils } from "@typescript-eslint/utils";
 import { isFunctionTypeNode } from "typescript";
 import {
@@ -119,7 +122,8 @@ const noHiddenTypeAssertions = createRule({
             const typeArgument = (tsExpressionNode.typeArguments ?? [])[index];
             return (
               typeArgument !== undefined &&
-              isTypeUnknownType(checker.getTypeAtLocation(typeArgument))
+              (isTypeUnknownType(checker.getTypeAtLocation(typeArgument)) ||
+                isTypeNeverType(checker.getTypeAtLocation(typeArgument)))
             );
           });
 
