@@ -145,12 +145,23 @@ const noHiddenTypeAssertions = createRule({
         // are they all set to `unknown` type arguments in this specific call?
         // If so, this is safe even if the function being called is a hidden type assertion.
         const allCorrespondingTypeArgumentsAreUnknownType =
-          typeParamsUsedInReturnType.every(({ index }) => {
+          typeParamsUsedInReturnType.every(({ typeParameter, index }) => {
             const typeArgument = (tsExpressionNode.typeArguments ?? [])[index];
+            const typeArgumentType =
+              typeArgument !== undefined
+                ? checker.getTypeAtLocation(typeArgument)
+                : undefined;
+
+            const typeParamDefaultType =
+              typeParameter.default !== undefined
+                ? checker.getTypeAtLocation(typeParameter.default)
+                : undefined;
+
+            const typeToCheck = typeArgumentType ?? typeParamDefaultType;
+
             return (
-              typeArgument !== undefined &&
-              (isTypeUnknownType(checker.getTypeAtLocation(typeArgument)) ||
-                isTypeNeverType(checker.getTypeAtLocation(typeArgument)))
+              typeToCheck !== undefined &&
+              (isTypeUnknownType(typeToCheck) || isTypeNeverType(typeToCheck))
             );
           });
 
