@@ -30,12 +30,15 @@ const noPartialDivision = createRule({
     // There is no equivalent of `isNumberLiteral()` for bigints.
     // `isLiteral()` returns false so isn't useful.
     const isPseudoBigInt = (val: unknown): val is PseudoBigInt => {
+      const valAsPseudoBigInt =
+        typeof val === "object" && val !== null
+          ? // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+            (val as Partial<PseudoBigInt>)
+          : undefined;
       return (
-        typeof val === "object" &&
-        // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-        typeof (val as Partial<PseudoBigInt>).base10Value === "string" &&
-        // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-        typeof (val as Partial<PseudoBigInt>).negative === "boolean"
+        valAsPseudoBigInt !== undefined &&
+        typeof valAsPseudoBigInt.base10Value === "string" &&
+        typeof valAsPseudoBigInt.negative === "boolean"
       );
     };
 
