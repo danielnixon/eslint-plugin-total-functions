@@ -64,6 +64,27 @@ ruleTester.run("no-partial-division", rule, {
         const result = foo / bar;
       `,
     },
+    {
+      filename: "file.ts",
+      code: `
+        declare const foo: 42 | 43;
+        const bar = 1 / foo;
+      `,
+    },
+    {
+      filename: "file.ts",
+      code: `
+        declare const foo: 43 & { __tag: string };
+        const bar = 1 / foo;
+      `,
+    },
+    {
+      filename: "file.ts",
+      code: `
+        declare const foo: 43n & { __tag: string };
+        const bar = 1n / foo;
+      `,
+    },
   ],
   invalid: [
     {
@@ -160,6 +181,45 @@ ruleTester.run("no-partial-division", rule, {
         const foo = 1n;
         const bar = 0n;
         const result = foo / bar;
+      `,
+      errors: [
+        {
+          messageId: "errorStringGeneric",
+          type: AST_NODE_TYPES.BinaryExpression,
+        },
+      ],
+    },
+    {
+      filename: "file.ts",
+      code: `
+        declare const foo: 42 | 0;
+        const bar = 1 / foo;
+      `,
+      errors: [
+        {
+          messageId: "errorStringGeneric",
+          type: AST_NODE_TYPES.BinaryExpression,
+        },
+      ],
+    },
+    {
+      filename: "file.ts",
+      code: `
+        declare const foo: 42 | number;
+        const bar = 1 / foo;
+      `,
+      errors: [
+        {
+          messageId: "errorStringGeneric",
+          type: AST_NODE_TYPES.BinaryExpression,
+        },
+      ],
+    },
+    {
+      filename: "file.ts",
+      code: `
+        declare const foo: number & { __tag: string };
+        const bar = 1 / foo;
       `,
       errors: [
         {

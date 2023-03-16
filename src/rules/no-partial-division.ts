@@ -1,7 +1,7 @@
 /* eslint-disable functional/prefer-immutable-types */
-import { isTypeFlagSet } from "@typescript-eslint/type-utils";
 import { AST_NODE_TYPES, ESLintUtils } from "@typescript-eslint/utils";
-import { BigIntLiteralType, TypeFlags } from "typescript";
+import { intersectionTypeParts, unionTypeParts } from "tsutils";
+import { BigIntLiteralType, PseudoBigInt, Type } from "typescript";
 import { createRule } from "./common";
 
 /**
@@ -25,6 +25,47 @@ const noPartialDivision = createRule({
   create: (context) => {
     const parserServices = ESLintUtils.getParserServices(context);
     const checker = parserServices.program.getTypeChecker();
+
+    // TODO find a way to get ahold of a BigIntLiteralType without type assertions.
+    // There is no equivalent of `isNumberLiteral()` for bigints.
+    // `isLiteral()` returns false so isn't useful.
+    const isPseudoBigInt = (val: unknown): val is PseudoBigInt => {
+      return (
+        typeof val === "object" &&
+        // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+        typeof (val as Partial<PseudoBigInt>).base10Value === "string" &&
+        // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+        typeof (val as Partial<PseudoBigInt>).negative === "boolean"
+      );
+    };
+
+    const isBigIntLiteral = (type: Type): type is BigIntLiteralType => {
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions, @typescript-eslint/no-unnecessary-condition
+      return isPseudoBigInt((type as Partial<BigIntLiteralType>)?.value);
+    };
+
+    const isSafeDenominator = (type: Type): boolean => {
+      // eslint-disable-next-line functional/no-conditional-statements
+      if (type.isIntersection()) {
+        const numberLiteralParts = intersectionTypeParts(type).filter(
+          (t) => isBigIntLiteral(t) || t.isNumberLiteral()
+        );
+        return (
+          numberLiteralParts.length > 0 &&
+          numberLiteralParts.every((t) => isSafeDenominator(t))
+        );
+      }
+
+      // eslint-disable-next-line functional/no-conditional-statements
+      if (type.isUnion()) {
+        return unionTypeParts(type).every((t) => isSafeDenominator(t));
+      }
+
+      return (
+        (type.isNumberLiteral() && type.value !== 0) ||
+        (isBigIntLiteral(type) && type.value.base10Value !== "0")
+      );
+    };
 
     return {
       // eslint-disable-next-line functional/no-return-void
@@ -52,28 +93,8 @@ const noPartialDivision = createRule({
           );
           const denominatorNodeType =
             checker.getTypeAtLocation(denominatorNode);
-
           // eslint-disable-next-line functional/no-conditional-statements
-          if (
-            isTypeFlagSet(denominatorNodeType, TypeFlags.NumberLike) &&
-            denominatorNodeType.isNumberLiteral() &&
-            denominatorNodeType.value !== 0
-          ) {
-            // Division by a number type that is known to be non-zero is safe.
-            return;
-          }
-
-          // TODO find a way to get ahold of a BigIntLiteralType without type assertions.
-          // There is no equivalent of `isNumberLiteral()` for bigints.
-          // `isLiteral()` returns false so isn't useful.
-          const bigIntBase10Value =
-            // eslint-disable-next-line @typescript-eslint/consistent-type-assertions, @typescript-eslint/no-unnecessary-condition
-            (denominatorNodeType as Partial<BigIntLiteralType>)?.value
-              ?.base10Value;
-
-          // eslint-disable-next-line functional/no-conditional-statements
-          if (bigIntBase10Value !== undefined && bigIntBase10Value !== "0") {
-            // Division by a bigint type that is known to be non-zero is safe.
+          if (isSafeDenominator(denominatorNodeType)) {
             return;
           }
         }
