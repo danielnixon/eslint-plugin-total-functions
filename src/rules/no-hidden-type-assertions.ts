@@ -88,7 +88,7 @@ const noHiddenTypeAssertions = createRule({
     };
 
     return {
-      // eslint-disable-next-line functional/no-return-void
+      // eslint-disable-next-line functional/no-return-void, sonarjs/cognitive-complexity
       CallExpression: (node) => {
         const tsExpressionNode = parserServices.esTreeNodeToTSNodeMap.get(node);
         const callSignature = checker.getResolvedSignature(tsExpressionNode);
