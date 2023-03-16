@@ -217,7 +217,7 @@ Infinity
 Uncaught RangeError: Division by zero
 ```
 
-This rule flags division unless the denominator is provably non-zero. If you need division, you should wrap it in a wrapper that returns undefined when the denominator is zero.
+This rule flags division unless the denominator is provably non-zero. If you need division, you should wrap it in a wrapper that returns undefined when the denominator is zero. Alternatively, consider using branded types / refinements, such as https://github.com/gcanti/io-ts/blob/master/index.md#branded-types--refinements or https://gcanti.github.io/newtype-ts/modules/NonZero.ts.html
 
 # See Also
 * [TypeScript for Functional Programmers](https://www.typescriptlang.org/docs/handbook/typescript-in-5-minutes-func.html)
