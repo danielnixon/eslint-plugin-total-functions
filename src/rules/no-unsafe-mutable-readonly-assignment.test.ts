@@ -580,7 +580,7 @@ ruleTester.run("no-unsafe-mutable-readonly-assignment", rule, {
       `,
       errors: [
         {
-          messageId: "errorStringVariableDeclaration",
+          messageId: "errorStringGeneric",
           type: AST_NODE_TYPES.VariableDeclaration,
         },
       ],
@@ -600,7 +600,7 @@ ruleTester.run("no-unsafe-mutable-readonly-assignment", rule, {
     //   `,
     //   errors: [
     //     {
-    //       messageId: "errorStringCallExpression",
+    //       messageId: "errorStringGeneric",
     //       type: AST_NODE_TYPES.Identifier,
     //     },
     //   ],
@@ -619,7 +619,7 @@ ruleTester.run("no-unsafe-mutable-readonly-assignment", rule, {
       `,
       errors: [
         {
-          messageId: "errorStringCallExpression",
+          messageId: "errorStringGeneric",
           type: AST_NODE_TYPES.Identifier,
         },
       ],
@@ -638,7 +638,7 @@ ruleTester.run("no-unsafe-mutable-readonly-assignment", rule, {
       `,
       errors: [
         {
-          messageId: "errorStringArrowFunctionExpression",
+          messageId: "errorStringGeneric",
           type: AST_NODE_TYPES.ReturnStatement,
         },
       ],
@@ -655,7 +655,7 @@ ruleTester.run("no-unsafe-mutable-readonly-assignment", rule, {
       `,
       errors: [
         {
-          messageId: "errorStringVariableDeclaration",
+          messageId: "errorStringGeneric",
           type: AST_NODE_TYPES.VariableDeclaration,
         },
       ],
@@ -676,7 +676,7 @@ ruleTester.run("no-unsafe-mutable-readonly-assignment", rule, {
       `,
       errors: [
         {
-          messageId: "errorStringVariableDeclaration",
+          messageId: "errorStringGeneric",
           type: AST_NODE_TYPES.VariableDeclaration,
         },
       ],
@@ -697,7 +697,7 @@ ruleTester.run("no-unsafe-mutable-readonly-assignment", rule, {
       `,
       errors: [
         {
-          messageId: "errorStringVariableDeclaration",
+          messageId: "errorStringGeneric",
           type: AST_NODE_TYPES.VariableDeclaration,
         },
       ],
@@ -718,7 +718,7 @@ ruleTester.run("no-unsafe-mutable-readonly-assignment", rule, {
       `,
       errors: [
         {
-          messageId: "errorStringVariableDeclaration",
+          messageId: "errorStringGeneric",
           type: AST_NODE_TYPES.VariableDeclaration,
         },
       ],
@@ -737,7 +737,7 @@ ruleTester.run("no-unsafe-mutable-readonly-assignment", rule, {
       `,
       errors: [
         {
-          messageId: "errorStringArrowFunctionExpression",
+          messageId: "errorStringGeneric",
           type: AST_NODE_TYPES.YieldExpression,
         },
       ],
@@ -807,7 +807,7 @@ ruleTester.run("no-unsafe-mutable-readonly-assignment", rule, {
       `,
       errors: [
         {
-          messageId: "errorStringVariableDeclaration",
+          messageId: "errorStringGeneric",
           type: AST_NODE_TYPES.VariableDeclaration,
         },
       ],

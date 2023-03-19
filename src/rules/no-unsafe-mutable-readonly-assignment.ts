@@ -1,8 +1,7 @@
 /* eslint-disable functional/prefer-immutable-types */
 import { getTypeImmutability, Immutability } from "is-immutable-type";
-import { unionTypeParts } from "tsutils";
 import { Type, TypeChecker } from "typescript";
-import { createRule } from "./common";
+import { assignableTypePairs, createRule } from "./common";
 import { createNoUnsafeAssignmentRule } from "./unsafe-assignment-rule";
 
 /**
@@ -18,40 +17,33 @@ const noUnsafeMutableReadonlyAssignment = createRule({
       recommended: "error",
     },
     messages: {
-      errorStringCallExpression:
-        "Passing a mutable type to a function that expects a readonly type can lead to unexpected mutation in the readonly value.",
-      errorStringAssignmentExpression:
-        "Assigning a mutable type to a readonly type can lead to unexpected mutation in the readonly value.",
-      errorStringVariableDeclaration:
-        "Using a mutable type to initialize a readonly type can lead to unexpected mutation in the readonly value.",
-      errorStringArrowFunctionExpression:
-        "Returning a mutable type from a function that is declared to return a readonly type can lead to unexpected mutation in the readonly value.",
+      errorStringGeneric:
+        'Unsafe mutable to readonly assignment. Source: "{{ source }}", destination: "{{ destination }}"',
     },
     schema: [],
   },
   create: createNoUnsafeAssignmentRule(
-    (checker: TypeChecker, destinationType: Type, sourceType: Type) => {
-      // eslint-disable-next-line functional/no-conditional-statements
-      if (
-        destinationType === sourceType ||
-        unionTypeParts(destinationType).some((t) => t === sourceType)
-      ) {
-        // not unsafe
-        return false;
-      }
-
-      const destinationImmutability = getTypeImmutability(
-        checker,
-        destinationType
+    (checker: TypeChecker, rawDestinationType: Type, rawSourceType: Type) => {
+      const typePairs = assignableTypePairs(
+        rawDestinationType,
+        rawSourceType,
+        checker
       );
-      const sourceImmutability = getTypeImmutability(checker, sourceType);
 
-      return (
-        (destinationImmutability === Immutability.Immutable ||
-          destinationImmutability === Immutability.ReadonlyDeep) &&
-        (sourceImmutability === Immutability.ReadonlyShallow ||
-          sourceImmutability === Immutability.Mutable)
-      );
+      return typePairs.some(({ sourceType, destinationType }) => {
+        const destinationImmutability = getTypeImmutability(
+          checker,
+          destinationType
+        );
+        const sourceImmutability = getTypeImmutability(checker, sourceType);
+
+        return (
+          (destinationImmutability === Immutability.Immutable ||
+            destinationImmutability === Immutability.ReadonlyDeep) &&
+          (sourceImmutability === Immutability.ReadonlyShallow ||
+            sourceImmutability === Immutability.Mutable)
+        );
+      });
     }
   ),
   defaultOptions: [],

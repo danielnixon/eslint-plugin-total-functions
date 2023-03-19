@@ -6,13 +6,9 @@ import {
   ParserServices,
 } from "@typescript-eslint/utils";
 import { TSESLint } from "@typescript-eslint/utils";
-import { Type, Node, TypeChecker } from "typescript";
+import { Type, TypeChecker } from "typescript";
 
-export type MessageId =
-  | "errorStringCallExpression"
-  | "errorStringAssignmentExpression"
-  | "errorStringVariableDeclaration"
-  | "errorStringArrowFunctionExpression";
+export type MessageId = "errorStringGeneric";
 
 export const createNoUnsafeAssignmentRule =
   (
@@ -134,7 +130,11 @@ export const createNoUnsafeAssignmentRule =
             // eslint-disable-next-line functional/no-expression-statements
             context.report({
               node: node,
-              messageId: "errorStringVariableDeclaration",
+              messageId: "errorStringGeneric",
+              data: {
+                source: checker.typeToString(rightType),
+                destination: checker.typeToString(leftType),
+              },
             } as const);
           }
         });
@@ -170,7 +170,11 @@ export const createNoUnsafeAssignmentRule =
           // eslint-disable-next-line functional/no-expression-statements
           context.report({
             node: node,
-            messageId: "errorStringAssignmentExpression",
+            messageId: "errorStringGeneric",
+            data: {
+              source: checker.typeToString(rightType),
+              destination: checker.typeToString(leftType),
+            },
           } as const);
         }
       },
@@ -218,7 +222,11 @@ export const createNoUnsafeAssignmentRule =
           // eslint-disable-next-line functional/no-expression-statements
           context.report({
             node: node,
-            messageId: "errorStringArrowFunctionExpression",
+            messageId: "errorStringGeneric",
+            data: {
+              source: checker.typeToString(sourceType),
+              destination: checker.typeToString(destinationType),
+            },
           } as const);
         }
       },
@@ -267,7 +275,11 @@ export const createNoUnsafeAssignmentRule =
           // eslint-disable-next-line functional/no-expression-statements
           context.report({
             node: node,
-            messageId: "errorStringArrowFunctionExpression",
+            messageId: "errorStringGeneric",
+            data: {
+              source: checker.typeToString(sourceType),
+              destination: checker.typeToString(destinationType),
+            },
           } as const);
         }
       },
@@ -278,8 +290,7 @@ export const createNoUnsafeAssignmentRule =
           return;
         }
 
-        // eslint-disable-next-line total-functions/no-unsafe-mutable-readonly-assignment
-        const destinationNode: Node = parserServices.esTreeNodeToTSNodeMap.get(
+        const destinationNode = parserServices.esTreeNodeToTSNodeMap.get(
           node.returnType.typeAnnotation
         );
         const destinationType = checker.getTypeAtLocation(destinationNode);
@@ -307,7 +318,11 @@ export const createNoUnsafeAssignmentRule =
           // eslint-disable-next-line functional/no-expression-statements
           context.report({
             node: node.body,
-            messageId: "errorStringArrowFunctionExpression",
+            messageId: "errorStringGeneric",
+            data: {
+              source: checker.typeToString(sourceType),
+              destination: checker.typeToString(destinationType),
+            },
           } as const);
         }
       },
@@ -328,7 +343,11 @@ export const createNoUnsafeAssignmentRule =
             // eslint-disable-next-line functional/no-expression-statements
             context.report({
               node: node.arguments[i] ?? node,
-              messageId: "errorStringCallExpression",
+              messageId: "errorStringGeneric",
+              data: {
+                source: checker.typeToString(argumentType),
+                destination: checker.typeToString(paramType),
+              },
             } as const);
           }
         });
