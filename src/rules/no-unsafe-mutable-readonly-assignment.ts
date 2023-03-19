@@ -3,7 +3,11 @@ import {
   isTypeAnyType,
   isTypeUnknownType,
 } from "@typescript-eslint/type-utils";
-import { getTypeImmutability, Immutability } from "is-immutable-type";
+import {
+  getDefaultOverrides,
+  getTypeImmutability,
+  Immutability,
+} from "is-immutable-type";
 import { Type, TypeChecker } from "typescript";
 import { assignableTypePairs, createRule } from "./common";
 import { createNoUnsafeAssignmentRule } from "./unsafe-assignment-rule";
@@ -56,11 +60,19 @@ const noUnsafeMutableReadonlyAssignment = createRule({
           return false;
         }
 
+        // TODO support config
+        const overrides = getDefaultOverrides();
+
         const destinationImmutability = getTypeImmutability(
           checker,
-          destinationType
+          destinationType,
+          overrides
         );
-        const sourceImmutability = getTypeImmutability(checker, sourceType);
+        const sourceImmutability = getTypeImmutability(
+          checker,
+          sourceType,
+          overrides
+        );
 
         return (
           (destinationImmutability === Immutability.Immutable ||
