@@ -72,7 +72,7 @@ Alternatively you can configure individual rules separately (see below).
 |  require-strict-mode                    | ✅           | ✅    |        |
 |  no-unsafe-type-assertion               | ✅           | ✅    |        |
 |  no-unsafe-readonly-mutable-assignment  | ✅           | ✅    |        |
-|  no-unsafe-mutable-readonly-assignment  |              | ✅    | [Not yet](https://github.com/danielnixon/eslint-plugin-total-functions/issues/99) |
+|  no-unsafe-mutable-readonly-assignment  |              | ✅    |        |
 |  no-enums                               | ✅           | ✅    |        |
 |  no-partial-url-constructor             | ✅           | ✅    |        |
 |  no-partial-division                    | ✅           | ✅    |        |
