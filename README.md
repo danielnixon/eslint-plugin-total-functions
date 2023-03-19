@@ -72,7 +72,6 @@ Alternatively you can configure individual rules separately (see below).
 |  no-unsafe-type-assertion               | ✅           | ✅    |        |
 |  no-unsafe-readonly-mutable-assignment  | ✅           | ✅    |        |
 |  no-unsafe-mutable-readonly-assignment  |              | ✅    | [Not yet](https://github.com/danielnixon/eslint-plugin-total-functions/issues/99) |
-|  no-unsafe-optional-property-assignment | [Not yet](https://github.com/danielnixon/eslint-plugin-total-functions/issues/83) | ✅    |       |
 |  no-unsafe-enum-assignment              | ✅           | ✅    |        |
 |  no-enums                               | ✅           | ✅    |        |
 |  no-partial-url-constructor             | ✅           | ✅    |        |
@@ -82,6 +81,10 @@ Alternatively you can configure individual rules separately (see below).
 |  no-nested-fp-ts-effects                |              | ✅    |        |
 |  no-partial-array-reduce                | ✅           | ✅    |        |
 |  no-hidden-type-assertions              |              | ✅    |        |
+
+### Deprecated rules
+
+* no-unsafe-optional-property-assignment
 
 ### total-functions/require-strict-mode
 
@@ -142,31 +145,6 @@ The solution is to append `as const` to the RHS:
 ```
 
 For examples of assignment that this rule considers valid and invalid, see [no-unsafe-mutable-readonly-assignment.test.ts](https://github.com/danielnixon/eslint-plugin-total-functions/blob/master/src/rules/no-unsafe-mutable-readonly-assignment.test.ts).
-
-### total-functions/no-unsafe-optional-property-assignment
-
-Optional properties (those with a `?` after their name) interact badly with TypeScript's structural type system in a way that can lead to unsoundness. Example:
-
-```ts
-type Foo = { readonly foo: string };
-type Bar = Foo & { readonly bar?: () => unknown };
-
-const thing = { foo: "foo", bar: "bar" };
-const foo: Foo = thing;
-const bar: Bar = foo;
-
-if (bar.bar !== undefined) {
-    bar.bar(); // explodes at runtime
-}
-```
-
-I find this scenario particularly vexing because it doesn't require type assertions, or plain JS with incorrect \*.d.ts typings, or anything 'loose' like that. You can pull it off with otherwise nicely typed, functional TypeScript (strict mode enabled, no interfaces, no classes, everything readonly, everything const, no type assertions, no plain JS, etc).
-
-This rule bans assignment from one type to another, if:
-1. the destination type has an optional property, and
-2. the source type has no matching property (either optional or otherwise).
-
-This rule is excluded from the `recommended` config until [#83](https://github.com/danielnixon/eslint-plugin-total-functions/issues/83) lands.
 
 ### total-functions/no-enums
 
