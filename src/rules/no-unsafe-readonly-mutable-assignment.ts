@@ -1,4 +1,5 @@
 /* eslint-disable functional/prefer-immutable-types */
+import { isTypeAnyType } from "@typescript-eslint/type-utils";
 import { getTypeImmutability, Immutability } from "is-immutable-type";
 import { TypeChecker, Type } from "typescript";
 import { assignableTypePairs, createRule } from "./common";
@@ -31,6 +32,18 @@ const noUnsafeReadonlyMutableAssignment = createRule({
       );
 
       return typePairs.some(({ sourceType, destinationType }) => {
+        // eslint-disable-next-line functional/no-conditional-statements
+        if (sourceType === destinationType) {
+          // not unsafe
+          return false;
+        }
+
+        // eslint-disable-next-line functional/no-conditional-statements
+        if (isTypeAnyType(sourceType) || isTypeAnyType(destinationType)) {
+          // not unsafe
+          return false;
+        }
+
         const destinationImmutability = getTypeImmutability(
           checker,
           destinationType
