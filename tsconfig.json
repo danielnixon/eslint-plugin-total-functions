@@ -32,7 +32,8 @@
     "esModuleInterop": true,
     
     /* Advanced Options */
-    "skipLibCheck": true,
+    "skipLibCheck": true, // TODO blocked by https://github.com/danielnixon/eslint-plugin-total-functions/issues/703#issuecomment-1475156433
+    "exactOptionalPropertyTypes": true,
     "forceConsistentCasingInFileNames": true
   },
   "include": ["src/**/*.ts", "typings"]
