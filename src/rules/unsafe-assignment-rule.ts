@@ -24,7 +24,7 @@ export const createNoUnsafeAssignmentRule =
   ) =>
   (
     context: Readonly<TSESLint.RuleContext<MessageId, readonly unknown[]>>
-    // eslint-disable-next-line sonarjs/cognitive-complexity
+    // eslint-disable-next-line sonarjs/cognitive-complexity, total-functions/no-unsafe-readonly-mutable-assignment
   ): TSESLint.RuleListener => {
     const parserServices = ESLintUtils.getParserServices(context);
     const checker = parserServices.program.getTypeChecker();
