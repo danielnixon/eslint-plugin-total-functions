@@ -25,6 +25,7 @@ module.exports = {
   ],
   rules: {
     "total-functions/no-unsafe-mutable-readonly-assignment": "error",
+    "total-functions/no-hidden-type-assertions": "error",
   },
   ignorePatterns: [
     "dist/*",

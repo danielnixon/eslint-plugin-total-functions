@@ -141,6 +141,15 @@ ruleTester.run("no-hidden-type-assertions", rule, {
         export const result = right("hello");
       `,
     },
+    // toArray
+    {
+      filename: "file.ts",
+      code: `
+        export declare const toArray: <A>(val: readonly A[]) => A[];
+        const ra = [""] as const;
+        export const result = toArray(ra);
+      `,
+    },
   ],
   invalid: [
     // Hidden type assertion set to arbitrary type

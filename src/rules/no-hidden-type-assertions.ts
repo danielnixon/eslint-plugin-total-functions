@@ -12,6 +12,7 @@ import {
   isTupleTypeNode,
   isTypeLiteralNode,
   isTypeNode,
+  isTypeOperatorNode,
   isUnionTypeNode,
   NodeArray,
   ParameterDeclaration,
@@ -80,7 +81,7 @@ const noHiddenTypeAssertions = createRule({
         : isIndexedAccessTypeNode(type)
         ? [type.objectType, type.indexType]
         : isFunctionTypeNode(type)
-        ? [type.type, ...parametersToTypeNodes(type.parameters, depth)] // TODO type params?
+        ? [type.type, ...parametersToTypeNodes(type.parameters, depth)]
         : isTupleTypeNode(type)
         ? type.elements
         : isNamedTupleMember(type)
@@ -89,6 +90,8 @@ const noHiddenTypeAssertions = createRule({
         ? type.members.flatMap((m) => (hasTypeNode(m) ? [m.type] : []))
         : isArrayTypeNode(type)
         ? [type.elementType]
+        : isTypeOperatorNode(type)
+        ? [type.type]
         : isUnionTypeNode(type)
         ? type.types
         : isIntersectionTypeNode(type)
