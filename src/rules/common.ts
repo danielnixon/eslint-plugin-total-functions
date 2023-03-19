@@ -1,4 +1,3 @@
-/* eslint-disable total-functions/no-unsafe-readonly-mutable-assignment */
 /* eslint-disable functional/prefer-immutable-types */
 import { ESLintUtils } from "@typescript-eslint/utils";
 import { unionTypeParts } from "tsutils";

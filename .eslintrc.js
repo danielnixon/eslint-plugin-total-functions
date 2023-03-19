@@ -24,8 +24,8 @@ module.exports = {
     "total-functions",
   ],
   rules: {
-    // "total-functions/no-unsafe-mutable-readonly-assignment": "error",
-    "total-functions/no-unsafe-readonly-mutable-assignment": "error",
+    "total-functions/no-unsafe-mutable-readonly-assignment": "warn",
+    "total-functions/no-unsafe-readonly-mutable-assignment": "warn",
     "total-functions/no-hidden-type-assertions": "error",
   },
   ignorePatterns: [
