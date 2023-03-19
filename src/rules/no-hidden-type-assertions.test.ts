@@ -133,7 +133,7 @@ ruleTester.run("no-hidden-type-assertions", rule, {
         export const result = axios.request<unknown>("hello");
       `,
     },
-    // TODO fix this case
+    // type param has default set to never
     {
       filename: "file.ts",
       code: `
@@ -239,23 +239,39 @@ ruleTester.run("no-hidden-type-assertions", rule, {
         },
       ],
     },
-    // TODO fix this case
     // object literal type
-    // {
-    //   filename: "file.ts",
-    //   code: `
-    //     declare class Axios {
-    //       readonly request: <T = any>(url: string) => { t: T };
-    //     }
-    //     declare const axios: Axios;
-    //     export const result = axios.request<boolean>("hello");
-    //   `,
-    //   errors: [
-    //     {
-    //       messageId: "errorStringGeneric",
-    //       type: AST_NODE_TYPES.CallExpression,
-    //     },
-    //   ],
-    // },
+    {
+      filename: "file.ts",
+      code: `
+        declare class Axios {
+          readonly request: <T = any>(url: string) => { t: { t2: T } };
+        }
+        declare const axios: Axios;
+        export const result = axios.request<boolean>("hello");
+      `,
+      errors: [
+        {
+          messageId: "errorStringGeneric",
+          type: AST_NODE_TYPES.CallExpression,
+        },
+      ],
+    },
+    // tuple
+    {
+      filename: "file.ts",
+      code: `
+        declare class Axios {
+          readonly request: <T = any>(url: string) => { t: [T] };
+        }
+        declare const axios: Axios;
+        export const result = axios.request<boolean>("hello");
+      `,
+      errors: [
+        {
+          messageId: "errorStringGeneric",
+          type: AST_NODE_TYPES.CallExpression,
+        },
+      ],
+    },
   ],
 } as const);

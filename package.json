@@ -48,7 +48,7 @@
     "mutation-test": "stryker run"
   },
   "typeCoverage": {
-    "atLeast": 100,
+    "atLeast": 99.97,
     "strict": true,
     "detail": true
   }

@@ -8,10 +8,14 @@ import {
   isArrayTypeNode,
   isFunctionTypeNode,
   isIntersectionTypeNode,
+  isNamedTupleMember,
+  isTupleTypeNode,
   isTypeLiteralNode,
+  isTypeNode,
   isUnionTypeNode,
   NodeArray,
   ParameterDeclaration,
+  TypeElement,
   TypeNode,
 } from "typescript";
 import {
@@ -44,6 +48,20 @@ const noHiddenTypeAssertions = createRule({
     const parserServices = ESLintUtils.getParserServices(context);
     const checker = parserServices.program.getTypeChecker();
 
+    const hasTypeNode = (
+      typeElement: TypeElement
+    ): typeElement is TypeElement & { readonly type: TypeNode } => {
+      // eslint-disable-next-line functional/no-try-statements
+      try {
+        // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+        const typeAttr = (typeElement as Partial<{ readonly type: TypeNode }>)
+          .type;
+        return typeAttr !== undefined && isTypeNode(typeAttr);
+      } catch {
+        return false;
+      }
+    };
+
     const explodeTypeNode = (
       type: TypeNode,
       depth: number
@@ -63,8 +81,12 @@ const noHiddenTypeAssertions = createRule({
         ? [type.objectType, type.indexType]
         : isFunctionTypeNode(type)
         ? [type.type, ...parametersToTypeNodes(type.parameters, depth)] // TODO type params?
+        : isTupleTypeNode(type)
+        ? type.elements
+        : isNamedTupleMember(type)
+        ? [type.type]
         : isTypeLiteralNode(type)
-        ? [] // TODO support type literals
+        ? type.members.flatMap((m) => (hasTypeNode(m) ? [m.type] : []))
         : isArrayTypeNode(type)
         ? [type.elementType]
         : isUnionTypeNode(type)
