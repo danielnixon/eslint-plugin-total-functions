@@ -1707,10 +1707,10 @@ eslint-plugin-sonarjs@0.18.0:
   resolved "https://registry.yarnpkg.com/eslint-plugin-sonarjs/-/eslint-plugin-sonarjs-0.18.0.tgz#7c009452f633cf6a4c28387dd50502a3e828b05e"
   integrity sha512-DJ3osLnt6KFdT5e9ZuIDOjT5A6wUGSLeiJJT03lPgpdD+7CVWlYAw9Goe3bt7SmbFO3Xh89NOCZAuB9XA7bAUQ==
 
-eslint-plugin-total-functions@7.0.1:
-  version "7.0.1"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-total-functions/-/eslint-plugin-total-functions-7.0.1.tgz#ca874c12fa250847a266d10a2a018da0af84af8d"
-  integrity sha512-krVFdscSlmj9EB+Kagthd9ivFrv+ppi8nbtSDsoWdOmZRUKR5GzbHGXRqaQU6Syoka/bUvzNIStdfIowUPATYw==
+eslint-plugin-total-functions@7.0.2:
+  version "7.0.2"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-total-functions/-/eslint-plugin-total-functions-7.0.2.tgz#b0c6cf7473e0a940260e0e551b61111285401312"
+  integrity sha512-qRTZvlKLBYjz+YJuKWq7/o1DViywEn5mXmM/zqFAnHwPD1U3IiAKyD2Nd1pfY0QbdLmpOSpm3ajQ9lvqddID2w==
   dependencies:
     "@typescript-eslint/eslint-plugin" "^5.55.0"
     "@typescript-eslint/parser" "^5.55.0"

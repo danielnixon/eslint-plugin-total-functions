@@ -18,7 +18,7 @@ const noUnsafeReadonlyMutableAssignment = createRule({
     },
     messages: {
       errorStringGeneric:
-        'Unsafe readonly to mutable assignment. Source: "{{ source }}", destination: "{{ destination }}"',
+        'Unsafe "{{ sourceImmutability }}" to "{{ destinationImmutability }}" assignment. Source: "{{ sourceType }}", destination: "{{ destinationType }}"',
     },
     schema: [],
   },

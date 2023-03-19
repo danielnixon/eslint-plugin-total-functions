@@ -6,6 +6,7 @@ import {
   ParserServices,
 } from "@typescript-eslint/utils";
 import { TSESLint } from "@typescript-eslint/utils";
+import { getTypeImmutability, Immutability } from "is-immutable-type";
 import { Type, TypeChecker } from "typescript";
 
 export type MessageId = "errorStringGeneric";
@@ -106,13 +107,13 @@ export const createNoUnsafeAssignmentRule =
             declaration.init
           );
 
-          const leftType = checker.getTypeAtLocation(leftTsNode);
-          const rightType = checker.getTypeAtLocation(rightTsNode);
+          const destinationType = checker.getTypeAtLocation(leftTsNode);
+          const sourceType = checker.getTypeAtLocation(rightTsNode);
 
           const arrayMethodCallSafety = isSafeAssignmentFromArrayMethod(
             declaration.init,
-            leftType,
-            rightType,
+            destinationType,
+            sourceType,
             checker,
             parserServices
           );
@@ -125,15 +126,19 @@ export const createNoUnsafeAssignmentRule =
           // eslint-disable-next-line functional/no-conditional-statements
           if (
             arrayMethodCallSafety === "unsafe" ||
-            isUnsafeAssignment(checker, leftType, rightType)
+            isUnsafeAssignment(checker, destinationType, sourceType)
           ) {
             // eslint-disable-next-line functional/no-expression-statements
             context.report({
               node: node,
               messageId: "errorStringGeneric",
               data: {
-                source: checker.typeToString(rightType),
-                destination: checker.typeToString(leftType),
+                sourceType: checker.typeToString(sourceType),
+                destinationType: checker.typeToString(destinationType),
+                sourceImmutability:
+                  Immutability[getTypeImmutability(checker, sourceType)],
+                destinationImmutability:
+                  Immutability[getTypeImmutability(checker, destinationType)],
               },
             } as const);
           }
@@ -146,13 +151,13 @@ export const createNoUnsafeAssignmentRule =
           node.right
         );
 
-        const leftType = checker.getTypeAtLocation(leftTsNode);
-        const rightType = checker.getTypeAtLocation(rightTsNode);
+        const destinationType = checker.getTypeAtLocation(leftTsNode);
+        const sourceType = checker.getTypeAtLocation(rightTsNode);
 
         const arrayMethodCallSafety = isSafeAssignmentFromArrayMethod(
           node.right,
-          leftType,
-          rightType,
+          destinationType,
+          sourceType,
           checker,
           parserServices
         );
@@ -165,15 +170,19 @@ export const createNoUnsafeAssignmentRule =
         // eslint-disable-next-line functional/no-conditional-statements
         if (
           arrayMethodCallSafety === "unsafe" ||
-          isUnsafeAssignment(checker, leftType, rightType)
+          isUnsafeAssignment(checker, destinationType, sourceType)
         ) {
           // eslint-disable-next-line functional/no-expression-statements
           context.report({
             node: node,
             messageId: "errorStringGeneric",
             data: {
-              source: checker.typeToString(rightType),
-              destination: checker.typeToString(leftType),
+              sourceType: checker.typeToString(sourceType),
+              destinationType: checker.typeToString(destinationType),
+              sourceImmutability:
+                Immutability[getTypeImmutability(checker, sourceType)],
+              destinationImmutability:
+                Immutability[getTypeImmutability(checker, destinationType)],
             },
           } as const);
         }
@@ -224,8 +233,12 @@ export const createNoUnsafeAssignmentRule =
             node: node,
             messageId: "errorStringGeneric",
             data: {
-              source: checker.typeToString(sourceType),
-              destination: checker.typeToString(destinationType),
+              sourceType: checker.typeToString(sourceType),
+              destinationType: checker.typeToString(destinationType),
+              sourceImmutability:
+                Immutability[getTypeImmutability(checker, sourceType)],
+              destinationImmutability:
+                Immutability[getTypeImmutability(checker, destinationType)],
             },
           } as const);
         }
@@ -277,8 +290,12 @@ export const createNoUnsafeAssignmentRule =
             node: node,
             messageId: "errorStringGeneric",
             data: {
-              source: checker.typeToString(sourceType),
-              destination: checker.typeToString(destinationType),
+              sourceType: checker.typeToString(sourceType),
+              destinationType: checker.typeToString(destinationType),
+              sourceImmutability:
+                Immutability[getTypeImmutability(checker, sourceType)],
+              destinationImmutability:
+                Immutability[getTypeImmutability(checker, destinationType)],
             },
           } as const);
         }
@@ -320,8 +337,12 @@ export const createNoUnsafeAssignmentRule =
             node: node.body,
             messageId: "errorStringGeneric",
             data: {
-              source: checker.typeToString(sourceType),
-              destination: checker.typeToString(destinationType),
+              sourceType: checker.typeToString(sourceType),
+              destinationType: checker.typeToString(destinationType),
+              sourceImmutability:
+                Immutability[getTypeImmutability(checker, sourceType)],
+              destinationImmutability:
+                Immutability[getTypeImmutability(checker, destinationType)],
             },
           } as const);
         }
@@ -332,21 +353,25 @@ export const createNoUnsafeAssignmentRule =
 
         // eslint-disable-next-line functional/no-expression-statements, functional/no-return-void
         tsNode.arguments.forEach((argument, i) => {
-          const argumentType = checker.getTypeAtLocation(argument);
-          const paramType = checker.getContextualType(argument);
+          const sourceType = checker.getTypeAtLocation(argument);
+          const destinationType = checker.getContextualType(argument);
 
           // eslint-disable-next-line functional/no-conditional-statements
           if (
-            paramType !== undefined &&
-            isUnsafeAssignment(checker, paramType, argumentType)
+            destinationType !== undefined &&
+            isUnsafeAssignment(checker, destinationType, sourceType)
           ) {
             // eslint-disable-next-line functional/no-expression-statements
             context.report({
               node: node.arguments[i] ?? node,
               messageId: "errorStringGeneric",
               data: {
-                source: checker.typeToString(argumentType),
-                destination: checker.typeToString(paramType),
+                sourceType: checker.typeToString(sourceType),
+                destinationType: checker.typeToString(destinationType),
+                sourceImmutability:
+                  Immutability[getTypeImmutability(checker, sourceType)],
+                destinationImmutability:
+                  Immutability[getTypeImmutability(checker, destinationType)],
               },
             } as const);
           }
