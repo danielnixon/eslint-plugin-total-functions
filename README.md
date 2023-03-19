@@ -72,7 +72,6 @@ Alternatively you can configure individual rules separately (see below).
 |  no-unsafe-type-assertion               | ✅           | ✅    |        |
 |  no-unsafe-readonly-mutable-assignment  | ✅           | ✅    |        |
 |  no-unsafe-mutable-readonly-assignment  |              | ✅    | [Not yet](https://github.com/danielnixon/eslint-plugin-total-functions/issues/99) |
-|  no-unsafe-enum-assignment              | ✅           | ✅    |        |
 |  no-enums                               | ✅           | ✅    |        |
 |  no-partial-url-constructor             | ✅           | ✅    |        |
 |  no-partial-division                    | ✅           | ✅    |        |
@@ -85,6 +84,7 @@ Alternatively you can configure individual rules separately (see below).
 ### Deprecated rules
 
 * no-unsafe-optional-property-assignment
+* no-unsafe-enum-assignment (No longer required as of TypeScript 5, see https://devblogs.microsoft.com/typescript/announcing-typescript-5-0/#all-enums-are-union-enums)
 
 ### total-functions/require-strict-mode
 
@@ -152,7 +152,9 @@ Enums have a number of issues, including unsoundness issues (which are especiall
 
 ### total-functions/no-unsafe-enum-assignment
 
-If you do use an enum (or are forced to by a library), this rule flags unsafe assignment that the TypeScript compiler permits. For example:
+*Deprecated* No longer required as of TypeScript 5 (https://devblogs.microsoft.com/typescript/announcing-typescript-5-0/#all-enums-are-union-enums).
+
+If you do use an enum (or are forced to by a library), this rule flags unsafe assignment that the TypeScript compiler (prior to version 5) permits. For example:
 
 ```typescript
   enum ZeroOrOne {
@@ -160,7 +162,7 @@ If you do use an enum (or are forced to by a library), this rule flags unsafe as
     One = 1,
   }
 
-  // This compiles but is flagged by no-unsafe-enum-assignment
+  // This compiles (prior to TypeScript 5) but is flagged by no-unsafe-enum-assignment
   const zeroOrOne: ZeroOrOne = 2;
 
   // This is not flagged by no-unsafe-enum-assignment

@@ -1,4 +1,3 @@
-/* eslint-disable functional/no-expression-statements */
 /* eslint-disable functional/prefer-immutable-types */
 import {
   ESLintUtils,
