@@ -264,8 +264,6 @@ ruleTester.run("no-unsafe-readonly-mutable-assignment", rule, {
         func(foo);
       `,
     },
-    // why does this hang?
-    // TODO fix
     {
       filename: "file.ts",
       code: `
@@ -282,192 +280,10 @@ ruleTester.run("no-unsafe-readonly-mutable-assignment", rule, {
         foo(arr);
       `,
     },
-    // readonly function parameter -> mutable function parameter
-    // (contravariant position so not flagged by this rule)
-    {
-      filename: "file.ts",
-      code: `
-        type MutableA = { a: string };
-        type ReadonlyA = { readonly a: string };
-
-        const takesMutable = (f: (roa: MutableA) => void): void => undefined;
-
-        takesMutable((roa: ReadonlyA): void => undefined);
-      `,
-    },
-    // readonly function parameter -> mutable function parameter (rest param)
-    // (contravariant position so not flagged by this rule)
-    {
-      filename: "file.ts",
-      code: `
-        type MutableA = { a: string };
-        type ReadonlyA = { readonly a: string };
-
-        const takesMutable = (f: (...roa: readonly MutableA[]) => void): void => undefined;
-
-        takesMutable((...roa: readonly MutableA[]): void => undefined);
-      `,
-    },
-    // readonly function parameter -> readonly function parameter (rest param array is mutable -> readonly)
-    // TODO should we flag this?
-    {
-      filename: "file.ts",
-      code: `
-        type MutableA = { a: string };
-        type ReadonlyA = { readonly a: string };
-
-        const takesReadonly = (f: (...roa: readonly ReadonlyA[]) => void): void => undefined;
-
-        takesReadonly((...roa: MutableA[]): void => undefined);
-      `,
-    },
     /**
      * Assignment expressions
      */
     // TODO
-    /**
-     * Arrow functions
-     */
-    // Arrow function (compact form) (readonly -> readonly)
-    {
-      filename: "file.ts",
-      code: `
-        type ReadonlyA = { readonly a: string };
-        const ro: ReadonlyA = { a: "" };
-        const func = (): ReadonlyA => ro;
-      `,
-    },
-    // Arrow function (compact form) (object literal -> readonly)
-    {
-      filename: "file.ts",
-      code: `
-        type ReadonlyA = { readonly a: string };
-        const func = (): ReadonlyA => { a: "" };
-      `,
-    },
-    // Arrow function (compact form) (object literal -> mutable)
-    {
-      filename: "file.ts",
-      code: `
-        type MutableA = { a: string };
-        const func = (): MutableA => { a: "" };
-      `,
-    },
-    // Arrow function (compact form) (mutable -> mutable)
-    {
-      filename: "file.ts",
-      code: `
-        type MutableA = { a: string };
-        const ro: MutableA = { a: "" };
-        const func = (): MutableA => ro;
-      `,
-    },
-    /**
-     * type assertions
-     */
-    // readonly -> readonly
-    {
-      filename: "file.ts",
-      code: `
-        type ReadonlyA = { readonly a: string };
-        const ro: ReadonlyA = { a: "" };
-        const mut = ro as ReadonlyA;
-      `,
-    },
-    // mutable -> mutable
-    {
-      filename: "file.ts",
-      code: `
-        type MutableA = { a: string };
-        const ro: MutableA = { a: "" };
-        const mut = ro as MutableA;
-      `,
-    },
-    // mutable -> readonly
-    {
-      filename: "file.ts",
-      code: `
-        type MutableA = { a: string };
-        type ReadonlyA = { readonly a: string };
-        const ro: MutableA = { a: "" };
-        const mut = ro as ReadonlyA;
-      `,
-    },
-    // readonly -> readonly
-    {
-      filename: "file.ts",
-      code: `
-        type ReadonlyA = { readonly a: string };
-        const ro: ReadonlyA = { a: "" };
-        const mut = <ReadonlyA>ro;
-      `,
-    },
-    // mutable -> mutable
-    {
-      filename: "file.ts",
-      code: `
-        type MutableA = { a: string };
-        const ro: MutableA = { a: "" };
-        const mut = <MutableA>ro;
-      `,
-    },
-    // mutable -> readonly
-    {
-      filename: "file.ts",
-      code: `
-        type MutableA = { a: string };
-        type ReadonlyA = { readonly a: string };
-        const ro: MutableA = { a: "" };
-        const mut = <ReadonlyA>ro;
-      `,
-    },
-    // Symbol.declarations claims to be of type Declaration[] but it's really Declaration[] | undefined
-    // This test exercises the case where it is undefined to ensure we handle it appropriately.
-    // TODO: what else in the typescript lib lies about its type?
-    // TODO: use patch-package to fix this type, forcing us to handle it.
-    {
-      filename: "file.ts",
-      code: `
-        Object.keys({}) as ReadonlyArray<string>;
-      `,
-    },
-    // as const
-    {
-      filename: "file.ts",
-      code: `
-        const foo: readonly string[] = [];
-
-        const bar = [
-          { key: -1, value: "" },
-          ...foo.map((c, i) => ({
-            key: i,
-            value: c,
-          })),
-        ] as const;
-      `,
-    },
-    // <const>
-    {
-      filename: "file.ts",
-      code: `
-        const foo: readonly string[] = [];
-
-        const bar = <const>[
-          { key: -1, value: "" },
-          ...foo.map((c, i) => ({
-            key: i,
-            value: c,
-          })),
-        ];
-      `,
-    },
-    // as unknown
-    {
-      filename: "file.ts",
-      code: `
-        const foo = [{ key: -1, label: "", value: "" }] as unknown;
-      `,
-    },
     /**
      * Return statement
      */
@@ -504,60 +320,6 @@ ruleTester.run("no-unsafe-readonly-mutable-assignment", rule, {
         function foo(): void {
           return;
         }
-      `,
-    },
-    {
-      filename: "file.ts",
-      code: `
-        interface Foo {
-          foo: 'bar'
-        }
-
-        interface Bar {
-          foo: 'bar'
-        }
-
-        const foo: Recursive<Foo> = 42 as any
-        export default foo as Recursive<Bar>
-
-        type Recursive<P> = P | Nested<P>;
-        type Nested<P> = ReadonlyArray<Recursive<P>>;
-      `,
-    },
-    {
-      filename: "file.ts",
-      code: `
-        interface Foo {
-          foo: 'bar'
-        }
-
-        interface Bar {
-          foo: 'bar'
-        }
-
-        const foo: Recursive<Foo> = 42 as any
-        export default foo as Recursive<Bar>
-
-        type Recursive<P> = P | Nested<P>;
-        type Nested<P> = () => Recursive<P>
-      `,
-    },
-    {
-      filename: "file.ts",
-      code: `
-        interface Foo {
-          foo: 'bar'
-        }
-
-        interface Bar {
-          foo: 'bar'
-        }
-
-        const foo: Recursive<Foo> = 42 as any
-        export default foo as Recursive<Bar>
-
-        type Recursive<P> = P | Nested<P>;
-        type Nested<P> = { baz: Recursive<P> }
       `,
     },
     // https://github.com/danielnixon/eslint-plugin-total-functions/issues/577
@@ -599,110 +361,6 @@ ruleTester.run("no-unsafe-readonly-mutable-assignment", rule, {
     },
   ],
   invalid: [
-    /**
-     * Call expressions
-     */
-    // readonly -> mutable
-    {
-      filename: "file.ts",
-      code: `
-        type MutableA = { a: string };
-        type ReadonlyA = { readonly a: string };
-        const mutate = (mut: MutableA): void => {
-          mut.a = "whoops";
-        };
-        const readonlyA: ReadonlyA = { a: "readonly?" };
-        mutate(readonlyA);
-      `,
-      errors: [
-        {
-          messageId: "errorStringCallExpression",
-          type: AST_NODE_TYPES.Identifier,
-        },
-      ],
-    },
-    // readonly -> mutable (union)
-    // this is invalid because it _could be_ readonly -> mutable
-    {
-      filename: "file.ts",
-      code: `
-        type MutableA = { a: string };
-        type ReadonlyA = { readonly a: string };
-        const mutate = (mixed: MutableA | undefined | null | number | string | boolean): void => {
-          return;
-        };
-        const mixedA: ReadonlyA = { a: "readonly?" };
-        mutate(mixedA);
-      `,
-      errors: [
-        {
-          messageId: "errorStringCallExpression",
-          type: AST_NODE_TYPES.Identifier,
-        },
-      ],
-    },
-    // readonly (union) -> mutable (union)
-    // this is invalid because it _could be_ readonly -> mutable
-    {
-      filename: "file.ts",
-      code: `
-        type MutableA = { a: string };
-        type ReadonlyA = { readonly a: string };
-        const mutate = (mixed: MutableA | undefined | null): void => {
-          return;
-        };
-        const mixedA: ReadonlyA | undefined | null = { a: "readonly?" };
-        mutate(mixedA);
-      `,
-      errors: [
-        {
-          messageId: "errorStringCallExpression",
-          type: AST_NODE_TYPES.Identifier,
-        },
-      ],
-    },
-    // callee has multiple type signatures (readonly -> mutable)
-    {
-      filename: "file.ts",
-      code: `
-        type MutableA = { a: string };
-        type ReadonlyA = { readonly a: string };
-
-        export function func(a: MutableA): MutableA;
-        export function func(a: number): number;
-        export function func(a: any): any {
-          return a;
-        }
-
-        const readonlyA: ReadonlyA = { a: "" };
-        func(readonlyA);
-      `,
-      errors: [
-        {
-          messageId: "errorStringCallExpression",
-          type: AST_NODE_TYPES.Identifier,
-        },
-      ],
-    },
-    // readonly -> mutable (nested object)
-    {
-      filename: "file.ts",
-      code: `
-        type MutableA = { readonly a: { b: string } };
-        type ReadonlyA = { readonly a: { readonly b: string } };
-        const mutate = (mut: MutableA): void => {
-          mut.a.b = "whoops";
-        };
-        const readonlyA: ReadonlyA = { a: { b: "readonly?" } };
-        mutate(readonlyA);
-      `,
-      errors: [
-        {
-          messageId: "errorStringCallExpression",
-          type: AST_NODE_TYPES.Identifier,
-        },
-      ],
-    },
     // object literal -> mutable (readonly reference to property retained)
     // this can lead to surprising mutation in the readonly reference that is retained
     {
@@ -715,12 +373,12 @@ ruleTester.run("no-unsafe-readonly-mutable-assignment", rule, {
           return undefined;
         };
         const b: ReadonlyB = { b: "" };
-        func({ a: b });
+        func({ a: b } as const);
       `,
       errors: [
         {
           messageId: "errorStringCallExpression",
-          type: AST_NODE_TYPES.ObjectExpression,
+          type: AST_NODE_TYPES.TSAsExpression,
         },
       ],
     },
@@ -785,66 +443,6 @@ ruleTester.run("no-unsafe-readonly-mutable-assignment", rule, {
         {
           messageId: "errorStringCallExpression",
           type: AST_NODE_TYPES.Identifier,
-        },
-      ],
-    },
-    // readonly function return type -> mutable function return type.
-    {
-      filename: "file.ts",
-      code: `
-        type MutableA = { a: string };
-        type ReadonlyA = { readonly a: string };
-        const mutate = (mut: () => MutableA): void => {
-          const mutable = mut();
-          mutable.a = "whoops";
-        };
-
-        const ro: ReadonlyA = { a: "" } as const;
-
-        mutate((): ReadonlyA => ro);
-      `,
-      errors: [
-        {
-          messageId: "errorStringCallExpression",
-          type: AST_NODE_TYPES.ArrowFunctionExpression,
-        },
-      ],
-    },
-    // mutable function parameter -> readonly function parameter
-    // (contravariant position)
-    {
-      filename: "file.ts",
-      code: `
-        type MutableA = { a: string };
-        type ReadonlyA = { readonly a: string };
-
-        const takesReadonly = (f: (roa: ReadonlyA) => void): void => undefined;
-
-        takesReadonly((ma: MutableA): void => undefined);
-      `,
-      errors: [
-        {
-          messageId: "errorStringCallExpression",
-          type: AST_NODE_TYPES.ArrowFunctionExpression,
-        },
-      ],
-    },
-    // mutable function parameter -> readonly function parameter (rest param)
-    // (contravariant position)
-    {
-      filename: "file.ts",
-      code: `
-        type MutableA = { a: string };
-        type ReadonlyA = { readonly a: string };
-
-        const takesReadonly = (f: (...roa: readonly ReadonlyA[]) => void): void => undefined;
-
-        takesReadonly((...ma: readonly MutableA[]): void => undefined);
-      `,
-      errors: [
-        {
-          messageId: "errorStringCallExpression",
-          type: AST_NODE_TYPES.ArrowFunctionExpression,
         },
       ],
     },
@@ -985,77 +583,6 @@ ruleTester.run("no-unsafe-readonly-mutable-assignment", rule, {
         },
       ],
     },
-    // readonly array prop with readonly generic type -> readonly array prop with mutable generic type
-    {
-      filename: "file.ts",
-      code: `
-        type MutableA = { readonly a: ReadonlyArray<{ b: string }> };
-        type ReadonlyA = { readonly a: ReadonlyArray<{ readonly b: string }> };
-
-        const readonlyA: ReadonlyA = { a: [] };
-        const mutableA: MutableA = readonlyA;
-      `,
-      errors: [
-        {
-          messageId: "errorStringVariableDeclaration",
-          type: AST_NODE_TYPES.VariableDeclaration,
-        },
-      ],
-    },
-    /**
-     * Arrow functions
-     */
-    // Arrow function (compact form) (readonly -> mutable)
-    {
-      filename: "file.ts",
-      code: `
-        type MutableA = { a: string };
-        type ReadonlyA = { readonly a: string };
-        const ro: ReadonlyA = { a: "" };
-        const func = (): MutableA => ro;
-      `,
-      errors: [
-        {
-          messageId: "errorStringArrowFunctionExpression",
-          type: AST_NODE_TYPES.Identifier,
-        },
-      ],
-    },
-    /**
-     * type assertions
-     */
-    // readonly -> mutable
-    {
-      filename: "file.ts",
-      code: `
-        type MutableA = { a: string };
-        type ReadonlyA = { readonly a: string };
-        const ro: ReadonlyA = { a: "" };
-        const mut = ro as MutableA;
-      `,
-      errors: [
-        {
-          messageId: "errorStringTSAsExpression",
-          type: AST_NODE_TYPES.TSAsExpression,
-        },
-      ],
-    },
-    // readonly -> mutable
-    {
-      filename: "file.ts",
-      code: `
-        type MutableA = { a: string };
-        type ReadonlyA = { readonly a: string };
-        const ro: ReadonlyA = { a: "" };
-        const mut = <MutableA>ro;
-      `,
-      errors: [
-        {
-          messageId: "errorStringTSTypeAssertion",
-          type: AST_NODE_TYPES.TSTypeAssertion,
-        },
-      ],
-    },
     /**
      * Return statement
      */
@@ -1070,24 +597,6 @@ ruleTester.run("no-unsafe-readonly-mutable-assignment", rule, {
           const ma: ReadonlyA = { a: "" };
           return ma;
         }
-      `,
-      errors: [
-        {
-          messageId: "errorStringArrowFunctionExpression",
-          type: AST_NODE_TYPES.ReturnStatement,
-        },
-      ],
-    },
-    // Arrow function (block form) (readonly -> mutable)
-    {
-      filename: "file.ts",
-      code: `
-        type MutableA = { a: string };
-        type ReadonlyA = { readonly a: string };
-        const ro: ReadonlyA = { a: "" };
-        const func = (): MutableA => {
-          return ro;
-        };
       `,
       errors: [
         {

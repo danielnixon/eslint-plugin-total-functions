@@ -1,73 +1,8 @@
 /* eslint-disable functional/prefer-immutable-types */
-import { isPropertyReadonlyInType } from "tsutils";
-import { Type, Symbol, IndexKind, TypeChecker } from "typescript";
+import { getTypeImmutability, Immutability } from "is-immutable-type";
+import { TypeChecker, Type } from "typescript";
 import { createRule } from "./common";
-import {
-  createNoUnsafeAssignmentRule,
-  UnsafeIndexAssignmentFunc,
-  UnsafePropertyAssignmentFunc,
-} from "./unsafe-assignment-rule";
-
-const unsafeIndexAssignmentFunc: UnsafeIndexAssignmentFunc = (
-  indexKind: IndexKind,
-  destinationType: Type,
-  sourceType: Type,
-  checker: TypeChecker
-): boolean => {
-  const destinationIndexInfo = checker.getIndexInfoOfType(
-    destinationType,
-    indexKind
-  );
-  const sourceIndexInfo = checker.getIndexInfoOfType(sourceType, indexKind);
-
-  // eslint-disable-next-line functional/no-conditional-statements
-  if (destinationIndexInfo === undefined) {
-    return false;
-  }
-
-  // eslint-disable-next-line functional/no-conditional-statements
-  if (sourceIndexInfo === undefined) {
-    return false;
-  }
-
-  const destinationTypeHasReadonlyIndexSignature =
-    destinationIndexInfo.isReadonly;
-  const sourceTypeHasReadonlyIndexSignature = sourceIndexInfo.isReadonly;
-
-  return (
-    sourceTypeHasReadonlyIndexSignature &&
-    !destinationTypeHasReadonlyIndexSignature
-  );
-};
-
-const unsafePropertyAssignmentFunc: UnsafePropertyAssignmentFunc = (
-  // eslint-disable-next-line @typescript-eslint/ban-types
-  destinationProperty: Symbol,
-  // eslint-disable-next-line @typescript-eslint/ban-types
-  sourceProperty: Symbol | undefined,
-  destinationType: Type,
-  sourceType: Type,
-  checker: TypeChecker
-): boolean => {
-  // eslint-disable-next-line functional/no-conditional-statements
-  if (sourceProperty === undefined) {
-    return false;
-  }
-
-  const destinationPropIsReadonly = isPropertyReadonlyInType(
-    destinationType,
-    destinationProperty.getEscapedName(),
-    checker
-  );
-
-  const sourcePropIsReadonly = isPropertyReadonlyInType(
-    sourceType,
-    sourceProperty.getEscapedName(),
-    checker
-  );
-
-  return sourcePropIsReadonly && !destinationPropIsReadonly;
-};
+import { createNoUnsafeAssignmentRule } from "./unsafe-assignment-rule";
 
 /**
  * An ESLint rule to ban unsafe assignment from readonly to mutable types.
@@ -89,17 +24,27 @@ const noUnsafeReadonlyMutableAssignment = createRule({
       errorStringVariableDeclaration:
         "Using a readonly type to initialize a mutable type can lead to unexpected mutation in the readonly value.",
       errorStringArrowFunctionExpression:
-        "Returning a readonly type from a function that returns a mutable type can lead to unexpected mutation in the readonly value.",
-      errorStringTSAsExpression:
-        "Asserting a readonly type to a mutable type can lead to unexpected mutation in the readonly value.",
-      errorStringTSTypeAssertion:
-        "Asserting a readonly type to a mutable type can lead to unexpected mutation in the readonly value.",
+        "Returning a readonly type from a function that is declared to return a mutable type can lead to unexpected mutation in the readonly value.",
     },
     schema: [],
   },
   create: createNoUnsafeAssignmentRule(
-    unsafePropertyAssignmentFunc,
-    unsafeIndexAssignmentFunc
+    (checker: TypeChecker, destinationType: Type, sourceType: Type) => {
+      const destinationImmutability = getTypeImmutability(
+        checker,
+        // eslint-disable-next-line total-functions/no-unsafe-mutable-readonly-assignment
+        destinationType
+      );
+      // eslint-disable-next-line total-functions/no-unsafe-mutable-readonly-assignment
+      const sourceImmutability = getTypeImmutability(checker, sourceType);
+
+      return (
+        (destinationImmutability === Immutability.ReadonlyShallow ||
+          destinationImmutability === Immutability.Mutable) &&
+        (sourceImmutability === Immutability.Immutable ||
+          sourceImmutability === Immutability.ReadonlyDeep)
+      );
+    }
   ),
   defaultOptions: [],
 } as const);

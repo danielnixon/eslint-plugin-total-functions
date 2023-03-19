@@ -1,3 +1,4 @@
+/* eslint-disable functional/no-expression-statements */
 /* eslint-disable functional/prefer-immutable-types */
 import {
   ESLintUtils,
@@ -6,121 +7,21 @@ import {
   ParserServices,
 } from "@typescript-eslint/utils";
 import { TSESLint } from "@typescript-eslint/utils";
-import {
-  Type,
-  Symbol,
-  IndexKind,
-  Node,
-  TypeChecker,
-  Signature,
-} from "typescript";
-import {
-  getCallSignaturesOfType,
-  intersectionTypeParts,
-  isObjectType,
-  isUnionOrIntersectionType,
-} from "tsutils";
-import { assignableTypePairs, TypePair } from "./common";
-
-// eslint-disable-next-line functional/type-declaration-immutability
-export type SignaturePairArray = readonly {
-  readonly destinationSignature: Signature;
-  readonly sourceSignature: Signature;
-}[];
+import { Type, Node, TypeChecker } from "typescript";
 
 export type MessageId =
   | "errorStringCallExpression"
   | "errorStringAssignmentExpression"
   | "errorStringVariableDeclaration"
-  | "errorStringArrowFunctionExpression"
-  | "errorStringTSAsExpression"
-  | "errorStringTSTypeAssertion";
-
-export type UnsafeIndexAssignmentFunc = (
-  indexKind: IndexKind,
-  destinationType: Type,
-  sourceType: Type,
-  checker: TypeChecker
-) => boolean;
-
-export type UnsafePropertyAssignmentFunc = (
-  // eslint-disable-next-line @typescript-eslint/ban-types
-  destinationProperty: Symbol,
-  // eslint-disable-next-line @typescript-eslint/ban-types
-  sourceProperty: Symbol | undefined,
-  destinationType: Type,
-  sourceType: Type,
-  checker: TypeChecker
-) => boolean;
-
-const maxDepth = 100;
-
-const isSignatureAssignable = (
-  destinationNode: Node,
-  sourceNode: Node,
-  destinationSignature: Signature,
-  sourceSignature: Signature,
-  checker: TypeChecker
-): boolean => {
-  const returnTypeIsAssignable = checker.isTypeAssignableTo(
-    sourceSignature.getReturnType(),
-    destinationSignature.getReturnType()
-  );
-
-  const allParametersAreAssignable = destinationSignature.parameters.every(
-    (destinationParameter, index) => {
-      const sourceParameter = sourceSignature.parameters[index];
-      // eslint-disable-next-line functional/no-conditional-statements
-      if (sourceParameter === undefined) {
-        return false;
-      }
-
-      // source and destination parameter reversed here due to contravariance.
-      return checker.isTypeAssignableTo(
-        checker.getTypeOfSymbolAtLocation(
-          destinationParameter,
-          destinationNode
-        ),
-        checker.getTypeOfSymbolAtLocation(sourceParameter, sourceNode)
-      );
-    }
-  );
-
-  return returnTypeIsAssignable && allParametersAreAssignable;
-};
-
-const assignableSignaturePairs = (
-  destinationNode: Node,
-  sourceNode: Node,
-  destinationSignatures: readonly Signature[],
-  sourceSignatures: readonly Signature[],
-  checker: TypeChecker
-): SignaturePairArray => {
-  return sourceSignatures.flatMap((sourceSignature) =>
-    destinationSignatures
-      .filter((destinationSignature) =>
-        isSignatureAssignable(
-          destinationNode,
-          sourceNode,
-          sourceSignature,
-          destinationSignature,
-          checker
-        )
-      )
-      .map(
-        (destinationSignature) =>
-          ({
-            sourceSignature,
-            destinationSignature,
-          } as const)
-      )
-  );
-};
+  | "errorStringArrowFunctionExpression";
 
 export const createNoUnsafeAssignmentRule =
   (
-    unsafePropertyAssignmentFunc: UnsafePropertyAssignmentFunc,
-    unsafeIndexAssignmentFunc: UnsafeIndexAssignmentFunc
+    isUnsafeAssignment: (
+      checker: TypeChecker,
+      destinationType: Type,
+      sourceType: Type
+    ) => boolean
   ) =>
   (
     context: Readonly<TSESLint.RuleContext<MessageId, readonly unknown[]>>
@@ -129,373 +30,16 @@ export const createNoUnsafeAssignmentRule =
     const parserServices = ESLintUtils.getParserServices(context);
     const checker = parserServices.program.getTypeChecker();
 
-    const isUnsafeIndexAssignment = (
-      indexKind: IndexKind,
-      destinationNode: Node,
-      sourceNode: Node,
-      destinationType: Type,
-      sourceType: Type,
-      checker: TypeChecker,
-      depth: number,
-      seenTypes: readonly TypePair[]
-    ): boolean => {
-      const isUnsafe = unsafeIndexAssignmentFunc(
-        indexKind,
-        destinationType,
-        sourceType,
-        checker
-      );
-
-      const destinationIndexType =
-        indexKind === IndexKind.Number
-          ? destinationType.getNumberIndexType()
-          : destinationType.getStringIndexType();
-      const sourceIndexType =
-        indexKind === IndexKind.Number
-          ? sourceType.getNumberIndexType()
-          : sourceType.getStringIndexType();
-
-      // This is unsafe if...
-      return (
-        // this particular rule considers the index assignment unsafe, or
-        isUnsafe ||
-        // the index types are considered unsafe themselves (recursively).
-        (destinationIndexType !== undefined &&
-          sourceIndexType !== undefined &&
-          isUnsafeAssignment(
-            destinationNode,
-            sourceNode,
-            destinationIndexType,
-            sourceIndexType,
-            checker,
-            depth,
-            seenTypes
-          ))
-      );
-    };
-
-    const isUnsafePropertyAssignmentRec = (
-      destinationNode: Node,
-      sourceNode: Node,
-      // eslint-disable-next-line @typescript-eslint/ban-types
-      destinationProperty: Symbol,
-      // eslint-disable-next-line @typescript-eslint/ban-types
-      sourceProperty: Symbol,
-      checker: TypeChecker,
-      depth: number,
-      seenTypes: readonly TypePair[]
-    ): boolean => {
-      const destinationPropertyType = checker.getTypeOfSymbolAtLocation(
-        destinationProperty,
-        destinationNode
-      );
-      const sourcePropertyType = checker.getTypeOfSymbolAtLocation(
-        sourceProperty,
-        sourceNode
-      );
-
-      return isUnsafeAssignment(
-        destinationNode,
-        sourceNode,
-        destinationPropertyType,
-        sourcePropertyType,
-        checker,
-        depth,
-        seenTypes
-      );
-    };
-
-    const isUnsafePropertyAssignment = (
-      destinationNode: Node,
-      sourceNode: Node,
-      destinationType: Type,
-      sourceType: Type,
-      checker: TypeChecker,
-      depth: number,
-      seenTypes: readonly TypePair[]
-    ): boolean => {
-      // eslint-disable-next-line functional/no-conditional-statements
-      if (
-        (checker.isArrayType(destinationType) ||
-          checker.isArrayType(sourceType)) &&
-        !isUnionOrIntersectionType(destinationType) &&
-        !isUnionOrIntersectionType(sourceType)
-      ) {
-        // For performance reasons we avoid checking every array property for unsafe assignment.
-        //
-        // If one of these arrays is readonly and the other mutable, it will be caught by `isUnsafeIndexAssignment`,
-        // so we needn't compare each individual property.
-        //
-        // TODO what about tuples?
-        // TODO should we ignore other built-in types like strings, symbols and numbers for performance too?
-        return false;
-      }
-
-      return destinationType.getProperties().some((destinationProperty) => {
-        const sourceProperty = sourceType.getProperty(destinationProperty.name);
-
-        const isUnsafe = unsafePropertyAssignmentFunc(
-          destinationProperty,
-          sourceProperty,
-          destinationType,
-          sourceType,
-          checker
-        );
-
-        // eslint-disable-next-line functional/no-conditional-statements
-        if (isUnsafe) {
-          return true;
-        }
-
-        // eslint-disable-next-line functional/no-conditional-statements
-        if (sourceProperty === undefined) {
-          return false;
-        }
-
-        const nextSeenTypes: readonly TypePair[] = seenTypes.concat({
-          destinationType,
-          sourceType,
-          destinationRecursionIdentity:
-            checker.getRecursionIdentity(destinationType),
-          sourceRecursionIdentity: checker.getRecursionIdentity(sourceType),
-        } as const);
-
-        return isUnsafePropertyAssignmentRec(
-          destinationNode,
-          sourceNode,
-          destinationProperty,
-          sourceProperty,
-          checker,
-          depth,
-          nextSeenTypes
-        );
-      });
-    };
-
-    const isUnsafeAssignment = (
-      destinationNode: Node,
-      sourceNode: Node,
-      rawDestinationType: Type,
-      rawSourceType: Type,
-      checker: TypeChecker,
-      depth: number,
-      seenTypes: readonly TypePair[] = []
-    ): boolean => {
-      // eslint-disable-next-line functional/no-conditional-statements
-      if (rawDestinationType === rawSourceType) {
-        // Never unsafe if the types are equal.
-        return false;
-      }
-
-      // eslint-disable-next-line functional/no-conditional-statements
-      if (depth >= maxDepth) {
-        return false;
-      }
-
-      const nextSeenTypes: readonly TypePair[] = seenTypes.concat({
-        destinationType: rawDestinationType,
-        sourceType: rawSourceType,
-        destinationRecursionIdentity:
-          checker.getRecursionIdentity(rawDestinationType),
-        sourceRecursionIdentity: checker.getRecursionIdentity(rawSourceType),
-      } as const);
-
-      const typePairs = assignableTypePairs(
-        rawDestinationType,
-        rawSourceType,
-        checker
-      );
-
-      const objectTypePairs: readonly TypePair[] = typePairs.filter((tp) =>
-        intersectionTypeParts(tp.destinationType).some(isObjectType)
-      );
-
-      const isUnsafeFunctionAssignment = (
-        typePairs: readonly TypePair[]
-      ): boolean => {
-        return typePairs.some(({ sourceType, destinationType }) => {
-          const nextSeenTypesWithPair: readonly TypePair[] =
-            nextSeenTypes.concat({
-              destinationType,
-              sourceType,
-              destinationRecursionIdentity:
-                checker.getRecursionIdentity(destinationType),
-              sourceRecursionIdentity: checker.getRecursionIdentity(sourceType),
-            } as const);
-
-          const sourceCallSignatures = getCallSignaturesOfType(sourceType);
-          const destinationCallSignatures =
-            getCallSignaturesOfType(destinationType);
-
-          const signaturePairs = assignableSignaturePairs(
-            destinationNode,
-            sourceNode,
-            destinationCallSignatures,
-            sourceCallSignatures,
-            checker
-          );
-
-          return signaturePairs.some(
-            ({ destinationSignature, sourceSignature }) => {
-              // eslint-disable-next-line functional/functional-parameters
-              const isUnsafeParameterAssignment = (): boolean => {
-                return destinationSignature
-                  .getParameters()
-                  .some((destinationParameterSymbol, index) => {
-                    const destinationParameterType =
-                      checker.getTypeOfSymbolAtLocation(
-                        destinationParameterSymbol,
-                        destinationNode
-                      );
-                    const sourceParameterSymbol =
-                      sourceSignature.getParameters()[index];
-
-                    // eslint-disable-next-line functional/no-conditional-statements
-                    if (sourceParameterSymbol === undefined) {
-                      return false;
-                    }
-
-                    const sourceParameterType =
-                      checker.getTypeOfSymbolAtLocation(
-                        sourceParameterSymbol,
-                        sourceNode
-                      );
-
-                    // Source and destination swapped here - function parameters are contravariant.
-                    return isUnsafeAssignment(
-                      sourceNode,
-                      destinationNode,
-                      sourceParameterType,
-                      destinationParameterType,
-                      checker,
-                      depth + 1,
-                      nextSeenTypesWithPair
-                    );
-                  });
-              };
-
-              const sourceReturnType = sourceSignature.getReturnType();
-              const sourceRecursionIdentity =
-                checker.getRecursionIdentity(sourceReturnType);
-              const destinationReturnType =
-                destinationSignature.getReturnType();
-              const destinationRecursionIdentity =
-                checker.getRecursionIdentity(destinationType);
-
-              // This is an unsafe assignment if...
-              return (
-                // we're not in an infinitely recursive type,
-                seenTypes.every(
-                  (t) =>
-                    t.destinationRecursionIdentity !==
-                      destinationRecursionIdentity &&
-                    t.sourceRecursionIdentity !== sourceRecursionIdentity
-                ) &&
-                // and the types we're assigning from and to are different,
-                destinationType !== sourceType &&
-                // and the return types of the functions are unsafe assignment,
-                (isUnsafeAssignment(
-                  destinationNode,
-                  sourceNode,
-                  destinationReturnType,
-                  sourceReturnType,
-                  checker,
-                  depth + 1,
-                  nextSeenTypesWithPair
-                ) ||
-                  // or the parameter types of the functions are unsafe assignment.
-                  isUnsafeParameterAssignment())
-              );
-            }
-          );
-        });
-      };
-
-      const inUnsafeObjectAssignment = (
-        objectTypePairs: readonly TypePair[]
-      ): boolean =>
-        objectTypePairs.some(({ sourceType, destinationType }) => {
-          const sourceRecursionIdentity =
-            checker.getRecursionIdentity(sourceType);
-          const destinationRecursionIdentity =
-            checker.getRecursionIdentity(destinationType);
-
-          const nextSeenTypesWithPair: readonly TypePair[] =
-            nextSeenTypes.concat({
-              destinationType,
-              sourceType,
-              destinationRecursionIdentity: destinationRecursionIdentity,
-              sourceRecursionIdentity: sourceRecursionIdentity,
-            } as const);
-
-          // This is an unsafe assignment if...
-          return (
-            // we're not in an infinitely recursive type,
-            seenTypes.every(
-              (t) =>
-                t.destinationRecursionIdentity !==
-                  destinationRecursionIdentity &&
-                t.sourceRecursionIdentity !== sourceRecursionIdentity
-            ) &&
-            // and the types we're assigning from and to are different,
-            // TODO this seems to be required to prevent a hang in https://github.com/oaf-project/oaf-react-router
-            // Need to work out why and formulate a test to reproduce
-            destinationType !== sourceType &&
-            // and we're either:
-            // unsafe string index assignment, or
-            (isUnsafeIndexAssignment(
-              IndexKind.String,
-              destinationNode,
-              sourceNode,
-              destinationType,
-              sourceType,
-              checker,
-              depth + 1,
-              nextSeenTypesWithPair
-            ) ||
-              // unsafe number index assignment, or
-              isUnsafeIndexAssignment(
-                IndexKind.Number,
-                destinationNode,
-                sourceNode,
-                destinationType,
-                sourceType,
-                checker,
-                depth + 1,
-                nextSeenTypesWithPair
-              ) ||
-              // unsafe property assignment.
-              isUnsafePropertyAssignment(
-                destinationNode,
-                sourceNode,
-                destinationType,
-                sourceType,
-                checker,
-                depth + 1,
-                nextSeenTypesWithPair
-              ))
-          );
-        });
-
-      return (
-        inUnsafeObjectAssignment(objectTypePairs) ||
-        isUnsafeFunctionAssignment(typePairs)
-      );
-    };
-
     // Special handling for array methods that return mutable arrays but that
     // we know are shallow copies and therefore safe to have their result
     // assigned to a readonly array.
     const isSafeAssignmentFromArrayMethod = (
       sourceExpression: TSESTree.Expression,
-      destinationNode: Node,
-      sourceNode: Node,
       destinationType: Type,
       sourceType: Type,
       checker: TypeChecker,
-      depth: number,
       parserServices: ParserServices
-    ): boolean => {
+    ): "safe" | "unsafe" | "unknown" => {
       const safeArrayMethods: readonly string[] = [
         "filter",
         "map",
@@ -509,10 +53,7 @@ export const createNoUnsafeAssignmentRule =
       const destinationIndexType = destinationType.getNumberIndexType();
       const sourceIndexType = sourceType.getNumberIndexType();
 
-      // eslint-disable-next-line functional/no-conditional-statements, sonarjs/prefer-single-boolean-return
-      if (
-        // We are assigning to and from arrays
-        checker.isArrayType(destinationType) &&
+      return checker.isArrayType(destinationType) &&
         checker.isArrayType(sourceType) &&
         destinationIndexType !== undefined &&
         sourceIndexType !== undefined &&
@@ -534,95 +75,16 @@ export const createNoUnsafeAssignmentRule =
         // TODO: support computed properties like myArray["concat"]?
         !sourceExpression.callee.computed &&
         // and the method being called is one that we know is safe to assign to a readonly array
-        safeArrayMethods.includes(sourceExpression.callee.property.name) &&
-        // and the types within the source and destination array are themselves safe to assign
-        // (avoid this issue: https://github.com/danielnixon/eslint-plugin-total-functions/issues/730)
-        !isUnsafeAssignment(
-          destinationNode,
-          sourceNode,
-          destinationIndexType,
-          sourceIndexType,
-          checker,
-          depth
-        )
-      ) {
-        return true;
-      }
-
-      return false;
+        safeArrayMethods.includes(sourceExpression.callee.property.name)
+        ? // and the types within the source and destination array are themselves safe to assign
+          // (avoid this issue: https://github.com/danielnixon/eslint-plugin-total-functions/issues/730)
+          isUnsafeAssignment(checker, destinationIndexType, sourceIndexType)
+          ? "unsafe"
+          : "safe"
+        : "unknown";
     };
 
     return {
-      // eslint-disable-next-line functional/no-return-void
-      TSTypeAssertion: (node): void => {
-        // eslint-disable-next-line functional/no-conditional-statements
-        if (
-          node.typeAnnotation.type === AST_NODE_TYPES.TSTypeReference &&
-          node.typeAnnotation.typeName.type === AST_NODE_TYPES.Identifier &&
-          node.typeAnnotation.typeName.name === "const"
-        ) {
-          // Always allow `as const`.
-          return;
-        }
-
-        const destinationNode = parserServices.esTreeNodeToTSNodeMap.get(node);
-        const destinationType = checker.getTypeAtLocation(destinationNode);
-        const sourceNode = destinationNode.expression;
-        const sourceType = checker.getTypeAtLocation(sourceNode);
-
-        // eslint-disable-next-line functional/no-conditional-statements
-        if (
-          isUnsafeAssignment(
-            destinationNode,
-            sourceNode,
-            destinationType,
-            sourceType,
-            checker,
-            0
-          )
-        ) {
-          // eslint-disable-next-line functional/no-expression-statements
-          context.report({
-            node: node,
-            messageId: "errorStringTSTypeAssertion",
-          } as const);
-        }
-      },
-      // eslint-disable-next-line functional/no-return-void
-      TSAsExpression: (node): void => {
-        // eslint-disable-next-line functional/no-conditional-statements
-        if (
-          node.typeAnnotation.type === AST_NODE_TYPES.TSTypeReference &&
-          node.typeAnnotation.typeName.type === AST_NODE_TYPES.Identifier &&
-          node.typeAnnotation.typeName.name === "const"
-        ) {
-          // Always allow `as const`.
-          return;
-        }
-
-        const destinationNode = parserServices.esTreeNodeToTSNodeMap.get(node);
-        const destinationType = checker.getTypeAtLocation(destinationNode);
-        const sourceNode = destinationNode.expression;
-        const sourceType = checker.getTypeAtLocation(sourceNode);
-
-        // eslint-disable-next-line functional/no-conditional-statements
-        if (
-          isUnsafeAssignment(
-            destinationNode,
-            sourceNode,
-            destinationType,
-            sourceType,
-            checker,
-            0
-          )
-        ) {
-          // eslint-disable-next-line functional/no-expression-statements
-          context.report({
-            node: node,
-            messageId: "errorStringTSAsExpression",
-          } as const);
-        }
-      },
       // eslint-disable-next-line functional/no-return-void
       VariableDeclaration: (node): void => {
         // eslint-disable-next-line functional/no-expression-statements, functional/no-return-void
@@ -652,32 +114,23 @@ export const createNoUnsafeAssignmentRule =
           const leftType = checker.getTypeAtLocation(leftTsNode);
           const rightType = checker.getTypeAtLocation(rightTsNode);
 
+          const arrayMethodCallSafety = isSafeAssignmentFromArrayMethod(
+            declaration.init,
+            leftType,
+            rightType,
+            checker,
+            parserServices
+          );
+
           // eslint-disable-next-line functional/no-conditional-statements
-          if (
-            isSafeAssignmentFromArrayMethod(
-              declaration.init,
-              leftTsNode,
-              rightTsNode,
-              leftType,
-              rightType,
-              checker,
-              0,
-              parserServices
-            )
-          ) {
+          if (arrayMethodCallSafety === "safe") {
             return;
           }
 
           // eslint-disable-next-line functional/no-conditional-statements
           if (
-            isUnsafeAssignment(
-              leftTsNode,
-              rightTsNode,
-              leftType,
-              rightType,
-              checker,
-              0
-            )
+            arrayMethodCallSafety === "unsafe" ||
+            isUnsafeAssignment(checker, leftType, rightType)
           ) {
             // eslint-disable-next-line functional/no-expression-statements
             context.report({
@@ -697,32 +150,23 @@ export const createNoUnsafeAssignmentRule =
         const leftType = checker.getTypeAtLocation(leftTsNode);
         const rightType = checker.getTypeAtLocation(rightTsNode);
 
+        const arrayMethodCallSafety = isSafeAssignmentFromArrayMethod(
+          node.right,
+          leftType,
+          rightType,
+          checker,
+          parserServices
+        );
+
         // eslint-disable-next-line functional/no-conditional-statements
-        if (
-          isSafeAssignmentFromArrayMethod(
-            node.right,
-            leftTsNode,
-            rightTsNode,
-            leftType,
-            rightType,
-            checker,
-            0,
-            parserServices
-          )
-        ) {
+        if (arrayMethodCallSafety === "safe") {
           return;
         }
 
         // eslint-disable-next-line functional/no-conditional-statements
         if (
-          isUnsafeAssignment(
-            leftTsNode,
-            rightTsNode,
-            leftType,
-            rightType,
-            checker,
-            0
-          )
+          arrayMethodCallSafety === "unsafe" ||
+          isUnsafeAssignment(checker, leftType, rightType)
         ) {
           // eslint-disable-next-line functional/no-expression-statements
           context.report({
@@ -754,32 +198,23 @@ export const createNoUnsafeAssignmentRule =
 
         const sourceType = checker.getTypeAtLocation(tsNode.expression);
 
+        const arrayMethodCallSafety = isSafeAssignmentFromArrayMethod(
+          node.argument,
+          destinationType,
+          sourceType,
+          checker,
+          parserServices
+        );
+
         // eslint-disable-next-line functional/no-conditional-statements
-        if (
-          isSafeAssignmentFromArrayMethod(
-            node.argument,
-            tsNode.expression,
-            tsNode.expression,
-            destinationType,
-            sourceType,
-            checker,
-            0,
-            parserServices
-          )
-        ) {
+        if (arrayMethodCallSafety === "safe") {
           return;
         }
 
         // eslint-disable-next-line functional/no-conditional-statements
         if (
-          isUnsafeAssignment(
-            tsNode.expression,
-            tsNode.expression,
-            destinationType,
-            sourceType,
-            checker,
-            0
-          )
+          arrayMethodCallSafety === "unsafe" ||
+          isUnsafeAssignment(checker, destinationType, sourceType)
         ) {
           // eslint-disable-next-line functional/no-expression-statements
           context.report({
@@ -812,32 +247,23 @@ export const createNoUnsafeAssignmentRule =
 
         const sourceType = checker.getTypeAtLocation(tsNode.expression);
 
+        const arrayMethodCallSafety = isSafeAssignmentFromArrayMethod(
+          node.argument,
+          destinationType,
+          sourceType,
+          checker,
+          parserServices
+        );
+
         // eslint-disable-next-line functional/no-conditional-statements
-        if (
-          isSafeAssignmentFromArrayMethod(
-            node.argument,
-            tsNode.expression,
-            tsNode.expression,
-            destinationType,
-            sourceType,
-            checker,
-            0,
-            parserServices
-          )
-        ) {
+        if (arrayMethodCallSafety === "safe") {
           return;
         }
 
         // eslint-disable-next-line functional/no-conditional-statements
         if (
-          isUnsafeAssignment(
-            tsNode.expression,
-            tsNode.expression,
-            destinationType,
-            sourceType,
-            checker,
-            0
-          )
+          arrayMethodCallSafety === "unsafe" ||
+          isUnsafeAssignment(checker, destinationType, sourceType)
         ) {
           // eslint-disable-next-line functional/no-expression-statements
           context.report({
@@ -861,34 +287,24 @@ export const createNoUnsafeAssignmentRule =
         const sourceNode = parserServices.esTreeNodeToTSNodeMap.get(node.body);
         const sourceType = checker.getTypeAtLocation(sourceNode);
 
+        const arrayMethodCallSafety =
+          node.body.type !== AST_NODE_TYPES.BlockStatement
+            ? isSafeAssignmentFromArrayMethod(
+                node.body,
+                destinationType,
+                sourceType,
+                checker,
+                parserServices
+              )
+            : "unknown";
+
         // eslint-disable-next-line functional/no-conditional-statements
-        if (
-          node.body.type !== AST_NODE_TYPES.BlockStatement &&
-          isSafeAssignmentFromArrayMethod(
-            node.body,
-            destinationNode,
-            sourceNode,
-            destinationType,
-            sourceType,
-            checker,
-            0,
-            parserServices
-          )
-        ) {
+        if (arrayMethodCallSafety === "safe") {
           return;
         }
 
         // eslint-disable-next-line functional/no-conditional-statements
-        if (
-          isUnsafeAssignment(
-            destinationNode,
-            sourceNode,
-            destinationType,
-            sourceType,
-            checker,
-            0
-          )
-        ) {
+        if (isUnsafeAssignment(checker, destinationType, sourceType)) {
           // eslint-disable-next-line functional/no-expression-statements
           context.report({
             node: node.body,
@@ -908,14 +324,7 @@ export const createNoUnsafeAssignmentRule =
           // eslint-disable-next-line functional/no-conditional-statements
           if (
             paramType !== undefined &&
-            isUnsafeAssignment(
-              argument,
-              argument,
-              paramType,
-              argumentType,
-              checker,
-              0
-            )
+            isUnsafeAssignment(checker, paramType, argumentType)
           ) {
             // eslint-disable-next-line functional/no-expression-statements
             context.report({

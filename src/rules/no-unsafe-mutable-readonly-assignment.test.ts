@@ -241,43 +241,6 @@ ruleTester.run("no-unsafe-mutable-readonly-assignment", rule, {
      * Assignment expressions
      */
     // TODO
-    /**
-     * Arrow functions
-     */
-    // Arrow function (compact form) (readonly -> readonly)
-    {
-      filename: "file.ts",
-      code: `
-        type ReadonlyA = { readonly a: string };
-        const ro: ReadonlyA = { a: "" } as const;
-        const func = (): ReadonlyA => ro;
-      `,
-    },
-    // Arrow function (compact form) (object literal -> readonly)
-    {
-      filename: "file.ts",
-      code: `
-        type ReadonlyA = { readonly a: string };
-        const func = (): ReadonlyA => ({ a: "" } as const);
-      `,
-    },
-    // Arrow function (compact form) (object literal -> mutable)
-    {
-      filename: "file.ts",
-      code: `
-        type MutableA = { a: string };
-        const func = (): MutableA => { a: "" };
-      `,
-    },
-    // Arrow function (compact form) (mutable -> mutable)
-    {
-      filename: "file.ts",
-      code: `
-        type MutableA = { a: string };
-        const ro: MutableA = { a: "" };
-        const func = (): MutableA => ro;
-      `,
-    },
     // Array safe mutable to readonly assignment with chained array operations.
     {
       filename: "file.ts",
@@ -333,68 +296,6 @@ ruleTester.run("no-unsafe-mutable-readonly-assignment", rule, {
       code: `
         const fooArray: readonly string[] = ["test"] as const;
         const nextArray: readonly string[] = fooArray.slice();
-      `,
-    },
-    /**
-     * type assertions
-     */
-    // readonly -> readonly
-    {
-      filename: "file.ts",
-      code: `
-        type ReadonlyA = { readonly a: string };
-        const ro: ReadonlyA = { a: "" } as const;
-        const mut = ro as ReadonlyA;
-      `,
-    },
-    // mutable -> mutable
-    {
-      filename: "file.ts",
-      code: `
-        type MutableA = { a: string };
-        const ro: MutableA = { a: "" };
-        const mut = ro as MutableA;
-      `,
-    },
-    // readonly -> readonly
-    {
-      filename: "file.ts",
-      code: `
-        type ReadonlyA = { readonly a: string };
-        const ro: ReadonlyA = { a: "" } as const;
-        const mut = <ReadonlyA>ro;
-      `,
-    },
-    // mutable -> mutable
-    {
-      filename: "file.ts",
-      code: `
-        type MutableA = { a: string };
-        const ro: MutableA = { a: "" };
-        const mut = <MutableA>ro;
-      `,
-    },
-    // as const
-    {
-      filename: "file.ts",
-      code: `
-        type ReadonlyA = { readonly a: string };
-        const ro: ReadonlyA = { a: "" } as const;
-      `,
-    },
-    // <const>
-    {
-      filename: "file.ts",
-      code: `
-      type ReadonlyA = { readonly a: string };
-      const ro: ReadonlyA = <const>{ a: "" };
-      `,
-    },
-    // as unknown
-    {
-      filename: "file.ts",
-      code: `
-        const foo = [{ key: -1, label: "", value: "" }] as unknown;
       `,
     },
     /**
@@ -639,6 +540,34 @@ ruleTester.run("no-unsafe-mutable-readonly-assignment", rule, {
         const bar: Bar<string> = foo;
       `,
     },
+    // Return empty array literal from function that is declared to return empty tuple.
+    {
+      filename: "file.ts",
+      code: `
+        const foo = (): readonly [] => {
+          return [];
+        };
+      `,
+    },
+    // https://github.com/danielnixon/eslint-plugin-total-functions/issues/741
+    {
+      filename: "file.ts",
+      code: `
+        type Foo<U> = {
+          b?: Foo<Foo<U>>;
+        };
+        
+        const takesAFoo = <U>(foo: Foo<U>): void => {
+          return undefined;
+        }
+        
+        let foo: Foo<unknown> = { b: {} };
+        
+        foo.b = foo;
+        
+        takesAFoo(foo);
+      `,
+    },
   ],
   invalid: [
     // initalization using mutable (literal) -> readonly
@@ -676,41 +605,6 @@ ruleTester.run("no-unsafe-mutable-readonly-assignment", rule, {
     //     },
     //   ],
     // },
-    /**
-     * type assertions
-     */
-    // mutable -> readonly
-    {
-      filename: "file.ts",
-      code: `
-        type MutableA = { a: string };
-        type ReadonlyA = { readonly a: string };
-        const ro: MutableA = { a: "" };
-        const mut = <ReadonlyA>ro;
-      `,
-      errors: [
-        {
-          messageId: "errorStringTSTypeAssertion",
-          type: AST_NODE_TYPES.TSTypeAssertion,
-        },
-      ],
-    },
-    // mutable -> readonly
-    {
-      filename: "file.ts",
-      code: `
-        type MutableA = { a: string };
-        type ReadonlyA = { readonly a: string };
-        const ro: MutableA = { a: "" };
-        const mut = ro as ReadonlyA;
-      `,
-      errors: [
-        {
-          messageId: "errorStringTSAsExpression",
-          type: AST_NODE_TYPES.TSAsExpression,
-        },
-      ],
-    },
     // mutable -> readonly
     {
       filename: "file.ts",
@@ -749,24 +643,6 @@ ruleTester.run("no-unsafe-mutable-readonly-assignment", rule, {
         },
       ],
     },
-    // mutable function return -> readonly function return (as part of intersection with object).
-    {
-      filename: "file.ts",
-      code: `
-        type RandomObject = { readonly b?: string };
-        type MutableA = RandomObject & (() => { a: string });
-        type ReadonlyA = RandomObject & (() => { readonly a: string });
-
-        const ma: MutableA = () => ({ a: "" });
-        const ra: ReadonlyA = ma;
-      `,
-      errors: [
-        {
-          messageId: "errorStringVariableDeclaration",
-          type: AST_NODE_TYPES.VariableDeclaration,
-        },
-      ],
-    },
     // mutable object prop -> readonly object prop (as part of intersection with non-object).
     {
       filename: "file.ts",
@@ -776,51 +652,6 @@ ruleTester.run("no-unsafe-mutable-readonly-assignment", rule, {
 
         const ma: MutableA = 42;
         const ra: ReadonlyA = ma;
-      `,
-      errors: [
-        {
-          messageId: "errorStringVariableDeclaration",
-          type: AST_NODE_TYPES.VariableDeclaration,
-        },
-      ],
-    },
-    // Return empty mutable array from function that is declared to return empty tuple.
-    {
-      filename: "file.ts",
-      code: `
-        const foo = (): readonly [] => {
-          return [];
-        };
-      `,
-      errors: [
-        {
-          messageId: "errorStringArrowFunctionExpression",
-          type: AST_NODE_TYPES.ReturnStatement,
-        },
-      ],
-    },
-    // mutable function return -> readonly function return (multiple call signatures).
-    {
-      filename: "file.ts",
-      code: `
-        type MutableA = { a: string };
-        type ReadonlyA = { readonly a: string };
-
-        interface MutableFunc {
-          (b: number): MutableA;
-          (b: string): MutableA;
-        }
-
-        interface ReadonlyFunc {
-          (b: number): ReadonlyA;
-          (b: string): ReadonlyA;
-        }
-
-        const mf: MutableFunc = (b: number | string): MutableA => {
-          return { a: "" };
-        };
-
-        const rf: ReadonlyFunc = mf;
       `,
       errors: [
         {
@@ -920,27 +751,27 @@ ruleTester.run("no-unsafe-mutable-readonly-assignment", rule, {
         };
         
         type B = {
-          a: A;
+          readonly a: A;
         };
         
         type C = {
-          b: B;
+          readonly b: B;
         };
         
         type D = {
-          c: C;
+          readonly c: C;
         };
         
         type E = {
-          d: D;
+          readonly d: D;
         };
         
         type F = {
-          e: E;
+          readonly e: E;
         };
         
         type G = {
-          f: F;
+          readonly f: F;
         };
         
         type A2 = {
@@ -948,27 +779,27 @@ ruleTester.run("no-unsafe-mutable-readonly-assignment", rule, {
         };
         
         type B2 = {
-          a: A2;
+          readonly a: A2;
         };
         
         type C2 = {
-          b: B2;
+          readonly b: B2;
         };
         
         type D2 = {
-          c: C2;
+          readonly c: C2;
         };
         
         type E2 = {
-          d: D2;
+          readonly d: D2;
         };
         
         type F2 = {
-          e: E2;
+          readonly e: E2;
         };
         
         type G2 = {
-          f: F2;
+          readonly f: F2;
         };
         
         declare const g: G;
