@@ -41,7 +41,7 @@ const noHiddenTypeAssertions = createRule({
     },
     messages: {
       errorStringGeneric:
-        "Do not use hidden type assertions. Specify `unknown` instead of an arbitrary type argument.",
+        "Do not use hidden type assertions. Specify `unknown` or `never` instead of an arbitrary type argument.",
     },
     schema: [],
   },
