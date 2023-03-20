@@ -568,6 +568,14 @@ ruleTester.run("no-unsafe-mutable-readonly-assignment", rule, {
         takesAFoo(foo);
       `,
     },
+    {
+      filename: "file.ts",
+      code: `
+        declare const fooArray: readonly string[];
+        declare const takesReadonly: (a: readonly string[]) => void;
+        const nextArray: readonly string[] = takesReadonly(fooArray.slice());
+      `,
+    },
   ],
   invalid: [
     // initalization using mutable (literal) -> readonly

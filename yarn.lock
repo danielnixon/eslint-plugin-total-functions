@@ -907,10 +907,10 @@
   dependencies:
     "@babel/types" "^7.3.0"
 
-"@types/eslint@8.21.2":
-  version "8.21.2"
-  resolved "https://registry.yarnpkg.com/@types/eslint/-/eslint-8.21.2.tgz#2b61b43a8b0e66006856a2a4c8e51f6f773ead27"
-  integrity sha512-EMpxUyystd3uZVByZap1DACsMXvb82ypQnGn89e1Y0a+LYu3JJscUd/gqhRsVFDkaD2MIiWo0MT8EfXr3DGRKw==
+"@types/eslint@8.21.3":
+  version "8.21.3"
+  resolved "https://registry.yarnpkg.com/@types/eslint/-/eslint-8.21.3.tgz#5794b3911f0f19e34e3a272c49cbdf48d6f543f2"
+  integrity sha512-fa7GkppZVEByMWGbTtE5MbmXWJTVbrjjaS8K6uQj+XtuuUv1fsuPAxhygfqLmsb/Ufb3CV8deFCpiMfAgi00Sw==
   dependencies:
     "@types/estree" "*"
     "@types/json-schema" "*"
@@ -1671,10 +1671,10 @@ eslint-config-prettier@8.7.0:
   resolved "https://registry.yarnpkg.com/eslint-config-prettier/-/eslint-config-prettier-8.7.0.tgz#f1cc58a8afebc50980bd53475451df146c13182d"
   integrity sha512-HHVXLSlVUhMSmyW4ZzEuvjpwqamgmlfkutD53cYXLikh4pt/modINRcCIApJ84czDxM4GZInwUrromsDdTImTA==
 
-eslint-config-typed-fp@4.4.0:
-  version "4.4.0"
-  resolved "https://registry.yarnpkg.com/eslint-config-typed-fp/-/eslint-config-typed-fp-4.4.0.tgz#0c45a7c8943630ff294802be2d7e163dd8ae9a9c"
-  integrity sha512-+rlkdxLv4tK6FOEwgVhwUHFIDHsMRnImlYSFdw9N8nfXzWW+Hag+V4T9taHrv/09v4+vFfOVxhxx1ve+a+zgKA==
+eslint-config-typed-fp@5.0.0:
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/eslint-config-typed-fp/-/eslint-config-typed-fp-5.0.0.tgz#3e63f2bf1a258706a7431207833452062786b8ba"
+  integrity sha512-oJw7uqJwjuOl/sxadz/P7XuUohucEns+I8rA+kugMM+/c4fWEKX4qB/sF2P3e637xMvDSWFnIs/4+rH9vU8HQA==
 
 eslint-plugin-functional@5.0.6:
   version "5.0.6"

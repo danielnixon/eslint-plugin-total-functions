@@ -366,6 +366,12 @@ ruleTester.run("no-unsafe-readonly-mutable-assignment", rule, {
         const bar: string | { a: string } = foo;
       `,
     },
+    {
+      filename: "file.ts",
+      code: `
+        const a: readonly string[] = ["a"] as const;
+      `,
+    },
   ],
   invalid: [
     // object literal -> mutable (readonly reference to property retained)

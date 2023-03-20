@@ -1,6 +1,7 @@
 /* eslint-disable functional/prefer-immutable-types */
 import {
   isTypeAnyType,
+  isTypeFlagSet,
   isTypeUnknownType,
 } from "@typescript-eslint/type-utils";
 import {
@@ -8,7 +9,7 @@ import {
   getTypeImmutability,
   Immutability,
 } from "is-immutable-type";
-import { Type, TypeChecker } from "typescript";
+import { Type, TypeChecker, TypeFlags } from "typescript";
 import { assignableTypePairs, createRule } from "./common";
 import { createNoUnsafeAssignmentRule } from "./unsafe-assignment-rule";
 
@@ -38,17 +39,20 @@ const noUnsafeMutableReadonlyAssignment = createRule({
         checker
       );
 
-      return typePairs.some(({ sourceType, destinationType }) => {
+      // TODO support config
+      const overrides = getDefaultOverrides();
+
+      const allSafe = typePairs.every(({ sourceType, destinationType }) => {
         // eslint-disable-next-line functional/no-conditional-statements
         if (sourceType === destinationType) {
-          // not unsafe
-          return false;
+          // safe
+          return true;
         }
 
         // eslint-disable-next-line functional/no-conditional-statements
         if (isTypeAnyType(sourceType) || isTypeAnyType(destinationType)) {
-          // not unsafe
-          return false;
+          // safe
+          return true;
         }
 
         // eslint-disable-next-line functional/no-conditional-statements
@@ -56,12 +60,15 @@ const noUnsafeMutableReadonlyAssignment = createRule({
           isTypeUnknownType(sourceType) ||
           isTypeUnknownType(destinationType)
         ) {
-          // not unsafe
-          return false;
+          // safe
+          return true;
         }
 
-        // TODO support config
-        const overrides = getDefaultOverrides();
+        // eslint-disable-next-line functional/no-conditional-statements
+        if (isTypeFlagSet(destinationType, TypeFlags.VoidLike)) {
+          // safe
+          return true;
+        }
 
         const destinationImmutability = getTypeImmutability(
           checker,
@@ -74,13 +81,16 @@ const noUnsafeMutableReadonlyAssignment = createRule({
           overrides
         );
 
-        return (
+        const isUnsafe =
           (destinationImmutability === Immutability.Immutable ||
             destinationImmutability === Immutability.ReadonlyDeep) &&
           (sourceImmutability === Immutability.ReadonlyShallow ||
-            sourceImmutability === Immutability.Mutable)
-        );
+            sourceImmutability === Immutability.Mutable);
+
+        return !isUnsafe;
       });
+
+      return !allSafe;
     }
   ),
   defaultOptions: [],

@@ -314,6 +314,7 @@ export const createNoUnsafeAssignmentRule =
         const sourceNode = parserServices.esTreeNodeToTSNodeMap.get(node.body);
         const sourceType = checker.getTypeAtLocation(sourceNode);
 
+        // the BlockStatement case should be handled by the ReturnStatement branch.
         const arrayMethodCallSafety =
           node.body.type !== AST_NODE_TYPES.BlockStatement
             ? isSafeAssignmentFromArrayMethod(
@@ -331,7 +332,10 @@ export const createNoUnsafeAssignmentRule =
         }
 
         // eslint-disable-next-line functional/no-conditional-statements
-        if (isUnsafeAssignment(checker, destinationType, sourceType)) {
+        if (
+          arrayMethodCallSafety === "unsafe" ||
+          isUnsafeAssignment(checker, destinationType, sourceType)
+        ) {
           // eslint-disable-next-line functional/no-expression-statements
           context.report({
             node: node.body,
@@ -352,13 +356,38 @@ export const createNoUnsafeAssignmentRule =
         const tsNode = parserServices.esTreeNodeToTSNodeMap.get(node);
 
         // eslint-disable-next-line functional/no-expression-statements, functional/no-return-void
-        tsNode.arguments.forEach((argument, i) => {
-          const sourceType = checker.getTypeAtLocation(argument);
-          const destinationType = checker.getContextualType(argument);
+        tsNode.arguments.forEach((tsArgument, i) => {
+          const sourceType = checker.getTypeAtLocation(tsArgument);
+          const destinationType = checker.getContextualType(tsArgument);
+
+          // eslint-disable-next-line functional/no-conditional-statements
+          if (destinationType === undefined) {
+            return;
+          }
+
+          const argument = node.arguments[i];
+
+          // TODO handle spread elements
+          const arrayMethodCallSafety =
+            argument === undefined ||
+            argument.type === AST_NODE_TYPES.SpreadElement
+              ? "unknown"
+              : isSafeAssignmentFromArrayMethod(
+                  argument,
+                  destinationType,
+                  sourceType,
+                  checker,
+                  parserServices
+                );
+
+          // eslint-disable-next-line functional/no-conditional-statements
+          if (arrayMethodCallSafety === "safe") {
+            return;
+          }
 
           // eslint-disable-next-line functional/no-conditional-statements
           if (
-            destinationType !== undefined &&
+            arrayMethodCallSafety === "unsafe" ||
             isUnsafeAssignment(checker, destinationType, sourceType)
           ) {
             // eslint-disable-next-line functional/no-expression-statements
