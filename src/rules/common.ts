@@ -1,5 +1,9 @@
 /* eslint-disable functional/prefer-immutable-types */
-import { ESLintUtils } from "@typescript-eslint/utils";
+import {
+  AST_NODE_TYPES,
+  ESLintUtils,
+  TSESTree,
+} from "@typescript-eslint/utils";
 import { unionTypeParts } from "tsutils";
 import { Type, TypeChecker } from "typescript";
 
@@ -52,4 +56,31 @@ export const assignableTypePairs = (
           } as const)
       )
   );
+};
+
+/**
+ * True if this expression is a literal, false otherwise.
+ */
+export const isLiteral = (sourceNode: TSESTree.Expression | undefined) => {
+  // eslint-disable-next-line functional/no-conditional-statements
+  if (sourceNode === undefined) {
+    return false;
+  }
+
+  // eslint-disable-next-line functional/no-conditional-statements
+  if (sourceNode.type === AST_NODE_TYPES.ObjectExpression) {
+    // empty object literal: {}
+    return sourceNode.properties.length === 0;
+  }
+
+  // eslint-disable-next-line functional/no-conditional-statements
+  if (sourceNode.type === AST_NODE_TYPES.ArrayExpression) {
+    // empty object literal: []
+    return sourceNode.elements.length === 0;
+  }
+
+  // TODO: handle recursive case for both arrays and objects and
+  // permit literals such as string and numbers as properties
+
+  return false;
 };

@@ -372,6 +372,14 @@ ruleTester.run("no-unsafe-readonly-mutable-assignment", rule, {
         const a: readonly string[] = ["a"] as const;
       `,
     },
+    // Literal (immutable) assigned to mutable but safe because no surprising mutation can arise
+    // see https://github.com/danielnixon/eslint-plugin-total-functions/issues/754
+    {
+      filename: "file.ts",
+      code: `
+        const o: Record<string, string> = {};
+      `,
+    },
   ],
   invalid: [
     // object literal -> mutable (readonly reference to property retained)
@@ -546,7 +554,7 @@ ruleTester.run("no-unsafe-readonly-mutable-assignment", rule, {
       code: `
         type MutableA = Record<string, { a: string }>;
         type ReadonlyA = Record<string, { readonly a: string }>;
-        const readonlyA: ReadonlyA = {};
+        declare const readonlyA: ReadonlyA;
         const mutableA: MutableA = readonlyA;
       `,
       errors: [

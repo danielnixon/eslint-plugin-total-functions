@@ -576,6 +576,13 @@ ruleTester.run("no-unsafe-mutable-readonly-assignment", rule, {
         const nextArray: readonly string[] = takesReadonly(fooArray.slice());
       `,
     },
+    // Literal (mutable) assigned to immutable but safe because no surprising mutation can arise
+    {
+      filename: "file.ts",
+      code: `
+        const o: readonly string[] = [];
+      `,
+    },
   ],
   invalid: [
     // initalization using mutable (literal) -> readonly

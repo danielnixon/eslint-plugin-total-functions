@@ -16,8 +16,9 @@ export const createNoUnsafeAssignmentRule =
     isUnsafeAssignment: (
       checker: TypeChecker,
       destinationType: Type,
-      sourceType: Type
-    ) => boolean
+      sourceType: Type,
+      sourceNode: TSESTree.Expression | undefined
+    ) => "safe" | "unsafe"
   ) =>
   (
     context: Readonly<TSESLint.RuleContext<MessageId, readonly unknown[]>>
@@ -74,9 +75,12 @@ export const createNoUnsafeAssignmentRule =
         safeArrayMethods.includes(sourceExpression.callee.property.name)
         ? // and the types within the source and destination array are themselves safe to assign
           // (avoid this issue: https://github.com/danielnixon/eslint-plugin-total-functions/issues/730)
-          isUnsafeAssignment(checker, destinationIndexType, sourceIndexType)
-          ? "unsafe"
-          : "safe"
+          isUnsafeAssignment(
+            checker,
+            destinationIndexType,
+            sourceIndexType,
+            undefined
+          )
         : "unknown";
     };
 
@@ -126,7 +130,12 @@ export const createNoUnsafeAssignmentRule =
           // eslint-disable-next-line functional/no-conditional-statements
           if (
             arrayMethodCallSafety === "unsafe" ||
-            isUnsafeAssignment(checker, destinationType, sourceType)
+            isUnsafeAssignment(
+              checker,
+              destinationType,
+              sourceType,
+              declaration.init
+            ) === "unsafe"
           ) {
             // eslint-disable-next-line functional/no-expression-statements
             context.report({
@@ -170,7 +179,12 @@ export const createNoUnsafeAssignmentRule =
         // eslint-disable-next-line functional/no-conditional-statements
         if (
           arrayMethodCallSafety === "unsafe" ||
-          isUnsafeAssignment(checker, destinationType, sourceType)
+          isUnsafeAssignment(
+            checker,
+            destinationType,
+            sourceType,
+            node.right
+          ) === "unsafe"
         ) {
           // eslint-disable-next-line functional/no-expression-statements
           context.report({
@@ -226,7 +240,12 @@ export const createNoUnsafeAssignmentRule =
         // eslint-disable-next-line functional/no-conditional-statements
         if (
           arrayMethodCallSafety === "unsafe" ||
-          isUnsafeAssignment(checker, destinationType, sourceType)
+          isUnsafeAssignment(
+            checker,
+            destinationType,
+            sourceType,
+            node.argument
+          ) === "unsafe"
         ) {
           // eslint-disable-next-line functional/no-expression-statements
           context.report({
@@ -283,7 +302,12 @@ export const createNoUnsafeAssignmentRule =
         // eslint-disable-next-line functional/no-conditional-statements
         if (
           arrayMethodCallSafety === "unsafe" ||
-          isUnsafeAssignment(checker, destinationType, sourceType)
+          isUnsafeAssignment(
+            checker,
+            destinationType,
+            sourceType,
+            node.argument
+          ) === "unsafe"
         ) {
           // eslint-disable-next-line functional/no-expression-statements
           context.report({
@@ -334,7 +358,14 @@ export const createNoUnsafeAssignmentRule =
         // eslint-disable-next-line functional/no-conditional-statements
         if (
           arrayMethodCallSafety === "unsafe" ||
-          isUnsafeAssignment(checker, destinationType, sourceType)
+          isUnsafeAssignment(
+            checker,
+            destinationType,
+            sourceType,
+            node.body.type !== AST_NODE_TYPES.BlockStatement
+              ? node.body
+              : undefined
+          ) === "unsafe"
         ) {
           // eslint-disable-next-line functional/no-expression-statements
           context.report({
@@ -365,12 +396,15 @@ export const createNoUnsafeAssignmentRule =
             return;
           }
 
-          const argument = node.arguments[i];
-
           // TODO handle spread elements
+          const rawArgument = node.arguments[i];
+          const argument =
+            rawArgument?.type === AST_NODE_TYPES.SpreadElement
+              ? undefined
+              : rawArgument;
+
           const arrayMethodCallSafety =
-            argument === undefined ||
-            argument.type === AST_NODE_TYPES.SpreadElement
+            argument === undefined
               ? "unknown"
               : isSafeAssignmentFromArrayMethod(
                   argument,
@@ -388,7 +422,12 @@ export const createNoUnsafeAssignmentRule =
           // eslint-disable-next-line functional/no-conditional-statements
           if (
             arrayMethodCallSafety === "unsafe" ||
-            isUnsafeAssignment(checker, destinationType, sourceType)
+            isUnsafeAssignment(
+              checker,
+              destinationType,
+              sourceType,
+              argument
+            ) === "unsafe"
           ) {
             // eslint-disable-next-line functional/no-expression-statements
             context.report({

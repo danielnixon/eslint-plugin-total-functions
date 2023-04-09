@@ -9,8 +9,9 @@ import {
   getTypeImmutability,
   Immutability,
 } from "is-immutable-type";
+import { TSESTree } from "@typescript-eslint/utils";
 import { Type, TypeChecker, TypeFlags } from "typescript";
-import { assignableTypePairs, createRule } from "./common";
+import { assignableTypePairs, createRule, isLiteral } from "./common";
 import { createNoUnsafeAssignmentRule } from "./unsafe-assignment-rule";
 
 /**
@@ -32,7 +33,17 @@ const noUnsafeMutableReadonlyAssignment = createRule({
     schema: [],
   },
   create: createNoUnsafeAssignmentRule(
-    (checker: TypeChecker, rawDestinationType: Type, rawSourceType: Type) => {
+    (
+      checker: TypeChecker,
+      rawDestinationType: Type,
+      rawSourceType: Type,
+      sourceNode: TSESTree.Expression | undefined
+    ) => {
+      // eslint-disable-next-line functional/no-conditional-statements
+      if (isLiteral(sourceNode)) {
+        return "safe";
+      }
+
       const typePairs = assignableTypePairs(
         rawDestinationType,
         rawSourceType,
@@ -90,7 +101,7 @@ const noUnsafeMutableReadonlyAssignment = createRule({
         return !isUnsafe;
       });
 
-      return !allSafe;
+      return allSafe ? "safe" : "unsafe";
     }
   ),
   defaultOptions: [],
