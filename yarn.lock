@@ -3847,7 +3847,7 @@ type-check@^0.4.0, type-check@~0.4.0:
   dependencies:
     prelude-ls "^1.2.1"
 
-type-coverage-core@^2.25.1:
+type-coverage-core@^2.25.2:
   version "2.25.2"
   resolved "https://registry.yarnpkg.com/type-coverage-core/-/type-coverage-core-2.25.2.tgz#d71ce0dc28d4674aa6f8807c7a7dee82601ffcdc"
   integrity sha512-uf4us+EXtv2t5Uo+aJIOI588UW1epT4Sp7JxozfqbsBvOypd+VhcgnrSxm7Zndy4h3LBbzoXCCBzmI8oZ1u/Qw==
@@ -3858,13 +3858,13 @@ type-coverage-core@^2.25.1:
     tslib "1 || 2"
     tsutils "3"
 
-type-coverage@2.25.1:
-  version "2.25.1"
-  resolved "https://registry.yarnpkg.com/type-coverage/-/type-coverage-2.25.1.tgz#c4b502707635c235d529e267b732c3d5203edd3e"
-  integrity sha512-i7HbLSOFvxQDZxYhGMJDTeL70GBSpibFSfuDNFXzes0so2gl/Y9shkZzkA6v0wCxBWCTOr/nGaJGXGLXeymzlg==
+type-coverage@2.25.2:
+  version "2.25.2"
+  resolved "https://registry.yarnpkg.com/type-coverage/-/type-coverage-2.25.2.tgz#73453f7ccc3f35a7019708e6eee1ab9dd7c7d395"
+  integrity sha512-+RwY80TOXJs7jI1BBnMoqAxuibYxblLk5NJwQEFwUW02ZqkAHav4N1/OjAue8PHu3RaG1pxfNeeuzDmjCcjTNg==
   dependencies:
     minimist "1"
-    type-coverage-core "^2.25.1"
+    type-coverage-core "^2.25.2"
 
 type-detect@4.0.8:
   version "4.0.8"
