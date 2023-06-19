@@ -13,7 +13,7 @@
     "@types/eslint": "8.40.2",
     "@types/jest": "29.5.2",
     "codecov": "3.8.3",
-    "eslint": "8.42.0",
+    "eslint": "8.43.0",
     "eslint-config-prettier": "8.8.0",
     "eslint-config-typed-fp": "5.1.0",
     "eslint-plugin-functional": "5.0.8",
