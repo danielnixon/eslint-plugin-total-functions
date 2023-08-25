@@ -11,7 +11,7 @@
     "@stryker-mutator/jest-runner": "6.4.2",
     "@stryker-mutator/typescript-checker": "6.4.2",
     "@types/eslint": "8.44.2",
-    "@types/jest": "29.5.3",
+    "@types/jest": "29.5.4",
     "codecov": "3.8.3",
     "eslint": "8.47.0",
     "eslint-config-prettier": "8.10.0",
