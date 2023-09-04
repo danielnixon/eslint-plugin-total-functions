@@ -2925,7 +2925,7 @@ is-immutable-type@^1.2.9:
   dependencies:
     "@typescript-eslint/type-utils" "^5.55.0"
 
-is-immutable-type@^2.0.1:
+is-immutable-type@^2.0.0, is-immutable-type@^2.0.1:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/is-immutable-type/-/is-immutable-type-2.0.1.tgz#5a968a045689d5094d553802d2282a83cfa2ba13"
   integrity sha512-SNO0yWLzSN+oYb8adM4AvsPYSCqElmjcXUNemryDLo0r5M54oMs/6R4cvKLc9QtIs/nRuc3ahlgJoMdGfcHLwQ==
