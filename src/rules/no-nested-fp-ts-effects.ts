@@ -45,7 +45,7 @@ const noNestedFpTsEffects = createRule({
           effectType.effectTypeParameter !== undefined
         ) {
           const effectTypeParameterName = typeSymbolName(
-            effectType.effectTypeParameter
+            effectType.effectTypeParameter,
           );
           // eslint-disable-next-line functional/no-conditional-statements
           if (effectTypeParameterName === undefined) {
@@ -56,7 +56,7 @@ const noNestedFpTsEffects = createRule({
           const isNestedPromise = isThenableType(
             checker,
             tsNode,
-            effectType.effectTypeParameter
+            effectType.effectTypeParameter,
           );
 
           // eslint-disable-next-line functional/no-conditional-statements

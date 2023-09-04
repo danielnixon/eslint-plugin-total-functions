@@ -50,7 +50,7 @@ const noHiddenTypeAssertions = createRule({
     const checker = parserServices.program.getTypeChecker();
 
     const hasTypeNode = (
-      typeElement: TypeElement
+      typeElement: TypeElement,
     ): typeElement is TypeElement & { readonly type: TypeNode } => {
       // eslint-disable-next-line functional/no-try-statements
       try {
@@ -65,7 +65,7 @@ const noHiddenTypeAssertions = createRule({
 
     const explodeTypeNode = (
       type: TypeNode,
-      depth: number
+      depth: number,
       // eslint-disable-next-line sonarjs/cognitive-complexity
     ): readonly TypeNode[] => {
       // TODO write a test that exercises this
@@ -103,11 +103,11 @@ const noHiddenTypeAssertions = createRule({
 
     const parametersToTypeNodes = (
       parameters: NodeArray<ParameterDeclaration>,
-      depth: number
+      depth: number,
     ): readonly TypeNode[] => {
       return parameters
         .flatMap((parameter) =>
-          parameter.type !== undefined ? [parameter.type] : []
+          parameter.type !== undefined ? [parameter.type] : [],
         )
         .flatMap((parameter) => explodeTypeNode(parameter, depth));
     };
@@ -135,7 +135,7 @@ const noHiddenTypeAssertions = createRule({
         const typeParameters = callSignature.declaration.typeParameters;
         const parameters = parametersToTypeNodes(
           callSignature.declaration.parameters,
-          0
+          0,
         );
 
         const returnType = callSignature.declaration.type;
@@ -162,8 +162,8 @@ const noHiddenTypeAssertions = createRule({
                 isTypeReferenceNode(returnType) &&
                 returnType.typeName.kind === SyntaxKind.Identifier &&
                 returnType.typeName.text ===
-                  typeParameter.typeParameter.name.text
-            )
+                  typeParameter.typeParameter.name.text,
+            ),
           );
 
         // Of all the type parameters that appear in the return type,

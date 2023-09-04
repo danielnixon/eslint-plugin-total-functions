@@ -27,7 +27,7 @@ const noUnsafeTypeAssertion = createRule({
 
     const isUnsafe = (
       rawDestinationType: ts.Type,
-      rawSourceType: ts.Type
+      rawSourceType: ts.Type,
     ): boolean => {
       // eslint-disable-next-line functional/no-conditional-statements
       if (
@@ -42,7 +42,7 @@ const noUnsafeTypeAssertion = createRule({
     };
 
     const reportUnsafe = (
-      node: TSESTree.TSTypeAssertion | TSESTree.TSAsExpression
+      node: TSESTree.TSTypeAssertion | TSESTree.TSAsExpression,
       // eslint-disable-next-line functional/no-return-void
     ): void => {
       // The right hand side of the "as".

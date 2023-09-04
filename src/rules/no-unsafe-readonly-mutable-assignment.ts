@@ -37,7 +37,7 @@ const noUnsafeReadonlyMutableAssignment = createRule({
       checker: TypeChecker,
       rawDestinationType: Type,
       rawSourceType: Type,
-      sourceNode: TSESTree.Expression | undefined
+      sourceNode: TSESTree.Expression | undefined,
     ) => {
       // eslint-disable-next-line functional/no-conditional-statements
       if (isLiteral(sourceNode)) {
@@ -47,7 +47,7 @@ const noUnsafeReadonlyMutableAssignment = createRule({
       const typePairs = assignableTypePairs(
         rawDestinationType,
         rawSourceType,
-        checker
+        checker,
       );
 
       // TODO support config
@@ -84,12 +84,12 @@ const noUnsafeReadonlyMutableAssignment = createRule({
         const destinationImmutability = getTypeImmutability(
           checker,
           destinationType,
-          overrides
+          overrides,
         );
         const sourceImmutability = getTypeImmutability(
           checker,
           sourceType,
-          overrides
+          overrides,
         );
 
         const isUnsafe =
@@ -102,7 +102,7 @@ const noUnsafeReadonlyMutableAssignment = createRule({
       });
 
       return allSafe ? "safe" : "unsafe";
-    }
+    },
   ),
   defaultOptions: [],
 } as const);

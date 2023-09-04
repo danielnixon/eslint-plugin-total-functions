@@ -47,7 +47,7 @@ const noPartialUrlConstructor = createRule({
         }
 
         const objectNode = parserServices.esTreeNodeToTSNodeMap.get(
-          node.callee
+          node.callee,
         );
         const objectType = checker.getTypeAtLocation(objectNode);
 

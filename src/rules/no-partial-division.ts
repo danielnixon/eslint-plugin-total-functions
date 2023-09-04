@@ -51,7 +51,7 @@ const noPartialDivision = createRule({
       // eslint-disable-next-line functional/no-conditional-statements
       if (type.isIntersection()) {
         const numberLiteralParts = intersectionTypeParts(type).filter(
-          (t) => isBigIntLiteral(t) || t.isNumberLiteral()
+          (t) => isBigIntLiteral(t) || t.isNumberLiteral(),
         );
         return (
           numberLiteralParts.length > 0 &&
@@ -92,7 +92,7 @@ const noPartialDivision = createRule({
         // eslint-disable-next-line functional/no-conditional-statements
         if (node.right.type === AST_NODE_TYPES.Identifier) {
           const denominatorNode = parserServices.esTreeNodeToTSNodeMap.get(
-            node.right
+            node.right,
           );
           const denominatorNodeType =
             checker.getTypeAtLocation(denominatorNode);

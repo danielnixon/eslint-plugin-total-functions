@@ -51,7 +51,7 @@ const noPartialArrayReduce = createRule({
         }
 
         const objectType = checker.getTypeAtLocation(
-          parserServices.esTreeNodeToTSNodeMap.get(node.callee.object)
+          parserServices.esTreeNodeToTSNodeMap.get(node.callee.object),
         );
 
         const typeParts = unionTypeParts(objectType);
@@ -63,7 +63,7 @@ const noPartialArrayReduce = createRule({
             (t) =>
               checker.isArrayType(t) ||
               isTupleType(t) ||
-              isTupleTypeReference(t)
+              isTupleTypeReference(t),
           )
         ) {
           return;
@@ -111,11 +111,11 @@ const noPartialArrayReduce = createRule({
             node.callee.computed &&
             unionTypeParts(
               checker.getTypeAtLocation(
-                parserServices.esTreeNodeToTSNodeMap.get(node.callee.property)
-              )
+                parserServices.esTreeNodeToTSNodeMap.get(node.callee.property),
+              ),
             ).some(
               (type) =>
-                type.isStringLiteral() && unsafeMethods.includes(type.value)
+                type.isStringLiteral() && unsafeMethods.includes(type.value),
             ));
 
         // eslint-disable-next-line functional/no-conditional-statements

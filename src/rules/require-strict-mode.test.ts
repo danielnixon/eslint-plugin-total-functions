@@ -29,7 +29,7 @@ strictRuleTester.run("require-strict-mode", rule, {
 
 // eslint-disable-next-line functional/prefer-immutable-types
 const nonStrictRuleTester = ruleTesterForTSConfig(
-  "./tsconfig.tests.non-strict.json"
+  "./tsconfig.tests.non-strict.json",
 );
 
 // eslint-disable-next-line functional/no-expression-statements
@@ -51,7 +51,7 @@ nonStrictRuleTester.run("require-strict-mode", rule, {
 
 // eslint-disable-next-line functional/prefer-immutable-types
 const nonNoUncheckedIndexedAccessRuleTester = ruleTesterForTSConfig(
-  "./tsconfig.tests.non-noUncheckedIndexedAccess.json"
+  "./tsconfig.tests.non-noUncheckedIndexedAccess.json",
 );
 
 // eslint-disable-next-line functional/no-expression-statements
@@ -73,7 +73,7 @@ nonNoUncheckedIndexedAccessRuleTester.run("require-strict-mode", rule, {
 
 // eslint-disable-next-line functional/prefer-immutable-types
 const strictFunctionTypesRuleTester = ruleTesterForTSConfig(
-  "./tsconfig.tests.non-strictFunctionTypes.json"
+  "./tsconfig.tests.non-strictFunctionTypes.json",
 );
 
 // eslint-disable-next-line functional/no-expression-statements

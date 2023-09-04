@@ -27,7 +27,7 @@ export type FpTsEffectType = {
 
 const fpTsEffectTypeParameter = (
   effectName: string,
-  effectType: Type
+  effectType: Type,
 ): Type | undefined => {
   // eslint-disable-next-line functional/no-conditional-statements
   if (effectName === "IO") {

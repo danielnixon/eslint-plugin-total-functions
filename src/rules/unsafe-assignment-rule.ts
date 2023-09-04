@@ -17,11 +17,11 @@ export const createNoUnsafeAssignmentRule =
       checker: TypeChecker,
       destinationType: Type,
       sourceType: Type,
-      sourceNode: TSESTree.Expression | undefined
-    ) => "safe" | "unsafe"
+      sourceNode: TSESTree.Expression | undefined,
+    ) => "safe" | "unsafe",
   ) =>
   (
-    context: Readonly<TSESLint.RuleContext<MessageId, readonly unknown[]>>
+    context: Readonly<TSESLint.RuleContext<MessageId, readonly unknown[]>>,
     // eslint-disable-next-line sonarjs/cognitive-complexity
   ): TSESLint.RuleListener => {
     const parserServices = ESLintUtils.getParserServices(context);
@@ -35,7 +35,7 @@ export const createNoUnsafeAssignmentRule =
       destinationType: Type,
       sourceType: Type,
       checker: TypeChecker,
-      parserServices: ParserServices
+      parserServices: ParserServices,
     ): "safe" | "unsafe" | "unknown" => {
       const safeArrayMethods: readonly string[] = [
         "filter",
@@ -62,9 +62,9 @@ export const createNoUnsafeAssignmentRule =
         checker.isArrayType(
           checker.getTypeAtLocation(
             parserServices.esTreeNodeToTSNodeMap.get(
-              sourceExpression.callee.object
-            )
-          )
+              sourceExpression.callee.object,
+            ),
+          ),
         ) &&
         // and the method being called is an identifier that we can match on like "concat"
         sourceExpression.callee.property.type === AST_NODE_TYPES.Identifier &&
@@ -79,7 +79,7 @@ export const createNoUnsafeAssignmentRule =
             checker,
             destinationIndexType,
             sourceIndexType,
-            undefined
+            undefined,
           )
         : "unknown";
     };
@@ -105,10 +105,10 @@ export const createNoUnsafeAssignmentRule =
           }
 
           const leftTsNode = parserServices.esTreeNodeToTSNodeMap.get(
-            declaration.id
+            declaration.id,
           );
           const rightTsNode = parserServices.esTreeNodeToTSNodeMap.get(
-            declaration.init
+            declaration.init,
           );
 
           const destinationType = checker.getTypeAtLocation(leftTsNode);
@@ -119,7 +119,7 @@ export const createNoUnsafeAssignmentRule =
             destinationType,
             sourceType,
             checker,
-            parserServices
+            parserServices,
           );
 
           // eslint-disable-next-line functional/no-conditional-statements
@@ -134,7 +134,7 @@ export const createNoUnsafeAssignmentRule =
               checker,
               destinationType,
               sourceType,
-              declaration.init
+              declaration.init,
             ) === "unsafe"
           ) {
             // eslint-disable-next-line functional/no-expression-statements
@@ -157,7 +157,7 @@ export const createNoUnsafeAssignmentRule =
       AssignmentExpression: (node): void => {
         const leftTsNode = parserServices.esTreeNodeToTSNodeMap.get(node.left);
         const rightTsNode = parserServices.esTreeNodeToTSNodeMap.get(
-          node.right
+          node.right,
         );
 
         const destinationType = checker.getTypeAtLocation(leftTsNode);
@@ -168,7 +168,7 @@ export const createNoUnsafeAssignmentRule =
           destinationType,
           sourceType,
           checker,
-          parserServices
+          parserServices,
         );
 
         // eslint-disable-next-line functional/no-conditional-statements
@@ -183,7 +183,7 @@ export const createNoUnsafeAssignmentRule =
             checker,
             destinationType,
             sourceType,
-            node.right
+            node.right,
           ) === "unsafe"
         ) {
           // eslint-disable-next-line functional/no-expression-statements
@@ -229,7 +229,7 @@ export const createNoUnsafeAssignmentRule =
           destinationType,
           sourceType,
           checker,
-          parserServices
+          parserServices,
         );
 
         // eslint-disable-next-line functional/no-conditional-statements
@@ -244,7 +244,7 @@ export const createNoUnsafeAssignmentRule =
             checker,
             destinationType,
             sourceType,
-            node.argument
+            node.argument,
           ) === "unsafe"
         ) {
           // eslint-disable-next-line functional/no-expression-statements
@@ -291,7 +291,7 @@ export const createNoUnsafeAssignmentRule =
           destinationType,
           sourceType,
           checker,
-          parserServices
+          parserServices,
         );
 
         // eslint-disable-next-line functional/no-conditional-statements
@@ -306,7 +306,7 @@ export const createNoUnsafeAssignmentRule =
             checker,
             destinationType,
             sourceType,
-            node.argument
+            node.argument,
           ) === "unsafe"
         ) {
           // eslint-disable-next-line functional/no-expression-statements
@@ -332,7 +332,7 @@ export const createNoUnsafeAssignmentRule =
         }
 
         const destinationNode = parserServices.esTreeNodeToTSNodeMap.get(
-          node.returnType.typeAnnotation
+          node.returnType.typeAnnotation,
         );
         const destinationType = checker.getTypeAtLocation(destinationNode);
         const sourceNode = parserServices.esTreeNodeToTSNodeMap.get(node.body);
@@ -346,7 +346,7 @@ export const createNoUnsafeAssignmentRule =
                 destinationType,
                 sourceType,
                 checker,
-                parserServices
+                parserServices,
               )
             : "unknown";
 
@@ -364,7 +364,7 @@ export const createNoUnsafeAssignmentRule =
             sourceType,
             node.body.type !== AST_NODE_TYPES.BlockStatement
               ? node.body
-              : undefined
+              : undefined,
           ) === "unsafe"
         ) {
           // eslint-disable-next-line functional/no-expression-statements
@@ -411,7 +411,7 @@ export const createNoUnsafeAssignmentRule =
                   destinationType,
                   sourceType,
                   checker,
-                  parserServices
+                  parserServices,
                 );
 
           // eslint-disable-next-line functional/no-conditional-statements
@@ -426,7 +426,7 @@ export const createNoUnsafeAssignmentRule =
               checker,
               destinationType,
               sourceType,
-              argument
+              argument,
             ) === "unsafe"
           ) {
             // eslint-disable-next-line functional/no-expression-statements

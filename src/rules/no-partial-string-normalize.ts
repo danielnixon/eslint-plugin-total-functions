@@ -40,7 +40,7 @@ const noPartialStringNormalize = createRule({
         }
 
         const objectType = checker.getTypeAtLocation(
-          parserServices.esTreeNodeToTSNodeMap.get(node.callee.object)
+          parserServices.esTreeNodeToTSNodeMap.get(node.callee.object),
         );
 
         // We only care if this call is on a string object.
@@ -73,10 +73,10 @@ const noPartialStringNormalize = createRule({
             node.callee.computed &&
             unionTypeParts(
               checker.getTypeAtLocation(
-                parserServices.esTreeNodeToTSNodeMap.get(node.callee.property)
-              )
+                parserServices.esTreeNodeToTSNodeMap.get(node.callee.property),
+              ),
             ).some(
-              (type) => type.isStringLiteral() && type.value === "normalize"
+              (type) => type.isStringLiteral() && type.value === "normalize",
             ));
 
         // We only care if this call is to the normalize method.
@@ -118,12 +118,12 @@ const noPartialStringNormalize = createRule({
           argument.type === AST_NODE_TYPES.Identifier &&
           unionTypeParts(
             checker.getTypeAtLocation(
-              parserServices.esTreeNodeToTSNodeMap.get(argument)
-            )
+              parserServices.esTreeNodeToTSNodeMap.get(argument),
+            ),
           ).every(
             (type) =>
               (type.isStringLiteral() && safeValues.includes(type.value)) ||
-              isTypeFlagSet(type, TypeFlags.Undefined)
+              isTypeFlagSet(type, TypeFlags.Undefined),
           )
         ) {
           return;

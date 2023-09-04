@@ -9,7 +9,7 @@ import { Type, TypeChecker } from "typescript";
 
 export const createRule = ESLintUtils.RuleCreator(
   // eslint-disable-next-line functional/functional-parameters
-  () => "https://github.com/danielnixon/eslint-plugin-total-functions"
+  () => "https://github.com/danielnixon/eslint-plugin-total-functions",
 );
 
 export const typeSymbolName = (type: Type): string | undefined => {
@@ -37,7 +37,7 @@ export type TypePair = {
 export const assignableTypePairs = (
   rawDestinationType: Type,
   rawSourceType: Type,
-  checker: TypeChecker
+  checker: TypeChecker,
 ): readonly TypePair[] => {
   const destinationTypeParts = unionTypeParts(rawDestinationType);
 
@@ -46,15 +46,15 @@ export const assignableTypePairs = (
   return sourceTypeParts.flatMap((sourceTypePart) =>
     destinationTypeParts
       .filter((destinationTypePart) =>
-        checker.isTypeAssignableTo(sourceTypePart, destinationTypePart)
+        checker.isTypeAssignableTo(sourceTypePart, destinationTypePart),
       )
       .map(
         (destinationTypePart) =>
           ({
             sourceType: sourceTypePart,
             destinationType: destinationTypePart,
-          } as const)
-      )
+          }) as const,
+      ),
   );
 };
 
