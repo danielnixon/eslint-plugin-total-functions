@@ -15,7 +15,7 @@
     "codecov": "3.8.3",
     "eslint": "8.48.0",
     "eslint-config-prettier": "9.0.0",
-    "eslint-config-typed-fp": "5.2.1",
+    "eslint-config-typed-fp": "5.3.0",
     "eslint-plugin-functional": "6.0.0",
     "eslint-plugin-jest": "27.2.3",
     "eslint-plugin-prettier": "5.0.0",
