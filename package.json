@@ -10,7 +10,7 @@
     "@stryker-mutator/core": "7.2.0",
     "@stryker-mutator/jest-runner": "7.2.0",
     "@stryker-mutator/typescript-checker": "7.2.0",
-    "@types/eslint": "8.44.3",
+    "@types/eslint": "8.44.4",
     "@types/jest": "29.5.5",
     "codecov": "3.8.3",
     "eslint": "8.51.0",
