@@ -2096,10 +2096,10 @@ eslint-config-typed-fp@5.4.0:
   resolved "https://registry.yarnpkg.com/eslint-config-typed-fp/-/eslint-config-typed-fp-5.4.0.tgz#737f13f3bdfa417954c782d0c9749f4a37ff9575"
   integrity sha512-jvZcj+7CEYTqjET5HgpammnNE6LiyoCfRw/rPr324jaWvwmYoxBrEMgQVlmZk5vQQamNbs65nOqpqJWSrdgC/w==
 
-eslint-plugin-functional@6.0.0:
-  version "6.0.0"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-functional/-/eslint-plugin-functional-6.0.0.tgz#37c32dd78443f156bb0b45febaa5d19f596cd7e7"
-  integrity sha512-jOUHUMA9cN2CIpgPj93fW1vTI3c95ZYUHMPJxEJL4KAtFkJDcT/9/YlfyrLOBxHkAcwBhJ29HSmeC/CUnN0k3g==
+eslint-plugin-functional@6.0.1:
+  version "6.0.1"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-functional/-/eslint-plugin-functional-6.0.1.tgz#06d31e534201026918220164778df2e8e786dfd1"
+  integrity sha512-FDsPbSa3RKRh3i9re8ASmjN6iUfnSjyo++pfedL3S410/F4h0PwxBeNo+C2+qstHfW2XL4Gml8D4l6KMoQkJKg==
   dependencies:
     "@typescript-eslint/utils" "^6.2.0"
     deepmerge-ts "^5.1.0"
