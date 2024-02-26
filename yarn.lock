@@ -1197,10 +1197,10 @@
   dependencies:
     "@babel/types" "^7.3.0"
 
-"@types/eslint@8.56.2":
-  version "8.56.2"
-  resolved "https://registry.yarnpkg.com/@types/eslint/-/eslint-8.56.2.tgz#1c72a9b794aa26a8b94ad26d5b9aa51c8a6384bb"
-  integrity sha512-uQDwm1wFHmbBbCZCqAlq6Do9LYwByNZHWzXppSnay9SuwJ+VRbjkbLABer54kcPnMSlG6Fdiy2yaFXm/z9Z5gw==
+"@types/eslint@8.56.3":
+  version "8.56.3"
+  resolved "https://registry.yarnpkg.com/@types/eslint/-/eslint-8.56.3.tgz#d1f6b2303ac5ed53cb2cf59e0ab680cde1698f5f"
+  integrity sha512-PvSf1wfv2wJpVIFUMSb+i4PvqNYkB9Rkp9ZDO3oaWzq4SKhsQk4mrMBr3ZH06I0hKrVGLBacmgl8JM4WVjb9dg==
   dependencies:
     "@types/estree" "*"
     "@types/json-schema" "*"
