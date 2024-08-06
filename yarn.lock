@@ -1791,6 +1791,14 @@ caniuse-lite@^1.0.30001517:
   resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001525.tgz#d2e8fdec6116ffa36284ca2c33ef6d53612fe1c8"
   integrity sha512-/3z+wB4icFt3r0USMwxujAqRvaD/B7rvGTsKhbhSQErVrJvkZCLhgNLJxU8MevahQVH6hCU9FsHdNUFbiwmE7Q==
 
+chalk@4.1.2, chalk@^4.0.0, chalk@^4.0.2, chalk@^4.1.0:
+  version "4.1.2"
+  resolved "https://registry.yarnpkg.com/chalk/-/chalk-4.1.2.tgz#aac4e2b7734a740867aeb16bf02aad556a1e7a01"
+  integrity sha512-oKnbhFyRIXpUuez8iBMmyEa4nbj4IOQyuhc/wy9kY7/WVPcwIO9VA668Pu8RkO7+0G76SLROeyw9CpQ061i4mA==
+  dependencies:
+    ansi-styles "^4.1.0"
+    supports-color "^7.1.0"
+
 chalk@^2.0.0, chalk@^2.4.2:
   version "2.4.2"
   resolved "https://registry.yarnpkg.com/chalk/-/chalk-2.4.2.tgz#cd42541677a54333cf541a49108c1432b44c9424"
@@ -1799,14 +1807,6 @@ chalk@^2.0.0, chalk@^2.4.2:
     ansi-styles "^3.2.1"
     escape-string-regexp "^1.0.5"
     supports-color "^5.3.0"
-
-chalk@^4.0.0, chalk@^4.0.2, chalk@^4.1.0:
-  version "4.1.2"
-  resolved "https://registry.yarnpkg.com/chalk/-/chalk-4.1.2.tgz#aac4e2b7734a740867aeb16bf02aad556a1e7a01"
-  integrity sha512-oKnbhFyRIXpUuez8iBMmyEa4nbj4IOQyuhc/wy9kY7/WVPcwIO9VA668Pu8RkO7+0G76SLROeyw9CpQ061i4mA==
-  dependencies:
-    ansi-styles "^4.1.0"
-    supports-color "^7.1.0"
 
 chalk@^5.3.0, chalk@~5.3.0:
   version "5.3.0"
@@ -4333,10 +4333,10 @@ type-check@^0.4.0, type-check@~0.4.0:
   dependencies:
     prelude-ls "^1.2.1"
 
-type-coverage-core@^2.28.1:
-  version "2.28.1"
-  resolved "https://registry.yarnpkg.com/type-coverage-core/-/type-coverage-core-2.28.1.tgz#047520fc969337c60935600c24d5d2c1c120cc1a"
-  integrity sha512-NniLJtLiDg0+dhrf/9ACGwi3OAhIfvd20f1CB0yxIUBMECwmJp7e7me3lM8djkrDBJtqSY+uXA6PRs+yv3HTnA==
+type-coverage-core@^2.29.1:
+  version "2.29.1"
+  resolved "https://registry.yarnpkg.com/type-coverage-core/-/type-coverage-core-2.29.1.tgz#f330b55060453c9e721c5f347375144cd709c8be"
+  integrity sha512-lonikLRWnejbW9qsjoUsqXxQ3c4D0LPHaY2fsN5YD78sHAL27AaIoWYOjtitSqmv5UCS+3tv4qYjnj56vUH5eQ==
   dependencies:
     fast-glob "3"
     minimatch "6 || 7 || 8 || 9"
@@ -4344,13 +4344,14 @@ type-coverage-core@^2.28.1:
     tslib "1 || 2"
     tsutils "3"
 
-type-coverage@2.28.2:
-  version "2.28.2"
-  resolved "https://registry.yarnpkg.com/type-coverage/-/type-coverage-2.28.2.tgz#de7bedc8ed745444f89e048771c5f4011dac6eb5"
-  integrity sha512-mTANnzAeuH7ldrg0fzPnhh+aCCSVAO7V7hlBoVg4XxuUtQyD3ogir/R7Z6Q7W0H1JREtDIY4I91SGHAgEPi6Bw==
+type-coverage@2.29.1:
+  version "2.29.1"
+  resolved "https://registry.yarnpkg.com/type-coverage/-/type-coverage-2.29.1.tgz#97eca964f46a25edec12aca154510ccb360d9575"
+  integrity sha512-hsS1UYDrSltiSqMHJQn5wRFJiAeSA1PItMgeszxBkBjZEbtCzzmAU9dQswR1k8z0/ewj2/SbYEldYRurxgmxhA==
   dependencies:
+    chalk "4.1.2"
     minimist "1"
-    type-coverage-core "^2.28.1"
+    type-coverage-core "^2.29.1"
 
 type-detect@4.0.8:
   version "4.0.8"
