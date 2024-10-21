@@ -13,7 +13,7 @@
     "@types/eslint": "8.56.11",
     "@types/jest": "29.5.12",
     "codecov": "3.8.3",
-    "eslint": "8.57.0",
+    "eslint": "9.13.0",
     "eslint-config-prettier": "9.1.0",
     "eslint-config-typed-fp": "5.4.0",
     "eslint-plugin-functional": "6.1.1",
@@ -36,7 +36,7 @@
     "tsutils": "^3.21.0"
   },
   "peerDependencies": {
-    "eslint": "^8.48.0",
+    "eslint": "^9.0.0",
     "typescript": "^5.2.2"
   },
   "scripts": {
